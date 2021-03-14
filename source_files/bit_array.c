@@ -17,7 +17,7 @@
 /********************** Macros Definitions **********************/
 
 #define MASK_ONLY_ONES 0xFFFFFFFFFFFFFFFF
-#define MAX_BITS 64
+#define NUM_OF_BITS 64
 
 /******************************* BitArraySetAll **********************/
 
@@ -39,7 +39,8 @@ bitsarr_ty BitArrayResetAll(bitsarr_ty bitarr)
 
 bitsarr_ty BitArraySetOn(bitsarr_ty bitarr, unsigned int bit_to_turn)
 {
-	assert(bit_to_turn < MAX_BITS);
+	assert(bit_to_turn < NUM_OF_BITS);
+	
 	bitarr |= (1UL << bit_to_turn);
 	return(bitarr);
 }
@@ -48,7 +49,8 @@ bitsarr_ty BitArraySetOn(bitsarr_ty bitarr, unsigned int bit_to_turn)
 
 bitsarr_ty BitArraySetOff(bitsarr_ty bitarr, unsigned int bit_to_turn)
 {
-	assert(bit_to_turn < MAX_BITS);
+	assert(bit_to_turn < NUM_OF_BITS);
+	
 	bitarr &= ~(1UL << bit_to_turn);
 	return(bitarr);
 }
@@ -58,7 +60,8 @@ bitsarr_ty BitArraySetOff(bitsarr_ty bitarr, unsigned int bit_to_turn)
 bitsarr_ty BitArraySetBit(bitsarr_ty bitarr, unsigned int bit_to_set, 
 												bit_state_ty new_state)
 {
-	assert(bit_to_set < MAX_BITS);
+	assert(bit_to_set < NUM_OF_BITS);
+	
 	bitarr |= (new_state << bit_to_set);
 	return(bitarr);
 }
@@ -76,7 +79,8 @@ bit_state_ty BitArrayGetVal(bitsarr_ty bitarr, unsigned int bit_to_read)
 
 bitsarr_ty BitArrayFlip(bitsarr_ty bitarr, unsigned int bit_to_flip)
 {
-	assert(bit_to_flip < MAX_BITS);
+	assert(bit_to_flip < NUM_OF_BITS);
+	
 	bitarr ^= (1UL << bit_to_flip);
 	return(bitarr);
 }
@@ -85,30 +89,28 @@ bitsarr_ty BitArrayFlip(bitsarr_ty bitarr, unsigned int bit_to_flip)
 
 bitsarr_ty BitArrayMirror(bitsarr_ty bitarr)
 {
-	size_t  num_of_bits = MAX_BITS; 
 	size_t curr_bit_index = 0; 	
 	bitsarr_ty mirrored_bitarr = 0; 
 	
-	for (curr_bit_index = 0; curr_bit_index < num_of_bits; ++curr_bit_index) 
+	for (curr_bit_index = 0; curr_bit_index < NUM_OF_BITS; ++curr_bit_index) 
 	{ 
 		if((bitarr & (1UL << curr_bit_index)))
 		{
-			mirrored_bitarr |= 1UL << ((num_of_bits - 1) - curr_bit_index); 
+			mirrored_bitarr |= 1UL << ((NUM_OF_BITS - 1) - curr_bit_index); 
 		}  
 	} 
 	
-	return mirrored_bitarr; 
+	return(mirrored_bitarr); 
 }
 	
 /******************************* BitArrayRotR **********************/
 
 bitsarr_ty BitArrayRotR(bitsarr_ty bitarr, unsigned int amount)
 {
-	size_t  num_of_bits = MAX_BITS; 
 	size_t curr_bit_index = 0; 	
 	bitsarr_ty rotated_bitarr = 0; 
 	
-	for (curr_bit_index = 0; curr_bit_index < num_of_bits; ++curr_bit_index) 
+	for (curr_bit_index = 0; curr_bit_index < NUM_OF_BITS; ++curr_bit_index) 
 	{ 
 		if((bitarr & (1UL << curr_bit_index)))
 		{
@@ -116,18 +118,17 @@ bitsarr_ty BitArrayRotR(bitsarr_ty bitarr, unsigned int amount)
 		}  
 	} 
 	
-	return rotated_bitarr; 
+	return(rotated_bitarr); 
 }
 
 /******************************* BitArrayRotL **********************/
 
 bitsarr_ty BitArrayRotL(bitsarr_ty bitarr, unsigned int amount)
 {
-	size_t  num_of_bits = MAX_BITS; 
 	size_t curr_bit_index = 0; 	
 	bitsarr_ty rotated_bitarr = 0; 
 	
-	for (curr_bit_index = 0; curr_bit_index < num_of_bits; ++curr_bit_index) 
+	for (curr_bit_index = 0; curr_bit_index < NUM_OF_BITS; ++curr_bit_index) 
 	{ 
 		if((bitarr & (1UL << curr_bit_index)))
 		{
@@ -135,7 +136,7 @@ bitsarr_ty BitArrayRotL(bitsarr_ty bitarr, unsigned int amount)
 		}  
 	} 
 	
-	return rotated_bitarr; 
+	return(rotated_bitarr); 
 }
 
 /******************************* BitArrayRot **********************/
@@ -143,12 +144,12 @@ bitsarr_ty BitArrayRotL(bitsarr_ty bitarr, unsigned int amount)
 bitsarr_ty BitArrayRot(bitsarr_ty bitarr, unsigned int amount, 
 														rotation_ty direction)
 {
-	size_t  num_of_bits = MAX_BITS; 
 	size_t curr_bit_index = 0; 	
 	bitsarr_ty rotated_bitarr = 0; 
+	
 	assert(LEFT == direction || RIGHT == direction);
 	
-	for (curr_bit_index = 0; curr_bit_index < num_of_bits; ++curr_bit_index) 
+	for (curr_bit_index = 0; curr_bit_index < NUM_OF_BITS; ++curr_bit_index) 
 	{ 
 		if((bitarr & (1UL << curr_bit_index)))
 		{
@@ -163,18 +164,41 @@ bitsarr_ty BitArrayRot(bitsarr_ty bitarr, unsigned int amount,
 		}  
 	} 
 	
-	return rotated_bitarr; 
+	return(rotated_bitarr); 
 }
 
 /******************************* BitArrayCountOn **********************/
 
-BitArrayCountOn(bitsarr_ty bitarr)
+unsigned int BitArrayCountOn(bitsarr_ty bitarr)
 {
-
+	size_t curr_bit_index = 0;
+	size_t set_bits_counter = 0; 
+	
+	for (curr_bit_index = 0; curr_bit_index < NUM_OF_BITS; ++curr_bit_index) 
+	{ 
+		if((bitarr & (1UL << curr_bit_index)))
+		{
+			++set_bits_counter; 
+		}  
+	} 
+	
+	return(set_bits_counter); 
 }
 
 /******************************* BitArrayCountOff **********************/
 
-BitArrayCountOff(bitsarr_ty bitarr)
+unsigned int BitArrayCountOff(bitsarr_ty bitarr)
 {
+	size_t curr_bit_index = 0;
+	size_t off_bits_counter = 0; 
+	
+	for (curr_bit_index = 0; curr_bit_index < NUM_OF_BITS; ++curr_bit_index) 
+	{ 
+		if(0 == (bitarr & (1UL << curr_bit_index)))
+		{
+			++off_bits_counter; 
+		}  
+	} 
+	
+	return(off_bits_counter); 
 }

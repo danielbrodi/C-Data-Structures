@@ -39,8 +39,13 @@ int main()
 	bitarr = BitArrayRotL(bitarr, 15);
 	PrintBits(bitarr);
 	printf("BitArrayRot:\n");
-	bitarr = BitArrayRot(bitarr, 15, RIGHT);
+	bitarr = BitArrayRot(bitarr, 35, RIGHT);
 	PrintBits(bitarr);
+	printf("BitArrayCountOn & BitArrayCountOff:\n");
+	printf("Bits on: %d | Bits off: %d --> for: \n", BitArrayCountOn(bitarr),
+	 												BitArrayCountOff(bitarr));
+	PrintBits(bitarr);
+	
 
 	return(0);
 }
