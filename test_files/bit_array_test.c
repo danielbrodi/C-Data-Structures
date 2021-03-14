@@ -24,7 +24,8 @@ int main()
 	printf("BitArraySetBit:\n");
 	bitarr = BitArraySetBit(bitarr, 6, ON);
 	PrintBits(bitarr);
-	
+	printf("BitArrayGetVal:\n");
+	printf("Index %d is: %d\n\n", 6, BitArrayGetVal(bitarr, ));
 	return(0);
 }
 

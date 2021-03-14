@@ -57,3 +57,11 @@ bitsarr_ty BitArraySetBit(bitsarr_ty bitarr, unsigned int bit_to_set,
 	bitarr |= (new_state << bit_to_set);
 	return(bitarr);
 }
+
+/******************************* BitArraySetBit **********************/
+
+bit_state_ty BitArrayGetVal(bitsarr_ty bitarr, unsigned int bit_to_read)
+{
+	int bit_status = bitarr & (1 << bit_to_read);
+	return(!!bit_status);
+}
