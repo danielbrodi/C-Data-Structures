@@ -38,7 +38,7 @@ bitsarr_ty BitArrayFlip(bitsarr_ty bitarr, unsigned int bit_to_flip);
 bitsarr_ty BitArrayMirror(bitsarr_ty bitarr);
 
 bitsarr_ty BitArrayRotR(bitsarr_ty bitarr, unsigned int amount);
-
+	
 bitsarr_ty BitArrayRotL(bitsarr_ty bitarr, unsigned int amount);
 
 bitsarr_ty BitArrayRot(bitsarr_ty bitarr, unsigned int amount, 

@@ -10,12 +10,14 @@
 /******************************* Inclusions **********************/
 
 #include <stdio.h>
+#include <assert.h>
 
 #include "../include/bit_array.h"
 
 /********************** Macros Definitions **********************/
 
 #define MASK_ONLY_ONES 0xFFFFFFFFFFFFFFFF
+#define MAX_BITS 64
 
 /******************************* BitArraySetAll **********************/
 
@@ -37,7 +39,8 @@ bitsarr_ty BitArrayResetAll(bitsarr_ty bitarr)
 
 bitsarr_ty BitArraySetOn(bitsarr_ty bitarr, unsigned int bit_to_turn)
 {
-	bitarr |= (1 << bit_to_turn);
+	assert(bit_to_turn < MAX_BITS);
+	bitarr |= (1UL << bit_to_turn);
 	return(bitarr);
 }
 
@@ -45,7 +48,8 @@ bitsarr_ty BitArraySetOn(bitsarr_ty bitarr, unsigned int bit_to_turn)
 
 bitsarr_ty BitArraySetOff(bitsarr_ty bitarr, unsigned int bit_to_turn)
 {
-	bitarr &= ~(1 << bit_to_turn);
+	assert(bit_to_turn < MAX_BITS);
+	bitarr &= ~(1UL << bit_to_turn);
 	return(bitarr);
 }
 
@@ -54,14 +58,123 @@ bitsarr_ty BitArraySetOff(bitsarr_ty bitarr, unsigned int bit_to_turn)
 bitsarr_ty BitArraySetBit(bitsarr_ty bitarr, unsigned int bit_to_set, 
 												bit_state_ty new_state)
 {
+	assert(bit_to_set < MAX_BITS);
 	bitarr |= (new_state << bit_to_set);
 	return(bitarr);
 }
 
-/******************************* BitArraySetBit **********************/
+/******************************* BitArrayGetVal **********************/
 
 bit_state_ty BitArrayGetVal(bitsarr_ty bitarr, unsigned int bit_to_read)
 {
-	int bit_status = bitarr & (1 << bit_to_read);
+	int bit_status = bitarr & (1UL << bit_to_read);
+	
 	return(!!bit_status);
+}
+
+/******************************* BitArrayFlip **********************/
+
+bitsarr_ty BitArrayFlip(bitsarr_ty bitarr, unsigned int bit_to_flip)
+{
+	assert(bit_to_flip < MAX_BITS);
+	bitarr ^= (1UL << bit_to_flip);
+	return(bitarr);
+}
+
+/******************************* BitArrayMirror **********************/
+
+bitsarr_ty BitArrayMirror(bitsarr_ty bitarr)
+{
+	size_t  num_of_bits = MAX_BITS; 
+	size_t curr_bit_index = 0; 	
+	bitsarr_ty mirrored_bitarr = 0; 
+	
+	for (curr_bit_index = 0; curr_bit_index < num_of_bits; ++curr_bit_index) 
+	{ 
+		if((bitarr & (1UL << curr_bit_index)))
+		{
+			mirrored_bitarr |= 1UL << ((num_of_bits - 1) - curr_bit_index); 
+		}  
+	} 
+	
+	return mirrored_bitarr; 
+}
+	
+/******************************* BitArrayRotR **********************/
+
+bitsarr_ty BitArrayRotR(bitsarr_ty bitarr, unsigned int amount)
+{
+	size_t  num_of_bits = MAX_BITS; 
+	size_t curr_bit_index = 0; 	
+	bitsarr_ty rotated_bitarr = 0; 
+	
+	for (curr_bit_index = 0; curr_bit_index < num_of_bits; ++curr_bit_index) 
+	{ 
+		if((bitarr & (1UL << curr_bit_index)))
+		{
+			rotated_bitarr |= 1UL << (curr_bit_index - amount); 
+		}  
+	} 
+	
+	return rotated_bitarr; 
+}
+
+/******************************* BitArrayRotL **********************/
+
+bitsarr_ty BitArrayRotL(bitsarr_ty bitarr, unsigned int amount)
+{
+	size_t  num_of_bits = MAX_BITS; 
+	size_t curr_bit_index = 0; 	
+	bitsarr_ty rotated_bitarr = 0; 
+	
+	for (curr_bit_index = 0; curr_bit_index < num_of_bits; ++curr_bit_index) 
+	{ 
+		if((bitarr & (1UL << curr_bit_index)))
+		{
+			rotated_bitarr |= 1UL << (curr_bit_index + amount); 
+		}  
+	} 
+	
+	return rotated_bitarr; 
+}
+
+/******************************* BitArrayRot **********************/
+
+bitsarr_ty BitArrayRot(bitsarr_ty bitarr, unsigned int amount, 
+														rotation_ty direction)
+{
+	size_t  num_of_bits = MAX_BITS; 
+	size_t curr_bit_index = 0; 	
+	bitsarr_ty rotated_bitarr = 0; 
+	assert(LEFT == direction || RIGHT == direction);
+	
+	for (curr_bit_index = 0; curr_bit_index < num_of_bits; ++curr_bit_index) 
+	{ 
+		if((bitarr & (1UL << curr_bit_index)))
+		{
+			if(LEFT == direction)
+			{
+				rotated_bitarr |= 1UL << (curr_bit_index + amount); 
+			}
+			else
+			{
+				rotated_bitarr |= 1UL << (curr_bit_index - amount); 
+			}
+		}  
+	} 
+	
+	return rotated_bitarr; 
+}
+
+/******************************* BitArrayCountOn **********************/
+
+BitArrayCountOn(bitsarr_ty bitarr)
+{
+
+}
+
+/******************************* BitArrayCountOff **********************/
+
+BitArrayCountOff(bitsarr_ty bitarr)
+{
 }
