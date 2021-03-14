@@ -15,7 +15,7 @@ typedef enum
 {
 	LEFT,
 	RIGHT
-} rotation_ty;
+} rotation_ty;	
 
 bitsarr_ty BitArraySetAll(bitsarr_ty bitarr);
 
