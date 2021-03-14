@@ -7,15 +7,24 @@ void PrintBits(bitsarr_ty bitarr);
 int main()
 {
 	bitsarr_ty bitarr = 0;
+	printf("Default:\n");
 	PrintBits(bitarr);
+	printf("BitArraySetAll:\n");
 	bitarr = BitArraySetAll(bitarr);
 	PrintBits(bitarr);
+	printf("BitArrayResetAll:\n");
 	bitarr = BitArrayResetAll(bitarr);
 	PrintBits(bitarr);
+	printf("BitArraySetOn:\n");
 	bitarr = BitArraySetOn(bitarr, 6);
 	PrintBits(bitarr);
+	printf("BitArraySetOff:\n");
 	bitarr = BitArraySetOff(bitarr, 6);
 	PrintBits(bitarr);
+	printf("BitArraySetBit:\n");
+	bitarr = BitArraySetBit(bitarr, 6, ON);
+	PrintBits(bitarr);
+	
 	return(0);
 }
 
