@@ -13,7 +13,6 @@
 #include "../include/bit_array.h"
 
 /********************** Macros Definitions **********************/
-
 #define MASK_ONLY_ONES 0xFFFFFFFFFFFFFFFF
 #define NUM_OF_BITS 64
 #define ASCII_VALUE_ZERO '0'
