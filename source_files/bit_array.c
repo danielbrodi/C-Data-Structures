@@ -3,7 +3,7 @@
 * Author: Daniel Brodsky
 * Description: 	Implementation of a bit array data structure.
 * Date: 15/03/2021
-* Version: 1.0 (Before Review)
+* Version: 1.0 (After Review)
 * Reviewer: Omer
 \***************************************************************************/
 
@@ -18,6 +18,21 @@
 #define NUM_OF_BITS 64
 #define ASCII_VALUE_ZERO '0'
 #define NULL_TERMINATOR '\0'
+
+/******************************* InitLUT **********************/
+
+int *InitLut()
+{
+	int bits_lut[256]; /* For 8 bit lookup */
+	size_t i = 0;
+	for (i = 0; i < 256; ++i)
+	{
+		bits_lut[i] = bits_lut[i / 2] + (i & 1);
+	}
+	
+	return(bits_lut);
+}
+
 
 /******************************* BitArraySetAll **********************/
 
@@ -230,4 +245,12 @@ unsigned int BitArrayCountOff(bitsarr_ty bitarr)
 	} 
 	
 	return(NUM_OF_BITS - set_bits_counter); 
+}
+
+/******************************* BitArrayCountLut **********************/
+							/****NOT READY****/
+unsigned int BitArrayCountLut(bitsarr_ty bitarr)
+{
+	InitLut();
+
 }
