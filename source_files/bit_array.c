@@ -3,7 +3,7 @@
 * Author: Daniel Brodsky
 * Description: 	Implementation of a bit array data structure.
 * Date: 15/03/2021
-* Version: 1.0 (After Review)
+* Version: 2.0 (After Review)
 * Reviewer: Omer
 \***************************************************************************/
 
@@ -32,10 +32,10 @@ typedef enum
 
 /********************** Forward Declreations & Globals **********************/
 static int bits_lut[256] = {0}; 
-static int mirrored_bits_lut[256] = {0};
+static unsigned char mirrored_bits_lut[256] = {0};
 
 unsigned int BitArrayCountOn(bitsarr_ty bitarr);
-bitsarr_ty BitArrayMirror(bitsarr_ty bitarr);
+bitsarr_ty ByteMirror(bitsarr_ty bitarr);
 
 bits_lut_status_ty bits_lut_status = NOT_INITIALIZED;
 mirrored_lut_status_ty mirrored_lut_status = NOT_SETTED;
@@ -72,7 +72,7 @@ void InitMirroredLUT()
 	
 	for (integer_value = 0; integer_value < 256; ++integer_value)
 	{
-		mirrored_bits_lut[integer_value] = BitArrayMirror(integer_value);
+		mirrored_bits_lut[integer_value] = ByteMirror(integer_value);
 	}
 }
 
@@ -184,6 +184,24 @@ bitsarr_ty BitArrayMirror(bitsarr_ty bitarr)
 		if((bitarr & (1UL << curr_bit_index)))
 		{
 			mirrored_bitarr |= 1UL << ((NUM_OF_BITS - 1) - curr_bit_index); 
+		}  
+	} 
+	
+	return(mirrored_bitarr); 
+}
+
+/******************************* ByteMirror **********************/
+
+bitsarr_ty ByteMirror(bitsarr_ty bitarr)
+{
+	size_t curr_bit_index = 0; 	
+	bitsarr_ty mirrored_bitarr = 0; 
+	
+	for (curr_bit_index = 0; curr_bit_index < 8; ++curr_bit_index) 
+	{ 
+		if((bitarr & (1 << curr_bit_index)))
+		{
+			mirrored_bitarr |= 1 << ((8 - 1) - curr_bit_index); 
 		}  
 	} 
 	

@@ -3,7 +3,7 @@
 * Author: Daniel Brodsky
 * Description: Tests of implementation functions of a bit array data structure.
 * Date: 15/03/2021
-* Version: 1.0 (After Review)
+* Version: 2.0 (After Review)
 * Reviewer: Omer
 \***************************************************************************/
 
