@@ -20,17 +20,17 @@
 #define NULL_TERMINATOR '\0'
 
 /******************************* InitLUT **********************/
+unsigned int CountBits(bitsarr_ty bitarr);
 
-int *InitLut()
+static int bits_lut[256]; /* For 8 bit lookup */
+
+void InitLut()
 {
-	int bits_lut[256]; /* For 8 bit lookup */
 	size_t i = 0;
-	for (i = 0; i < 256; ++i)
+	for (i = 0; i < 256; i++)
 	{
-		bits_lut[i] = bits_lut[i / 2] + (i & 1);
+		bits_lut[i] = (i & 1) + bits_lut[i / 2];
 	}
-	
-	return(bits_lut);
 }
 
 
@@ -38,7 +38,7 @@ int *InitLut()
 
 bitsarr_ty BitArraySetAll(bitsarr_ty bitarr)
 {
-	bitarr = MASK_ONLY_ONES;
+	bitarr |= ~(0);
 	return(bitarr);
 }
 
@@ -205,7 +205,7 @@ bitsarr_ty BitArrayRot(bitsarr_ty bitarr, unsigned int amount,
 
 /******************************* BitArrayCountOn **********************/
 
-unsigned int BitArrayCountOn(bitsarr_ty bitarr)
+unsigned int CountBits(bitsarr_ty bitarr)
 {
 	size_t curr_bit_index = 0;
 	size_t set_bits_counter = 0; 
@@ -248,9 +248,17 @@ unsigned int BitArrayCountOff(bitsarr_ty bitarr)
 }
 
 /******************************* BitArrayCountLut **********************/
-							/****NOT READY****/
-unsigned int BitArrayCountLut(bitsarr_ty bitarr)
+unsigned int BitArrayCountOn(bitsarr_ty bitarr)
 {
+	unsigned int set_bits_counter = 0;
 	InitLut();
-
+	set_bits_counter = bits_lut[bitarr & 0xff] + 
+	bits_lut[(bitarr >> 8) & 0xff] + 
+	bits_lut[(bitarr >> 16) & 0xff] +
+	bits_lut[(bitarr >> 24) & 0xff] + 
+	bits_lut[(bitarr >> 32) & 0xff] + 
+	bits_lut[(bitarr >> 40) & 0xff] + 
+	bits_lut[(bitarr >> 48) & 0xff] + 
+	bits_lut[bitarr >> 56];
+	return (set_bits_counter);
 }

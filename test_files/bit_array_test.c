@@ -28,13 +28,13 @@ int main()
 	bitarr = BitArrayResetAll(bitarr);
 	PrintBits(bitarr);
 	printf("BitArraySetOn:\n");
-	bitarr = BitArraySetOn(bitarr, 6);
+	bitarr = BitArraySetOn(bitarr, 0);
 	PrintBits(bitarr);
 	printf("BitArraySetOff:\n");
 	bitarr = BitArraySetOff(bitarr, 6);
 	PrintBits(bitarr);
 	printf("BitArraySetBit:\n");
-	bitarr = BitArraySetBit(bitarr, 7, ON);
+	bitarr = BitArraySetBit(bitarr, 1, ON);
 	PrintBits(bitarr);
 	printf("BitArrayGetVal:\n");
 	printf("Index %d is: %d\n\n", 7, BitArrayGetVal(bitarr, 7));
@@ -45,14 +45,14 @@ int main()
 	bitarr = BitArrayMirror(bitarr);
 	PrintBits(bitarr);
 	printf("BitArrayRotR:\n");
-	bitarr = BitArrayRotR(bitarr, 6);
+	bitarr = BitArrayRotR(bitarr, 8);
 	PrintBits(bitarr);
 	printf("BitArrayRotL:\n");
-	bitarr = BitArrayRotL(bitarr, 15);
+	bitarr = BitArrayRotL(bitarr, 2);
 	PrintBits(bitarr);
-	printf("BitArrayRot:\n");
-	bitarr = BitArrayRot(bitarr, 35, RIGHT);
-	PrintBits(bitarr);
+/*	printf("BitArrayRot:\n");*/
+/*	bitarr = BitArrayRot(bitarr, 35, RIGHT);*/
+/*	PrintBits(bitarr);*/
 	printf("BitArrayCountOn & BitArrayCountOff:\n");
 	printf("Bits on: %d | Bits off: %d --> for: \n", BitArrayCountOn(bitarr),
 	 												BitArrayCountOff(bitarr));
