@@ -17,6 +17,7 @@
 #define MASK_ONLY_ONES 0xFFFFFFFFFFFFFFFF
 #define NUM_OF_BITS 64
 #define ASCII_VALUE_ZERO '0'
+#define NULL_TERMINATOR '\0'
 
 /******************************* BitArraySetAll **********************/
 
@@ -50,7 +51,7 @@ char *BitArrayToString(bitsarr_ty bitarr, char *bit_string)
 		--bit_number;
 		bitarr >>= 1;
 	} 
-	*(str_runner+NUM_OF_BITS) = '\0';
+	*(str_runner+NUM_OF_BITS) = NULL_TERMINATOR;
 	
 	return(bit_string);
 }
@@ -196,10 +197,7 @@ unsigned int BitArrayCountOn(bitsarr_ty bitarr)
 	
 	for (curr_bit_index = 0; curr_bit_index < NUM_OF_BITS; ++curr_bit_index) 
 	{ 
-		if((bitarr & (1UL << curr_bit_index)))
-		{
-			++set_bits_counter; 
-		}  
+		set_bits_counter += !!(bitarr & (1UL << curr_bit_index));  
 	} 
 	
 	return(set_bits_counter); 
@@ -210,15 +208,12 @@ unsigned int BitArrayCountOn(bitsarr_ty bitarr)
 unsigned int BitArrayCountOff(bitsarr_ty bitarr)
 {
 	size_t curr_bit_index = 0;
-	size_t off_bits_counter = 0; 
+	size_t set_bits_counter = 0; 
 	
 	for (curr_bit_index = 0; curr_bit_index < NUM_OF_BITS; ++curr_bit_index) 
 	{ 
-		if(0 == (bitarr & (1UL << curr_bit_index)))
-		{
-			++off_bits_counter; 
-		}  
+			set_bits_counter += !!(bitarr & (1UL << curr_bit_index)); 
 	} 
 	
-	return(off_bits_counter); 
+	return(NUM_OF_BITS - set_bits_counter); 
 }
