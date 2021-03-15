@@ -12,16 +12,24 @@
 
 #include "../include/bit_array.h"
 
-/********************** Macros Definitions **********************/
+/********************** Macros & Enums Definitions **********************/
 #define MASK_ONLY_ONES 0xFFFFFFFFFFFFFFFF
 #define NUM_OF_BITS 64
 #define ASCII_VALUE_ZERO '0'
 #define NULL_TERMINATOR '\0'
 
-/********************** Forward Declreations **********************/
+typedef enum
+{
+	NOT_INITIALIZED,
+	INITIALIZED
+} lut_status_ty;
+
+/********************** Forward Declreations & Globals **********************/
 static int bits_lut[256]; /* For 8 bit lookup */
 
 unsigned int CountBitsOn(bitsarr_ty bitarr);
+
+lut_status_ty lut_status = NOT_INITIALIZED;
 
 /******************************* InitLut **********************/
 
@@ -253,7 +261,11 @@ unsigned int BitArrayCountOn(bitsarr_ty bitarr)
 {
 	unsigned int set_bits_counter = 0;
 	
+	if (NOT_INITIALIZED == lut_status)
+	{
 	InitLut();
+	lut_status = INITIALIZED;
+	}
 	
 	set_bits_counter = bits_lut[bitarr & 0xff] + 
 	bits_lut[(bitarr >> 8) & 0xff] + 
