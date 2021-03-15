@@ -197,7 +197,14 @@ unsigned int BitArrayCountOn(bitsarr_ty bitarr)
 	
 	for (curr_bit_index = 0; curr_bit_index < NUM_OF_BITS; ++curr_bit_index) 
 	{ 
-		set_bits_counter += !!(bitarr & (1UL << curr_bit_index));  
+		set_bits_counter += !!(bitarr & (1UL << curr_bit_index));
+		
+		bitarr &= ~(1UL << curr_bit_index);
+		
+		if (0 == bitarr)
+		{
+			break;
+		}
 	} 
 	
 	return(set_bits_counter); 
@@ -212,7 +219,14 @@ unsigned int BitArrayCountOff(bitsarr_ty bitarr)
 	
 	for (curr_bit_index = 0; curr_bit_index < NUM_OF_BITS; ++curr_bit_index) 
 	{ 
-			set_bits_counter += !!(bitarr & (1UL << curr_bit_index)); 
+			set_bits_counter += !!(bitarr & (1UL << curr_bit_index));
+			 
+			bitarr &= ~(1UL << curr_bit_index);
+			
+			if (0 == bitarr)
+			{
+				break;
+			}
 	} 
 	
 	return(NUM_OF_BITS - set_bits_counter); 
