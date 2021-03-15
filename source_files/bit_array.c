@@ -2,7 +2,7 @@
 * File Name:  bit_array.c
 * Author: Daniel Brodsky
 * Description: 	Implementation of a bit array data structure.
-* Date: 14/03/2021
+* Date: 15/03/2021
 * Version: 1.0 (Before Review)
 * Reviewer: Omer
 \***************************************************************************/

@@ -1,3 +1,14 @@
+/****************************** File Header ******************************\
+* File Name:  bit_array_test.c
+* Author: Daniel Brodsky
+* Description: 	Tests of implementation functions of a bit array data structure.
+* Date: 15/03/2021
+* Version: 1.0 (Before Review)
+* Reviewer: Omer
+\***************************************************************************/
+
+/******************************* Inclusions **********************/
+
 #include <stdio.h> /* printf */
 
 #include "../include/bit_array.h"
@@ -17,18 +28,18 @@ int main()
 	bitarr = BitArrayResetAll(bitarr);
 	PrintBits(bitarr);
 	printf("BitArraySetOn:\n");
-	bitarr = BitArraySetOn(bitarr, 37);
+	bitarr = BitArraySetOn(bitarr, 6);
 	PrintBits(bitarr);
 	printf("BitArraySetOff:\n");
 	bitarr = BitArraySetOff(bitarr, 6);
 	PrintBits(bitarr);
 	printf("BitArraySetBit:\n");
-	bitarr = BitArraySetBit(bitarr, 6, ON);
+	bitarr = BitArraySetBit(bitarr, 7, ON);
 	PrintBits(bitarr);
 	printf("BitArrayGetVal:\n");
-	printf("Index %d is: %d\n\n", 6, BitArrayGetVal(bitarr, 10));
+	printf("Index %d is: %d\n\n", 7, BitArrayGetVal(bitarr, 7));
 	printf("BitArrayFlip:\n");
-	bitarr = BitArrayFlip(bitarr, 3);
+	bitarr = BitArrayFlip(bitarr, 15);
 	PrintBits(bitarr);
 	printf("BitArrayMirror:\n");
 	bitarr = BitArrayMirror(bitarr);
