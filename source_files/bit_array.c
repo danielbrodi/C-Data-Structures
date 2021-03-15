@@ -22,7 +22,7 @@
 
 bitsarr_ty BitArraySetAll(bitsarr_ty bitarr)
 {
-	bitarr |= MASK_ONLY_ONES;
+	bitarr = MASK_ONLY_ONES;
 	return(bitarr);
 }
 
