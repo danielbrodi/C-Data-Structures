@@ -11,11 +11,13 @@ typedef enum
 	ON
 } bit_state_ty;
 
+
 typedef enum
 {
 	LEFT,
 	RIGHT
 } rotation_ty;	
+
 
 bitsarr_ty BitArraySetAll(bitsarr_ty bitarr);
 
@@ -47,5 +49,9 @@ bitsarr_ty BitArrayRot(bitsarr_ty bitarr, unsigned int amount,
 unsigned int BitArrayCountOn(bitsarr_ty bitarr);
 
 unsigned int BitArrayCountOff(bitsarr_ty bitarr);
+
+unsigned int BitArrayCountOnLUT(bitsarr_ty bitarr);
+
+bitsarr_ty BitArrayMirrorLUT(bitsarr_ty bitarr);
 
 #endif	/* __BITARRAY_H__ */

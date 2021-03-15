@@ -22,29 +22,69 @@ typedef enum
 {
 	NOT_INITIALIZED,
 	INITIALIZED
-} lut_status_ty;
+} bits_lut_status_ty;
+
+typedef enum
+{
+	NOT_SETTED,
+	SETTED
+} mirrored_lut_status_ty;
 
 /********************** Forward Declreations & Globals **********************/
-static int bits_lut[256]; /* For 8 bit lookup */
+static int bits_lut[256] = {0}; 
+static int mirrored_bits_lut[256] = {0};
 
-unsigned int CountBitsOn(bitsarr_ty bitarr);
+unsigned int BitArrayCountOn(bitsarr_ty bitarr);
+bitsarr_ty BitArrayMirror(bitsarr_ty bitarr);
 
-lut_status_ty lut_status = NOT_INITIALIZED;
+bits_lut_status_ty bits_lut_status = NOT_INITIALIZED;
+mirrored_lut_status_ty mirrored_lut_status = NOT_SETTED;
 
-/******************************* InitLut **********************/
-
-void InitLut()
+/*******************************************************************
+ * Function: InitBitsLUT
+ * ----------------------------
+ *  Initializing a look up table
+ 	of 256 integers' bits.
+ *
+ *   returns: void 
+ */
+void InitBitsLUT()
 {
-	size_t i = 0;
+	size_t integer_value = 0;
 	
-	for (i = 0; i < 256; i++)
+	for (integer_value = 0; integer_value < 256; ++integer_value)
 	{
-		bits_lut[i] = CountBitsOn(i);
+		bits_lut[integer_value] = BitArrayCountOn(integer_value);
 	}
 }
 
-/******************************* BitArraySetAll **********************/
+/*******************************************************************
+ * Function: InitMirroredLUT
+ * ----------------------------
+ *  Initializing a look up table
+ 	of 256 integeres with reversed bits.
+ *
+ *   returns: void 
+ */
+void InitMirroredLUT()
+{
+	size_t integer_value = 0;
+	
+	for (integer_value = 0; integer_value < 256; ++integer_value)
+	{
+		mirrored_bits_lut[integer_value] = BitArrayMirror(integer_value);
+	}
+}
 
+/*******************************************************************
+ * Function: BitArraySetAll
+ * ----------------------------
+ * Sets all bits in a given variable to '1'.
+ *
+ * @bitsarr_ty bitarr: the value of a 8 bytes variable
+ *   
+ * returns: the new value
+ */
 bitsarr_ty BitArraySetAll(bitsarr_ty bitarr)
 {
 	bitarr |= ~(0);
@@ -106,8 +146,10 @@ bitsarr_ty BitArraySetBit(bitsarr_ty bitarr, unsigned int bit_to_set,
 												bit_state_ty new_state)
 {
 	assert(bit_to_set < NUM_OF_BITS);
+	assert(OFF == new_state || ON == new_state);
 	
-	bitarr |= (new_state << bit_to_set);
+	bitarr &= ~(1UL << bit_to_set);
+	bitarr |= ((bitsarr_ty)(new_state) << bit_to_set);
 	return(bitarr);
 }
 
@@ -154,6 +196,7 @@ bitsarr_ty BitArrayRotR(bitsarr_ty bitarr, unsigned int amount)
 {
 	size_t curr_bit_index = 0; 	
 	bitsarr_ty rotated_bitarr = 0; 
+	amount = amount % NUM_OF_BITS;
 	
 	for (curr_bit_index = 0; curr_bit_index < NUM_OF_BITS; ++curr_bit_index) 
 	{ 
@@ -172,6 +215,7 @@ bitsarr_ty BitArrayRotL(bitsarr_ty bitarr, unsigned int amount)
 {
 	size_t curr_bit_index = 0; 	
 	bitsarr_ty rotated_bitarr = 0; 
+	amount = amount % NUM_OF_BITS;
 	
 	for (curr_bit_index = 0; curr_bit_index < NUM_OF_BITS; ++curr_bit_index) 
 	{ 
@@ -191,6 +235,7 @@ bitsarr_ty BitArrayRot(bitsarr_ty bitarr, unsigned int amount,
 {
 	size_t curr_bit_index = 0; 	
 	bitsarr_ty rotated_bitarr = 0; 
+	amount = amount % NUM_OF_BITS;
 	
 	assert(LEFT == direction || RIGHT == direction);
 	
@@ -212,9 +257,9 @@ bitsarr_ty BitArrayRot(bitsarr_ty bitarr, unsigned int amount,
 	return(rotated_bitarr); 
 }
 
-/******************************* BitArrayCountOn **********************/
+/******************************* CountBitsOn **********************/
 
-unsigned int CountBitsOn(bitsarr_ty bitarr)
+unsigned int BitArrayCountOn(bitsarr_ty bitarr)
 {
 	size_t curr_bit_index = 0;
 	size_t set_bits_counter = 0; 
@@ -256,15 +301,16 @@ unsigned int BitArrayCountOff(bitsarr_ty bitarr)
 	return(NUM_OF_BITS - set_bits_counter); 
 }
 
-/******************************* BitArrayCountLut **********************/
-unsigned int BitArrayCountOn(bitsarr_ty bitarr)
+/******************************* BitArrayCountOn **********************/
+
+unsigned int BitArrayCountOnLUT(bitsarr_ty bitarr)
 {
 	unsigned int set_bits_counter = 0;
 	
-	if (NOT_INITIALIZED == lut_status)
+	if (NOT_INITIALIZED == bits_lut_status)
 	{
-	InitLut();
-	lut_status = INITIALIZED;
+	InitBitsLUT();
+	bits_lut_status = INITIALIZED;
 	}
 	
 	set_bits_counter = bits_lut[bitarr & 0xff] + 
@@ -277,4 +323,28 @@ unsigned int BitArrayCountOn(bitsarr_ty bitarr)
 	bits_lut[bitarr >> 56];
 	
 	return (set_bits_counter);
+}
+
+/******************************* BitArrayCountOn **********************/
+
+bitsarr_ty BitArrayMirrorLUT(bitsarr_ty bitarr)
+{
+	bitsarr_ty mirrored_bitarr = 0;
+	
+	if (NOT_SETTED == mirrored_lut_status)
+	{
+	InitMirroredLUT();
+	mirrored_lut_status = SETTED;
+	}
+	
+	mirrored_bitarr = (bitsarr_ty)mirrored_bits_lut[bitarr & 0xff] << 56 |
+        (bitsarr_ty)mirrored_bits_lut[(bitarr >> 8) & 0xff] << 48 |         
+        (bitsarr_ty)mirrored_bits_lut[(bitarr >> 16) & 0xff] << 40 |
+        (bitsarr_ty)mirrored_bits_lut[(bitarr >> 24) & 0xff] << 32 |         
+        (bitsarr_ty)mirrored_bits_lut[(bitarr >> 32) & 0xff] << 24 |
+        (bitsarr_ty)mirrored_bits_lut[(bitarr >> 40) & 0xff] << 16 |
+        (bitsarr_ty)mirrored_bits_lut[(bitarr >> 48) & 0xff] << 8 |            
+        (bitsarr_ty)mirrored_bits_lut[(bitarr >> 56) & 0xff];
+	
+	return (mirrored_bitarr);
 }
