@@ -19,20 +19,20 @@
 #define ASCII_VALUE_ZERO '0'
 #define NULL_TERMINATOR '\0'
 
-/******************************* InitLUT **********************/
-unsigned int CountBits(bitsarr_ty bitarr);
 
 static int bits_lut[256]; /* For 8 bit lookup */
+
+/******************************* InitLut **********************/
 
 void InitLut()
 {
 	size_t i = 0;
+	
 	for (i = 0; i < 256; i++)
 	{
 		bits_lut[i] = (i & 1) + bits_lut[i / 2];
 	}
 }
-
 
 /******************************* BitArraySetAll **********************/
 
