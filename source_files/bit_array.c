@@ -16,6 +16,7 @@
 
 #define MASK_ONLY_ONES 0xFFFFFFFFFFFFFFFF
 #define NUM_OF_BITS 64
+#define ASCII_VALUE_ZERO '0'
 
 /******************************* BitArraySetAll **********************/
 
@@ -38,18 +39,18 @@ bitsarr_ty BitArrayResetAll(bitsarr_ty bitarr)
 char *BitArrayToString(bitsarr_ty bitarr, char *bit_string)
 {
 	char *str_runner = bit_string;
-	size_t bit_number = 64;
+	size_t bit_number = NUM_OF_BITS;
 	size_t mask = 1;
 	
 	assert(bit_string);
 	
 	while(bit_number > 0) 
 	{
-	 	*(str_runner+bit_number-1) = (bitarr & mask) + '0';
+	 	*(str_runner + bit_number - 1) = (bitarr & mask) + ASCII_VALUE_ZERO;
 		--bit_number;
 		bitarr >>= 1;
 	} 
-	*(str_runner+64) = '\0';
+	*(str_runner+NUM_OF_BITS) = '\0';
 	
 	return(bit_string);
 }
