@@ -22,7 +22,7 @@
 /********************** Forward Declreations **********************/
 static int bits_lut[256]; /* For 8 bit lookup */
 
-unsigned int CountBits(bitsarr_ty bitarr);
+unsigned int CountBitsOn(bitsarr_ty bitarr);
 
 /******************************* InitLut **********************/
 
@@ -32,7 +32,7 @@ void InitLut()
 	
 	for (i = 0; i < 256; i++)
 	{
-		bits_lut[i] = CountBits(i);
+		bits_lut[i] = CountBitsOn(i);
 	}
 }
 
@@ -207,7 +207,7 @@ bitsarr_ty BitArrayRot(bitsarr_ty bitarr, unsigned int amount,
 
 /******************************* BitArrayCountOn **********************/
 
-unsigned int CountBits(bitsarr_ty bitarr)
+unsigned int CountBitsOn(bitsarr_ty bitarr)
 {
 	size_t curr_bit_index = 0;
 	size_t set_bits_counter = 0; 
@@ -253,7 +253,9 @@ unsigned int BitArrayCountOff(bitsarr_ty bitarr)
 unsigned int BitArrayCountOn(bitsarr_ty bitarr)
 {
 	unsigned int set_bits_counter = 0;
+	
 	InitLut();
+	
 	set_bits_counter = bits_lut[bitarr & 0xff] + 
 	bits_lut[(bitarr >> 8) & 0xff] + 
 	bits_lut[(bitarr >> 16) & 0xff] +
@@ -262,5 +264,6 @@ unsigned int BitArrayCountOn(bitsarr_ty bitarr)
 	bits_lut[(bitarr >> 40) & 0xff] + 
 	bits_lut[(bitarr >> 48) & 0xff] + 
 	bits_lut[bitarr >> 56];
+	
 	return (set_bits_counter);
 }
