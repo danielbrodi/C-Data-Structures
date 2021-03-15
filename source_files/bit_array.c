@@ -9,8 +9,7 @@
 
 /******************************* Inclusions **********************/
 
-#include <stdio.h>
-#include <assert.h>
+#include <assert.h> /* assert */
 
 #include "../include/bit_array.h"
 
@@ -33,6 +32,29 @@ bitsarr_ty BitArrayResetAll(bitsarr_ty bitarr)
 {
 	bitarr = 0;
 	return(bitarr);
+}
+
+/******************************* BitArrayToString **********************/
+
+char *BitArrayToString(bitsarr_ty bitarr, char *bit_string)
+{
+	char *str_runner = bit_string;
+	size_t bit_number = 0;
+	
+	assert(bit_string);
+	
+	*str_runner = ((bitarr+63) & 1UL) ? '1' : '0';
+	++str_runner;
+	
+	for (bit_number = NUM_OF_BITS - 1; bit_number > 0; --bit_number) 
+	{
+	 	*str_runner = ((bitarr >> bit_number) & 1UL) ? '1' : '0';
+		++str_runner;
+	} 
+	*str_runner = '\0';
+	
+	
+	return(bit_string);
 }
 
 /******************************* BitArraySetOn **********************/

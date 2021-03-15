@@ -6,6 +6,7 @@ void PrintBits(bitsarr_ty bitarr);
 
 int main()
 {
+	char bit_string[64] = {0};
 	bitsarr_ty bitarr = 0;
 	printf("Default:\n");
 	PrintBits(bitarr);
@@ -45,7 +46,9 @@ int main()
 	printf("Bits on: %d | Bits off: %d --> for: \n", BitArrayCountOn(bitarr),
 	 												BitArrayCountOff(bitarr));
 	PrintBits(bitarr);
-	
+	printf("BitArrayToString:\n");
+	BitArrayToString(bitarr, bit_string);
+	printf("%s\n\n", bit_string);
 
 	return(0);
 }
