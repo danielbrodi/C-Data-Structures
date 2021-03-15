@@ -6,7 +6,7 @@ void PrintBits(bitsarr_ty bitarr);
 
 int main()
 {
-	char bit_string[64] = {0};
+	char bit_string[65] = {0};
 	bitsarr_ty bitarr = 0;
 	printf("Default:\n");
 	PrintBits(bitarr);

@@ -3,12 +3,11 @@
 * Author: Daniel Brodsky
 * Description: 	Implementation of a bit array data structure.
 * Date: 14/03/2021
-* Version: Beta
+* Version: 1.0 (Before Review)
 * Reviewer: Omer
 \***************************************************************************/
 
 /******************************* Inclusions **********************/
-
 #include <assert.h> /* assert */
 
 #include "../include/bit_array.h"
@@ -39,20 +38,18 @@ bitsarr_ty BitArrayResetAll(bitsarr_ty bitarr)
 char *BitArrayToString(bitsarr_ty bitarr, char *bit_string)
 {
 	char *str_runner = bit_string;
-	size_t bit_number = 0;
+	size_t bit_number = 64;
+	size_t mask = 1;
 	
 	assert(bit_string);
 	
-	*str_runner = ((bitarr+63) & 1UL) ? '1' : '0';
-	++str_runner;
-	
-	for (bit_number = NUM_OF_BITS - 1; bit_number > 0; --bit_number) 
+	while(bit_number > 0) 
 	{
-	 	*str_runner = ((bitarr >> bit_number) & 1UL) ? '1' : '0';
-		++str_runner;
+	 	*(str_runner+bit_number-1) = (bitarr & mask) + '0';
+		--bit_number;
+		bitarr >>= 1;
 	} 
-	*str_runner = '\0';
-	
+	*(str_runner+64) = '\0';
 	
 	return(bit_string);
 }
