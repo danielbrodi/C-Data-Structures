@@ -64,7 +64,7 @@ boolean_ty IsEmpty(const stack_ty *stack)
  * Function: Pop
  * ----------------------------
  * Removes top element 		
-   undefined if the stack is empty
+   undefined if the stack is empty.
  */
 void Pop(stack_ty *stack)
 {
