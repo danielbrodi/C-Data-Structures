@@ -1,6 +1,19 @@
+/****************************** File Header ***********************************\
+* File Name:  stack_test.c
+* Author: Daniel Brodsky
+* Description: 	Tests of a stack's data structure functions.
+* Date: 16/03/2021
+* Version: 1.0 (Before Review)
+* Reviewer: Danel
+\******************************************************************************/
+
+/********************************** Inclusions ********************************/
+
 #include <stdio.h> /* printf */
 
 #include "../include/stack.h"
+
+/******************************* Main Function ********************************/
 
 int main()
 {
