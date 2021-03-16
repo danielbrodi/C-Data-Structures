@@ -92,8 +92,9 @@ void *Peek(const stack_ty *stack)
  */
 void Push(stack_ty *stack, void *element)
 {
+	size_t is_full = (0 != ((stack->max_size) - ((stack->top)+1)));
 	assert(stack);
-	assert(0 != GetStackSize(stack));
+	assert(is_full);
 	
 	stack->items[++stack->top] = element;
 }
@@ -101,15 +102,15 @@ void Push(stack_ty *stack, void *element)
 /*******************************************************************************
  * Function: GetStackSize
  * ----------------------------
- *  Returns available space in the size.
+ *  Returns the used space in the size.
  *
- *   returns: size_t the available space 
+ *   returns: size_t the used space 
  */
 size_t GetStackSize(const stack_ty *stack)
 {
 	assert(stack);
 	
-	return ((stack->max_size) - ((stack->top)+1));
+	return (stack -> top + 1);
 }
 
 /*******************************************************************************

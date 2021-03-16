@@ -21,10 +21,10 @@ int main()
  
     Push(new_stack, (void *)1);
     Push(new_stack, (void *)2);
-    Push(new_stack, (void *)3);
+    Push(new_stack, (void *)4);
  
     printf("The top element is %ld\n", (size_t)Peek(new_stack));
-    printf("Available space in the stack: %ld\n", GetStackSize(new_stack));
+    printf("Used space on the stack: %ld\n", GetStackSize(new_stack));
  
     Pop(new_stack);
     Pop(new_stack);
