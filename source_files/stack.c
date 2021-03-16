@@ -8,6 +8,7 @@
 \******************************************************************************/
 
 /********************************** Inclusions ********************************/
+#include <stdio.h> /* fprintf */
 #include <stdlib.h> /* malloc, free */
 #include <assert.h> /* assert */
 
@@ -28,20 +29,28 @@ struct stack
  *
  *	@capicty - the desired size of the stack
  *
- *   returns: *new_stack 
+ *  returns: *new_stack or NULL if allocation failed
  */
 stack_ty *CreateStack(size_t capacity)
 {
 	stack_ty *new_stack = (stack_ty *)malloc(sizeof(stack_ty));
+	if (NULL == new_stack)
+	{
+		fprintf(stderr, "Failed to allocate memory\n");
+		return (NULL);
+	}
 	
 	assert(capacity > 0);
-	assert(new_stack);
 	
 	new_stack->max_size = capacity;
 	new_stack->top = -1;
-	new_stack->items = malloc(sizeof(void *) * capacity);
 	
-	assert(new_stack->items);
+	new_stack->items = malloc(sizeof(void *) * capacity);
+	if (NULL == new_stack->items)
+	{
+		fprintf(stderr, "Failed to allocate memory\n");
+		return (NULL);
+	}
 
 	return (new_stack);
 }
