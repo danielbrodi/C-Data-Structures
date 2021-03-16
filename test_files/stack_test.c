@@ -38,6 +38,7 @@ int main()
         printf("The stack is not empty\n");
     }
     
+    
     DestroyStack(new_stack);
  
     return 0;
