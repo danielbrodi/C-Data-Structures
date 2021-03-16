@@ -27,7 +27,7 @@ struct stack
  * ----------------------------
  *  Creates a fixed size stack of elements.
  *
- *	@capicty - the desired size of the stack
+ *	@capicty - the desired size of the stack.
  *
  *  returns: *new_stack or NULL if allocation failed
  */
