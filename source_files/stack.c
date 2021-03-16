@@ -60,10 +60,17 @@ boolean_ty IsEmpty(const stack_ty *stack)
 	return ((stack->top == -1UL));
 }
 
+/*******************************************************************************
+ * Function: Pop
+ * ----------------------------
+ * Removes top element 		
+   undefined if the stack is empty
+ *
+ */
 void Pop(stack_ty *stack)
 {
 	assert(stack);
-	assert(0 == IsEmpty(stack));
+	assert(!IsEmpty(stack));
 	
 	stack->items[stack->top--];
 }
@@ -78,6 +85,7 @@ void Pop(stack_ty *stack)
 void *Peek(const stack_ty *stack)
 {
 	assert(stack);
+	assert(!IsEmpty(stack));
 	
 	return(stack->items[stack->top]);
 }

@@ -10,6 +10,7 @@
 /********************************** Inclusions ********************************/
 
 #include <stdio.h> /* printf */
+#include <stdlib.h> /* free */
 
 #include "../include/stack.h"
 
@@ -21,7 +22,7 @@ int main()
  
     Push(new_stack, (void *)1);
     Push(new_stack, (void *)2);
-    Push(new_stack, (void *)3);
+    Push(new_stack, (void *)8);
  
     printf("The top element is %ld\n", (size_t)Peek(new_stack));
     printf("Used space on the stack: %ld\n", GetStackSize(new_stack));
@@ -29,13 +30,15 @@ int main()
     Pop(new_stack);
     Pop(new_stack);
     Pop(new_stack);
- 
+    
     if (IsEmpty(new_stack)) {
         printf("The stack is empty\n");
     }
     else {
         printf("The stack is not empty\n");
     }
+    
+    free(new_stack);
  
     return 0;
 }
