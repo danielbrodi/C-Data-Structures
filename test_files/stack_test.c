@@ -38,7 +38,7 @@ int main()
         printf("The stack is not empty\n");
     }
     
-    free(new_stack);
+    DestroyStack(new_stack);
  
     return 0;
 }

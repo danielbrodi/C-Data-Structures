@@ -49,6 +49,7 @@ stack_ty *CreateStack(size_t capacity)
 	if (NULL == new_stack->items)
 	{
 		fprintf(stderr, "Failed to allocate memory\n");
+		free(new_stack);
 		return (NULL);
 	}
 
@@ -153,6 +154,6 @@ size_t Capacity(const stack_ty *stack)
 void DestroyStack(stack_ty *stack)
 {
 	assert(stack);
-	
+	free(stack->items);
 	free(stack);
 }
