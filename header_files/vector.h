@@ -1,3 +1,6 @@
+#ifndef	__VECTOR_H__
+#define	__VECTOR_H__
+
 /****************************** File Header ***********************************\
 * File Name:  vector.h
 * Author: Daniel Brodsky
@@ -6,9 +9,6 @@
 * Version: Beta
 * Reviewer: Rostik
 \******************************************************************************/
-
-#ifndef	__VECTOR_H__
-#define	__VECTOR_H__
 
 #include <stddef.h>	/* size_t */
 
