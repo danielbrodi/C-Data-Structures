@@ -15,7 +15,7 @@
 #include "vector.h"
 
 
-/******************************************************************************/
+/**********************Forward Declarations************************************/
 
 void VectorCreateTest(vector_ty *vector);
 void VectorSizeTest(vector_ty *vector);
