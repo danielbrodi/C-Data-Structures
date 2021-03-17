@@ -10,7 +10,7 @@
 /********************************** Inclusions ********************************/
 #include <stdio.h> /* printf, fprintf */
 
-#include "../include/vector.h"
+#include "vector.h"
 
 
 /**********************Forward Declarations************************************/
