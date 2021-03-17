@@ -3,7 +3,7 @@
 * Author: Daniel Brodsky
 * Description: Dynamic Vector API's functions implementations.
 * Date: 17/03/2021
-* Version: 1.0 (Before Review)
+* Version: 2.0 (After Review)
 * Reviewer: Rostik
 \******************************************************************************/
 
@@ -93,8 +93,11 @@ status_ty VectorReserve(vector_ty *vector, size_t new_size)
 	if (NULL != resized_items)
 	{
 		vector->items = resized_items;
+		resized_items = NULL;
+		
 		vector->capacity = new_size;
 		vector->min_capacity = new_size;
+		
 		status = SUCCESS;
 	}
 
@@ -115,7 +118,7 @@ void *VectorGetElement(const vector_ty *vector, size_t index)
 /* Returns SUCCESS upon successful addition */
 status_ty VectorPushBack(vector_ty *vector, void *element)
 {
-	status_ty status = FAILURE;
+	status_ty status = SUCCESS;
 	size_t original_min_capacity = 0;
 	
 	assert(vector);
@@ -124,19 +127,11 @@ status_ty VectorPushBack(vector_ty *vector, void *element)
 	if (vector->capacity == vector->num_of_elements)
 	{
 		original_min_capacity = vector->min_capacity;
-		
 		status = VectorReserve(vector, vector->capacity * 2);
-		
-		vector->min_capacity = original_min_capacity;
-		
-		if(FAILURE != status)
-		{
-		    vector->items[vector->num_of_elements] = element;
-		    ++(vector->num_of_elements);
-		    status = SUCCESS;
-		}
+		vector->min_capacity = original_min_capacity;	
 	}
-	else
+	
+	if (SUCCESS == status)
 	{
 		vector->items[vector->num_of_elements] = element;
 		++(vector->num_of_elements);
@@ -161,7 +156,10 @@ status_ty VectorShrinkToFit(vector_ty *vector)
 	if (NULL != shrinked_items)
 	{
 		vector->items = shrinked_items;
+		shrinked_items = NULL;
+		
 		vector->capacity = vector->num_of_elements;
+		
 		status = SUCCESS;
 	}
 	
@@ -173,6 +171,7 @@ status_ty VectorShrinkToFit(vector_ty *vector)
 status_ty VectorPopBack(vector_ty *vector)
 {
 	status_ty status = FAILURE;
+	size_t original_min_capacity = 0;
 	
 	assert(vector);
 	
@@ -185,7 +184,9 @@ status_ty VectorPopBack(vector_ty *vector)
 		if(vector->num_of_elements * 4 <= vector->capacity && 
 									vector->min_capacity * 2 < vector->capacity)
 		{
+			original_min_capacity = vector->min_capacity;
 			status = VectorReserve(vector, vector->capacity / 2);
+			vector->min_capacity = original_min_capacity;
 		}
 	}
 	return(status);
