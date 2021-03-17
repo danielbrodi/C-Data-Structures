@@ -19,6 +19,7 @@ struct vector
 {
 	void **items;
 	size_t capacity;      
+	size_t min_capacity;
 	size_t num_of_elements;
 };
 
@@ -36,6 +37,7 @@ vector_ty *VectorCreate(size_t initial_size)
 	}
 	
 	new_vector->capacity = initial_size;
+	new_vector->min_capacity = initial_size;
 	new_vector->num_of_elements = 0;
 	
 	new_vector->items = malloc(sizeof(void *) * initial_size);
@@ -92,6 +94,7 @@ status_ty VectorReserve(vector_ty *vector, size_t new_size)
 	{
 		vector->items = resized_items;
 		vector->capacity = new_size;
+		vector->min_capacity = new_size;
 		status = SUCCESS;
 	}
 
@@ -113,13 +116,18 @@ void *VectorGetElement(const vector_ty *vector, size_t index)
 status_ty VectorPushBack(vector_ty *vector, void *element)
 {
 	status_ty status = FAILURE;
+	size_t original_min_capacity = 0;
 	
 	assert(vector);
 	assert(element);
 	
 	if (vector->capacity == vector->num_of_elements)
 	{
+		original_min_capacity = vector->min_capacity;
+		
 		status = VectorReserve(vector, vector->capacity * 2);
+		
+		vector->min_capacity = original_min_capacity;
 		
 		if(FAILURE != status)
 		{
@@ -174,7 +182,8 @@ status_ty VectorPopBack(vector_ty *vector)
 		--(vector->num_of_elements);
 		status = SUCCESS;
 		
-		if(vector->num_of_elements * 4 < vector->capacity)
+		if(vector->num_of_elements * 4 <= vector->capacity && 
+									vector->min_capacity * 2 < vector->capacity)
 		{
 			status = VectorReserve(vector, vector->capacity / 2);
 		}

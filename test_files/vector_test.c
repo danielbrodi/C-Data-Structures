@@ -14,6 +14,17 @@
 
 #include "../include/vector.h"
 
+
+/******************************************************************************/
+
+/*void VectorCreateTest();*/
+/*void VectorDestroyTest();*/
+/*void VectorSize();*/
+/*void VectorCapacity();*/
+/*void VectorPushBack();*/
+/*void VectorGetElement();*/
+/*void VectorSetElement();*/
+
 /************************************Main Function*****************************/
 
 int main()	
@@ -59,5 +70,4 @@ int main()
 
 	return 0;
 }
-
 
