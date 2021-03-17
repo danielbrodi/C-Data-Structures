@@ -159,6 +159,32 @@ status_ty VectorShrinkToFit(vector_ty *vector)
 /* Returns SUCCESS upon successful deletion */
 status_ty VectorPopBack(vector_ty *vector)
 {
+	status_ty status = FAILURE;
+	
+	assert(vector);
+	
+	if(vector->num_of_elements > 0)
+	{
+		vector->items[vector->num_of_elements - 1] = NULL;
+		vector->items --;
+		status = SUCCESS;
+		
+		if(vector->num_of_elements * 4 < vector->capacity)
+		{
+			status = VectorReserve(vector, vector->capacity / 2);
+		}
 
+	return (status);
+}
+/*******************************************************************************
+/* Sets an element */
+/* Behavior is undefined for out of bounds indeces */
+void VectorSetElement(vector_ty *vector, size_t index, void *element)
+{
+	assert(vector);
+	assert(0 <= index < vector->num_of_elements);
+	assert(element);
+	
+	vector->items[index] = element;
 
 }
