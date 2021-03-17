@@ -6,7 +6,7 @@
 * Author: Daniel Brodsky
 * Description: Dynamic Vector data structure API overview.
 * Date: 17/03/2021
-* Version: Beta
+* Version: 1.0
 * Reviewer: Rostik
 \******************************************************************************/
 

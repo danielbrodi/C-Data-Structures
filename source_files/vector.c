@@ -3,13 +3,13 @@
 * Author: Daniel Brodsky
 * Description: Dynamic Vector API's functions implementations.
 * Date: 17/03/2021
-* Version: 2.0 (After Review)
+* Version: 3.0 (After group review)
 * Reviewer: Rostik
 \******************************************************************************/
 
 /********************************** Inclusions ********************************/
 #include <stdio.h> /* fprintf */
-#include <stdlib.h> /* malloc, free */
+#include <stdlib.h> /* malloc, realloc, free */
 #include <assert.h> /* assert */
 
 #include "vector.h"
@@ -20,14 +20,14 @@ struct vector
 	void **items;
 	size_t capacity;      
 	size_t min_capacity;
-	size_t num_of_elements;
+	size_t size;
 };
 
 /************************Functions Implementations*****************************/
 
 /******************************************************************************/
-/* Creates a new vector of size initial_size */
-vector_ty *VectorCreate(size_t initial_size)
+/* Creates a new vector of size initial_capacity */
+vector_ty *VectorCreate(size_t initial_capacity)
 {   
     vector_ty *new_vector = (vector_ty *)malloc(sizeof(vector_ty));
 	if (NULL == new_vector)
@@ -36,11 +36,11 @@ vector_ty *VectorCreate(size_t initial_size)
 		return(NULL);
 	}
 	
-	new_vector->capacity = initial_size;
-	new_vector->min_capacity = initial_size;
-	new_vector->num_of_elements = 0;
+	new_vector->capacity = initial_capacity;
+	new_vector->min_capacity = initial_capacity;
+	new_vector->size = 0;
 	
-	new_vector->items = malloc(sizeof(void *) * initial_size);
+	new_vector->items = malloc(sizeof(void *) * initial_capacity);
 	if (NULL == new_vector->items)
 	{
 		fprintf(stderr, "Failed to allocate memory\n");
@@ -68,7 +68,7 @@ size_t VectorSize(const vector_ty *vector)
 {
 	assert(vector);
 	
-	return(vector->num_of_elements);
+	return(vector->size);
 }
 /******************************************************************************/
 /* Returns the current capacity (max size) of the vector */
@@ -79,24 +79,29 @@ size_t VectorCapacity(const vector_ty *vector)
 	return(vector->capacity);
 }
 /******************************************************************************/
-/* Resizes the vector to new_size */
+/* Resizes the vector to new_capacity */
 /* Returns SUCCESS upon successful resizing */
 /* Note: shrinking the vector may delete previous elements */
-status_ty VectorReserve(vector_ty *vector, size_t new_size)
+status_ty VectorReserve(vector_ty *vector, size_t new_capacity)
 {
 	void **resized_items = NULL;
 	status_ty status = FAILURE;
 	
 	assert(vector);
 	
-	resized_items = realloc(vector->items, sizeof(void *) * new_size);
+	resized_items = realloc(vector->items, sizeof(void *) * new_capacity);
 	if (NULL != resized_items)
 	{
 		vector->items = resized_items;
 		resized_items = NULL;
 		
-		vector->capacity = new_size;
-		vector->min_capacity = new_size;
+		vector->capacity = new_capacity;
+		vector->min_capacity = new_capacity;
+		
+		if(vector->capacity < vector->size)
+		{
+			vector->size = vector->capacity;
+		}
 		
 		status = SUCCESS;
 	}
@@ -109,7 +114,7 @@ status_ty VectorReserve(vector_ty *vector, size_t new_size)
 void *VectorGetElement(const vector_ty *vector, size_t index)
 {
 	assert(vector);
-	assert(index < vector->num_of_elements);
+	assert(index < vector->size);
 	
 	return(vector->items[index]);
 }
@@ -124,7 +129,7 @@ status_ty VectorPushBack(vector_ty *vector, void *element)
 	assert(vector);
 	assert(element);
 	
-	if (vector->capacity == vector->num_of_elements)
+	if (vector->capacity == vector->size)
 	{
 		original_min_capacity = vector->min_capacity;
 		status = VectorReserve(vector, vector->capacity * 2);
@@ -133,9 +138,8 @@ status_ty VectorPushBack(vector_ty *vector, void *element)
 	
 	if (SUCCESS == status)
 	{
-		vector->items[vector->num_of_elements] = element;
-		++(vector->num_of_elements);
-		status = SUCCESS;
+		vector->items[vector->size] = element;
+		++(vector->size);
 	}
 	
 	return(status);
@@ -151,14 +155,14 @@ status_ty VectorShrinkToFit(vector_ty *vector)
 	assert(vector);
 	
 	shrinked_items = realloc(vector->items, 
-									sizeof(void *) * vector->num_of_elements);
+									sizeof(void *) * vector->size);
 	
 	if (NULL != shrinked_items)
 	{
 		vector->items = shrinked_items;
 		shrinked_items = NULL;
 		
-		vector->capacity = vector->num_of_elements;
+		vector->capacity = vector->size;
 		
 		status = SUCCESS;
 	}
@@ -175,13 +179,12 @@ status_ty VectorPopBack(vector_ty *vector)
 	
 	assert(vector);
 	
-	if(vector->num_of_elements > 0)
+	if(vector->size > 0)
 	{
-		vector->items[vector->num_of_elements - 1] = NULL;
-		--(vector->num_of_elements);
+		--(vector->size);
 		status = SUCCESS;
 		
-		if(vector->num_of_elements * 4 <= vector->capacity && 
+		if(vector->size * 4 <= vector->capacity && 
 									vector->min_capacity * 2 < vector->capacity)
 		{
 			original_min_capacity = vector->min_capacity;
@@ -197,7 +200,7 @@ status_ty VectorPopBack(vector_ty *vector)
 void VectorSetElement(vector_ty *vector, size_t index, void *element)
 {
 	assert(vector);
-	assert(index < vector->num_of_elements);
+	assert(index < vector->size);
 	assert(element);
 	
 	vector->items[index] = element;

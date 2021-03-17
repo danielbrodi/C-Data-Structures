@@ -8,11 +8,22 @@
 \******************************************************************************/
 
 /********************************** Inclusions ********************************/
+
 #include <stdio.h> /* printf, fprintf */
 #include <string.h> /* strcmp */
 
 #include "vector.h"
 
+/***************************** Macros Definitions *****************************/
+
+/* escape keys for printf to color output for StdOut */
+#define ANSI_COLOR_RED     "\x1b[31m"
+#define ANSI_COLOR_GREEN   "\x1b[32m"
+#define ANSI_COLOR_CYAN    "\x1b[36m"
+#define ANSI_COLOR_RESET   "\x1b[0m"
+
+#define PRINT_SUCCESS printf (ANSI_COLOR_GREEN "SUCCESS\n" ANSI_COLOR_RESET)
+#define PRINT_FAILURE printf (ANSI_COLOR_RED "FAILURE\n" ANSI_COLOR_RESET)
 
 /**********************Forward Declarations************************************/
 
@@ -23,12 +34,11 @@ void VectorPushBackTest(vector_ty *vector);
 void VectorPopBackTest(vector_ty *vector);
 void VectorGetElementTest(vector_ty *vector);
 void VectorSetElementTest(vector_ty *vector);
-void VectorDestroyTest(vector_ty *vector);
 void VectorReserveTest(vector_ty *vector);
 void VectorShrinkToFitTest(vector_ty *vector);
+void VectorDestroyTest(vector_ty *vector);
 
-/************************************Main Function*****************************/
-
+/***************************Main Function**************************************/
 
 int main()	
 {
@@ -50,7 +60,7 @@ int main()
 	VectorShrinkToFitTest(new_vector);
 	VectorDestroyTest(new_vector);
 	
-	return(0);
+	return(SUCCESS);
 }
 
 /************************Test Functions Implementations************************/
@@ -61,18 +71,19 @@ void VectorCreateTest(vector_ty *vector)
 	printf("\nVector Creatation Test: ");
 	if(NULL == vector)
 	{
-		printf ("FAILURE");
+		PRINT_FAILURE;
 	}
-	printf("SUCCESS");
-	printf("\n");
+	else
+	{
+	PRINT_SUCCESS;
+	}
 }
-
 /******************************************************************************/
 void VectorDestroyTest(vector_ty *vector)
 {
 	VectorDestroy(vector);
+	printf (ANSI_COLOR_CYAN "\nVector has been freed\n\n" ANSI_COLOR_RESET);
 }
-
 /******************************************************************************/
 void VectorSizeTest(vector_ty *new_vector)
 {
@@ -86,61 +97,54 @@ void VectorSizeTest(vector_ty *new_vector)
 	VectorPushBack(new_vector, "6.Ben");
 	if (7 != VectorSize(new_vector))
 	{
-		printf("FAILURE");
+		PRINT_FAILURE;
 	}
-	
-	printf("SUCCESS");
-	printf("\n");
+	else
+	{
+	PRINT_SUCCESS;
+	}
 }
-
 /******************************************************************************/
 void VectorReserveTest(vector_ty *vector)
 {
 	printf("Vector Reserve Test: ");
 	VectorReserve(vector,8);
-	8 != VectorCapacity(vector) ? printf("FAILURE\n") : printf("SUCCESS\n");
+	8 != VectorCapacity(vector) ? PRINT_FAILURE : PRINT_SUCCESS;
 }
-
-
 /******************************************************************************/
 void VectorShrinkToFitTest(vector_ty *vector)
 {
 	printf("Vector ShrinkToFit Test: ");
 	VectorShrinkToFit(vector);
-	VectorSize(vector) == VectorCapacity(vector) ? printf("SUCCESS\n") :
-														   printf("FAILURE\n"); 
+	VectorSize(vector) == VectorCapacity(vector) ? PRINT_SUCCESS : PRINT_FAILURE; 
+														   
 }
-
 /******************************************************************************/
 void VectorCapacityTest(vector_ty *vector)
 {
 	printf("Vector Capacity Test: ");
-	10 != VectorCapacity(vector) ? printf("FAILURE\n") : printf("SUCCESS\n");
+	10 != VectorCapacity(vector) ? PRINT_FAILURE : PRINT_SUCCESS;
 }
-
 /******************************************************************************/
 void VectorPushBackTest(vector_ty *vector)
 {
 	printf("Vector PushBack Test: ");
-   	VectorPushBack(vector, "7.Alon") ? printf("FAILURE\n") :
-   	                                                       printf("SUCCESS\n");
+   	VectorPushBack(vector, "7.Alon") ? PRINT_FAILURE : PRINT_SUCCESS;
+   	                                                       
 }
-
 /******************************************************************************/
 void VectorPopBackTest(vector_ty *vector)
 {
 	printf("Vector PopBack Test: ");
-	VectorPopBack(vector) ? printf("FAILURE\n") : printf("SUCCESS\n");
+	VectorPopBack(vector) ? PRINT_FAILURE : PRINT_SUCCESS;
 }
-
 /******************************************************************************/
 void VectorGetElementTest(vector_ty *vector)
 {
 	char *element = (char *)VectorGetElement(vector, 2);
 	printf("Vector GetElement Test: ");
-	!strcmp(element,"2.Eli") ? printf("SUCCESS\n") : printf("FAILURE\n");
+	!strcmp(element,"2.Eli") ? PRINT_SUCCESS : PRINT_FAILURE;
 }
-
 /******************************************************************************/
 void VectorSetElementTest(vector_ty *vector)
 {
@@ -148,8 +152,5 @@ void VectorSetElementTest(vector_ty *vector)
 	printf("Vector SetElement Test: ");
 	VectorSetElement(vector, 0, "Messi");
 	element = (char *)VectorGetElement(vector, 0);
-	!strcmp(element,"Messi") ? printf("SUCCESS\n") : printf("FAILURE\n");
+	!strcmp(element,"Messi") ? PRINT_SUCCESS : PRINT_FAILURE;
 }
-
-
-
