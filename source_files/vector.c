@@ -32,7 +32,7 @@ vector_ty *VectorCreate(size_t initial_size)
 	if (NULL == new_vector)
 	{
 		fprintf(stderr, "Failed to allocate memory\n");
-		return (NULL);
+		return(NULL);
 	}
 	
 	new_vector->capacity = initial_size;
@@ -43,21 +43,21 @@ vector_ty *VectorCreate(size_t initial_size)
 	{
 		fprintf(stderr, "Failed to allocate memory\n");
 		free(new_vector);
-		return (NULL);
+		return(NULL);
 	}
 
-	return (new_vector);
+	return(new_vector);
 }
 /******************************************************************************/
 /* Deletes entire Vector */
 void VectorDestroy(vector_ty *vector)
 {
-	assert(vector);
+	assert(vector);	
 	
 	free(vector->items);
-	free(vector);
-	
 	vector->items = NULL;
+	
+	free(vector);
 	vector = NULL;
 }
 /******************************************************************************/
@@ -66,7 +66,7 @@ size_t VectorSize(const vector_ty *vector)
 {
 	assert(vector);
 	
-	return (vector->num_of_elements);
+	return(vector->num_of_elements);
 }
 /******************************************************************************/
 /* Returns the current capacity (max size) of the vector */
@@ -74,7 +74,7 @@ size_t VectorCapacity(const vector_ty *vector)
 {
 	assert(vector);
 	
-	return (vector->capacity);
+	return(vector->capacity);
 }
 /******************************************************************************/
 /* Resizes the vector to new_size */
@@ -88,14 +88,14 @@ status_ty VectorReserve(vector_ty *vector, size_t new_size)
 	assert(vector);
 	
 	resized_items = realloc(vector->items, sizeof(void *) * new_size);
-	if (resized_items != NULL)
+	if (NULL != resized_items)
 	{
 		vector->items = resized_items;
 		vector->capacity = new_size;
 		status = SUCCESS;
 	}
 
-	return (status);
+	return(status);
 }
 /******************************************************************************/
 /* Returns element at selected index */
@@ -105,7 +105,7 @@ void *VectorGetElement(const vector_ty *vector, size_t index)
 	assert(vector);
 	assert(index < vector->num_of_elements);
 	
-	return (vector->items[index]);
+	return(vector->items[index]);
 }
 /******************************************************************************/
 /* Adds element to end of vector */
@@ -121,21 +121,21 @@ status_ty VectorPushBack(vector_ty *vector, void *element)
 	{
 		status = VectorReserve(vector, vector->capacity * 2);
 		
-		if(status != FAILURE)
+		if(FAILURE != status)
 		{
 		    vector->items[vector->num_of_elements] = element;
-		    vector->num_of_elements++;
+		    ++(vector->num_of_elements);
 		    status = SUCCESS;
 		}
 	}
 	else
 	{
 		vector->items[vector->num_of_elements] = element;
-		vector->num_of_elements++;
+		++(vector->num_of_elements);
 		status = SUCCESS;
 	}
 	
-	return (status);
+	return(status);
 }
 /******************************************************************************/
 /* Resizes the vector to the current vector size */
@@ -150,14 +150,14 @@ status_ty VectorShrinkToFit(vector_ty *vector)
 	shrinked_items = realloc(vector->items, 
 									sizeof(void *) * vector->num_of_elements);
 	
-	if (shrinked_items != NULL)
+	if (NULL != shrinked_items)
 	{
 		vector->items = shrinked_items;
 		vector->capacity = vector->num_of_elements;
 		status = SUCCESS;
 	}
 	
-	return (status);
+	return(status);
 }
 /******************************************************************************/
 /* Deletes the last element */
@@ -171,7 +171,7 @@ status_ty VectorPopBack(vector_ty *vector)
 	if(vector->num_of_elements > 0)
 	{
 		vector->items[vector->num_of_elements - 1] = NULL;
-		vector->num_of_elements --;
+		--(vector->num_of_elements);
 		status = SUCCESS;
 		
 		if(vector->num_of_elements * 4 < vector->capacity)
@@ -179,7 +179,7 @@ status_ty VectorPopBack(vector_ty *vector)
 			status = VectorReserve(vector, vector->capacity / 2);
 		}
 	}
-	return (status);
+	return(status);
 }
 /******************************************************************************/
 /* Sets an element */
