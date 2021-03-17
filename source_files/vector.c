@@ -12,7 +12,7 @@
 #include <stdlib.h> /* malloc, free */
 #include <assert.h> /* assert */
 
-#include "../include/vector.h"
+#include "vector.h"
 
 /******************************* Global Definitions ***************************/
 struct vector

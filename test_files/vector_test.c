@@ -12,7 +12,7 @@
 #include <stdlib.h> /* malloc, free */
 #include <assert.h> /* assert */
 
-#include "../include/vector.h"
+#include "vector.h"
 
 
 /******************************************************************************/
@@ -25,6 +25,7 @@ void VectorPopBackTest(vector_ty *vector);
 void VectorGetElementTest(vector_ty *vector);
 void VectorSetElementTest(vector_ty *vector);
 void VectorDestroyTest(vector_ty *vector);
+void VectorReserveTest(vector_ty *vector);
 
 /************************************Main Function*****************************/
 
@@ -42,9 +43,10 @@ int main()
 	VectorCapacityTest(new_vector);
 	VectorPushBackTest(new_vector);
 	VectorPopBackTest(new_vector);
-	VectorDestroyTest(new_vector);
 	VectorGetElementTest(new_vector);
 	VectorSetElementTest(new_vector);
+	VectorReserveTest(new_vector);
+	VectorDestroyTest(new_vector);
 	
 	return(0);
 }
@@ -92,7 +94,9 @@ void VectorSizeTest(vector_ty *new_vector)
 /* Note: shrinking the vector may delete previous elements */
 void VectorReserveTest(vector_ty *vector)
 {
-
+	printf("Vector Reserve Test: ");
+	VectorReserve(vector,8);
+	8 != VectorCapacity(vector) ? printf("FAILURE\n") : printf("SUCCESS\n");
 }
 
 
