@@ -23,6 +23,7 @@ struct vector
 };
 /************************Functions Implementations*****************************\
 
+
 /******************************************************************************\
 /* Creates a new vector of size initial_size */
 vector_ty *VectorCreate(size_t initial_size)
