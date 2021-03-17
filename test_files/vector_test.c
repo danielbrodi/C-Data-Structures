@@ -51,7 +51,9 @@ int main()
 	return(0);
 }
 
-/* Creates a new vector of size initial_size */
+/************************Test Functions Implementations************************/
+
+/******************************************************************************/
 void VectorCreateTest(vector_ty *vector)
 {
 	printf("\nVector Creatation Test: ");
@@ -63,13 +65,13 @@ void VectorCreateTest(vector_ty *vector)
 	printf("\n");
 }
 
-/* Deletes entire Vector */
+/******************************************************************************/
 void VectorDestroyTest(vector_ty *vector)
 {
 	VectorDestroy(vector);
 }
 
-/* Returns the current number of elements in the vector */
+/******************************************************************************/
 void VectorSizeTest(vector_ty *new_vector)
 {
 	printf("Vector Size Test: ");
@@ -89,9 +91,7 @@ void VectorSizeTest(vector_ty *new_vector)
 	printf("\n");
 }
 
-/* Resizes the vector to new_size */
-/* Returns SUCCESS upon successful resizing */
-/* Note: shrinking the vector may delete previous elements */
+/******************************************************************************/
 void VectorReserveTest(vector_ty *vector)
 {
 	printf("Vector Reserve Test: ");
@@ -100,36 +100,32 @@ void VectorReserveTest(vector_ty *vector)
 }
 
 
-/* Resizes the vector to the current vector size */
-/* Returns SUCCESS upon successful shrinking */
+/******************************************************************************/
 void VectorShrinkToFitTest(vector_ty *vector)
 {}
 
-/* Returns the current capacity Test(max size) of the vector */
+/******************************************************************************/
 void VectorCapacityTest(vector_ty *vector)
 {
 	printf("Vector Capacity Test: ");
 	10 != VectorCapacity(vector) ? printf("FAILURE\n") : printf("SUCCESS\n");
 }
 
-/* Adds element to end of vector */
-/* Returns SUCCESS upon successful addition */
+/******************************************************************************/
 void VectorPushBackTest(vector_ty *vector)
 {
 	printf("Vector PushBack Test: ");
    VectorPushBack(vector, "7.Alon") ? printf("FAILURE\n") : printf("SUCCESS\n");
 }
 
-/* Deletes the last element */
-/* Returns SUCCESS upon successful deletion */
+/******************************************************************************/
 void VectorPopBackTest(vector_ty *vector)
 {
 	printf("Vector PopBack Test: ");
 	VectorPopBack(vector) ? printf("FAILURE\n") : printf("SUCCESS\n");
 }
 
-/* Returns element at selected index */
-/* Behavior is undefined for out of bounds indeces */
+/******************************************************************************/
 void VectorGetElementTest(vector_ty *vector)
 {
 	char *element = (char *)VectorGetElement(vector, 2);
@@ -138,8 +134,7 @@ void VectorGetElementTest(vector_ty *vector)
 	eli == element ? printf("FAILURE\n") : printf("SUCCESS\n");
 }
 
-/* Sets an element */
-/* Behavior is undefined for out of bounds indeces */
+/******************************************************************************/
 void VectorSetElementTest(vector_ty *vector)
 {
 	size_t i = 0;
