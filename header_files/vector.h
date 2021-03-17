@@ -2,9 +2,9 @@
 #define	__VECTOR_H__
 
 /****************************** File Header ***********************************\
-* File Name:  vector.h
+* File Name: vector.h
 * Author: Daniel Brodsky
-* Description: Dynamic Vector data structure API.
+* Description: Dynamic Vector data structure API overview.
 * Date: 17/03/2021
 * Version: Beta
 * Reviewer: Rostik
