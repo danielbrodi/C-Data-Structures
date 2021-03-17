@@ -9,6 +9,7 @@
 
 /********************************** Inclusions ********************************/
 #include <stdio.h> /* printf, fprintf */
+#include <string.h> /* strcmp */
 
 #include "vector.h"
 
@@ -137,8 +138,7 @@ void VectorGetElementTest(vector_ty *vector)
 {
 	char *element = (char *)VectorGetElement(vector, 2);
 	printf("Vector GetElement Test: ");
-	"2.Eli" == element ? printf("SUCCESS\n") : printf("FAILURE\n");
-	/* strcmp */
+	!strcmp(element,"2.Eli") ? printf("SUCCESS\n") : printf("FAILURE\n");
 }
 
 /******************************************************************************/
@@ -148,8 +148,7 @@ void VectorSetElementTest(vector_ty *vector)
 	printf("Vector SetElement Test: ");
 	VectorSetElement(vector, 0, "Messi");
 	element = (char *)VectorGetElement(vector, 0);
-	"Messi" == element ? printf("SUCCESS\n") : printf("FAILURE\n");
-	/* strcmp */
+	!strcmp(element,"Messi") ? printf("SUCCESS\n") : printf("FAILURE\n");
 }
 
 
