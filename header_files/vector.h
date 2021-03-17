@@ -5,7 +5,7 @@
 * File Name:  vector.h
 * Author: Daniel Brodsky
 * Description: Dynamic Vector data structure API.
-* Date: 16/03/2021
+* Date: 17/03/2021
 * Version: Beta
 * Reviewer: Rostik
 \******************************************************************************/

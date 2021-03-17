@@ -1,8 +1,8 @@
 /****************************** File Header ***********************************\
-* File Name:  vector.h
+* File Name:  vector.c
 * Author: Daniel Brodsky
 * Description: Dynamic Vector API's functions implementations.
-* Date: 16/03/2021
+* Date: 17/03/2021
 * Version: Beta
 * Reviewer: Rostik
 \******************************************************************************/
@@ -14,7 +14,7 @@
 
 #include "../include/vector.h"
 
-/******************************* Globals & Statics ****************************/
+/******************************* Global Definitions ***************************/
 struct vector
 {
 	void **items;
