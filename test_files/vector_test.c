@@ -39,7 +39,6 @@ void VectorShrinkToFitTest(vector_ty *vector);
 void VectorDestroyTest(vector_ty *vector);
 
 /***************************Main Function**************************************/
-
 int main()	
 {
 	vector_ty *new_vector = VectorCreate(5);
@@ -62,7 +61,6 @@ int main()
 	
 	return(SUCCESS);
 }
-
 /************************Test Functions Implementations************************/
 
 /******************************************************************************/
@@ -75,7 +73,7 @@ void VectorCreateTest(vector_ty *vector)
 	}
 	else
 	{
-	PRINT_SUCCESS;
+		PRINT_SUCCESS;
 	}
 }
 /******************************************************************************/
@@ -101,7 +99,7 @@ void VectorSizeTest(vector_ty *new_vector)
 	}
 	else
 	{
-	PRINT_SUCCESS;
+		PRINT_SUCCESS;
 	}
 }
 /******************************************************************************/
