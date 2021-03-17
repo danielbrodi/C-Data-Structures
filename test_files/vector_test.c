@@ -17,57 +17,60 @@
 
 /******************************************************************************/
 
-/*void VectorCreateTest();*/
-/*void VectorDestroyTest();*/
-/*void VectorSize();*/
-/*void VectorCapacity();*/
-/*void VectorPushBack();*/
-/*void VectorGetElement();*/
-/*void VectorSetElement();*/
+void VectorCreateTest();
+void VectorDestroyTest();
+void VectorSizeTest();
+void VectorCapacityTest();
+void VectorPushBackTest();
+void VectorGetElementTest();
+void VectorSetElementTest();
 
 /************************************Main Function*****************************/
 
+/* Creates a new vector of size initial_size */
+void VectorCreateTest()
+{}
+
+/* Deletes entire Vector */
+void VectorDestroyTest()
+
+/* Resizes the vector to new_size */
+/* Returns SUCCESS upon successful resizing */
+/* Note: shrinking the vector may delete previous elements */
+void VectorReserveTest()
+{}
+
+/* Resizes the vector to the current vector size */
+/* Returns SUCCESS upon successful shrinking */
+void VectorShrinkToFitTest()
+{}
+
+/* Returns the current capacity Test(max size) of the vector */
+void VectorCapacityTest()
+{}
+
+/* Adds element to end of vector */
+/* Returns SUCCESS upon successful addition */
+void VectorPushBackTest()
+{}
+
+/* Deletes the last element */
+/* Returns SUCCESS upon successful deletion */
+void VectorPopBackTest()
+{}
+
+/* Returns element at selected index */
+/* Behavior is undefined for out of bounds indeces */
+void VectorGetElementTest()
+{}
+
+/* Sets an element */
+/* Behavior is undefined for out of bounds indeces */
+void VectorSetElementTest()
+{}
+
 int main()	
 {
-	size_t i = 0;
-	vector_ty *new_vector = VectorCreate(5);
-	
-	printf("Initial - num_elements: %ld, capacity: %ld\n", VectorSize(new_vector), VectorCapacity(new_vector));
 
-	VectorPushBack(new_vector, "0.Yosi");
-	VectorPushBack(new_vector, "1.Daniel");
-	VectorPushBack(new_vector, "2.Eli");
-	VectorPushBack(new_vector, "3.Rocky");
-	VectorPushBack(new_vector, "4.Ken");
-	VectorPushBack(new_vector, "5.Ted");
-	VectorPushBack(new_vector, "6.Ben");
-
-	printf("After Add*7 - num_elements: %ld, capacity: %ld\n", VectorSize(new_vector), VectorCapacity(new_vector));
-
-	VectorPopBack(new_vector);
-	VectorPopBack(new_vector);
-	VectorPopBack(new_vector);
-	VectorPopBack(new_vector);
-	VectorPopBack(new_vector);
-	printf("After 5*PopBack - num_elements: %ld, capacity: %ld\n", VectorSize(new_vector), VectorCapacity(new_vector));
-	VectorSetElement(new_vector, 1, "SetElementCheck");
-	VectorShrinkToFit(new_vector);
-
-	printf("After ShrinkToFit+SetElement - num_elements: %ld, capacity: %ld\n", VectorSize(new_vector), VectorCapacity(new_vector));
-	
-	VectorReserve(new_vector,8);
-	
-	printf("After Reserve->8 - num_elements: %ld, capacity: %ld\n", VectorSize(new_vector), VectorCapacity(new_vector));
-
-	printf("\nvector data:\n\n");
-
-	for (i = 0; i < VectorSize(new_vector); ++i)
-	{
-		printf("%s\n\n", (char*)VectorGetElement(new_vector,i));
-	}
-
-	VectorDestroy(new_vector);
-
-	return 0;
 }
 
