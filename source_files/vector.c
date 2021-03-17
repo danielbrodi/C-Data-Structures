@@ -79,7 +79,21 @@ size_t VectorCapacity(const vector_ty *vector)
 /* Note: shrinking the vector may delete previous elements */
 status_ty VectorReserve(vector_ty *vector, size_t new_size)
 {
+	void **resized_items = NULL;
+	status_ty status = FAILURE;
 	
+	assert(vector);
+	assert(new_size >= 0);
+	
+	resized_items = realloc(vector->items, sizeof(void *) * new_size);
+	if (resized_items != NULL)
+	{
+		vector->items = resized_items;
+		vector->capacity = new_size;
+		status = SUCCESS;
+	}
+
+	return (status);
 }
 /*******************************************************************************
 /* Returns element at selected index */
@@ -96,11 +110,11 @@ void *VectorGetElement(const vector_ty *vector, size_t index)
 /* Returns SUCCESS upon successful addition */
 status_ty VectorPushBack(vector_ty *vector, void *element)
 {
+	status_ty status = FAILURE;
+	
 	assert(vector);
 	assert(element);
 	
-	size_t status = FAILURE;
-
 	if (vector->capacity == vector->num_of_elements)
 	{
 		status = VectorReserve(vector, vector->capacity * 2);
@@ -116,9 +130,35 @@ status_ty VectorPushBack(vector_ty *vector, void *element)
 		status = SUCCESS;
 	}
 	
-	return status;
+	return (status);
 }
 /*******************************************************************************
+/* Resizes the vector to the current vector size */
+/* Returns SUCCESS upon successful shrinking */
+status_ty VectorShrinkToFit(vector_ty *vector)
+{
+	status_ty status = FAILURE;
+	void **shrinked_items = NULL;
+	
+	assert(vector);
+	
+	shrinked_items = realloc(vector->items, 
+									sizeof(void *) * vector->num_of_elements);
+	
+	if (shrinked_items != NULL)
+	{
+		vector->items = shrinked_items;
+		vector->capacity = vector->num_of_elements;
+		status = SUCCESS;
+	}
+	
+	return (status);
+}
+/*******************************************************************************
+/* Deletes the last element */
+/* Returns SUCCESS upon successful deletion */
+status_ty VectorPopBack(vector_ty *vector)
+{
 
 
-
+}
