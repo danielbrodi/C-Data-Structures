@@ -2,8 +2,9 @@
 * File Name:  stack.c
 * Author: Daniel Brodsky
 * Description: 	Implementation of a stack's data structure functions.
-* Date: 16/03/2021
-* Version: 1.0 (Before Review)
+				Including advanced allocation with one malloc function.
+* Date: 17/03/2021
+* Version: 2.0 (After Review)
 * Reviewer: Danel
 \******************************************************************************/
 
@@ -12,7 +13,7 @@
 #include <stdlib.h> /* malloc, free */
 #include <assert.h> /* assert */
 
-#include "../include/stack.h"
+#include "stack.h"
 
 /******************************* Globals & Statics ****************************/
 struct stack
@@ -33,7 +34,8 @@ struct stack
  */
 stack_ty *CreateStack(size_t capacity)
 {
-	stack_ty *new_stack = (stack_ty *)malloc(sizeof(stack_ty));
+	stack_ty *new_stack = (stack_ty *)malloc(sizeof(stack_ty)
+												 + capacity * sizeof(void *));
 	if (NULL == new_stack)
 	{
 		fprintf(stderr, "Failed to allocate memory\n");
@@ -45,13 +47,7 @@ stack_ty *CreateStack(size_t capacity)
 	new_stack->max_size = capacity;
 	new_stack->top = -1;
 	
-	new_stack->items = malloc(sizeof(void *) * capacity);
-	if (NULL == new_stack->items)
-	{
-		fprintf(stderr, "Failed to allocate memory\n");
-		free(new_stack);
-		return (NULL);
-	}
+	new_stack->items = (void *)(new_stack + 2);
 
 	return (new_stack);
 }
@@ -81,7 +77,7 @@ void Pop(stack_ty *stack)
 	assert(stack);
 	assert(!IsEmpty(stack));
 	
-	stack->items[stack->top--];
+	stack->items[--(stack->top)];
 }
 
 /*******************************************************************************
@@ -154,6 +150,9 @@ size_t Capacity(const stack_ty *stack)
 void DestroyStack(stack_ty *stack)
 {
 	assert(stack);
-	free(stack->items);
+	
+	stack->items = NULL;
+	
 	free(stack);
+	stack = NULL;
 }

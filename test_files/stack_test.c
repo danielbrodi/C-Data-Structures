@@ -12,7 +12,7 @@
 #include <stdio.h> /* printf */
 #include <stdlib.h> /* free */
 
-#include "../include/stack.h"
+#include "stack.h"
 
 /******************************* Main Function ********************************/
 
