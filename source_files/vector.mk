@@ -7,16 +7,17 @@ CC = gcc
   #  -pedantic used in conjunction with -ansi,  
   #  this tells the compiler to be adhere strictly to the ANSI standard, 
   #  rejecting any code which is not compliant.
-
 CFLAGS = -ansi -pedantic-errors -Wall -Wextra -g
-IFLAG = -I/home/danielbrod/daniel-brodsky/ds/include
+
+IFLAG = -I/home/danielbrod/daniel-brodsky/ds/include/
+
 RM = rm -rf
 
 OUT = vector
 TEST = vector_test.c
-TEST_PATH = /home/danielbrod/daniel-brodsky/ds/test
+TEST_PATH = /home/danielbrod/daniel-brodsky/ds/test/
 SOURCE = vector.c
-SRC_PATH = /home/danielbrod/daniel-brodsky/ds/source
+SRC_PATH = /home/danielbrod/daniel-brodsky/ds/source/
 
 
 all: build
@@ -28,7 +29,7 @@ build: vector_test.o vector.o
 vector_test.o: $(TEST_PATH)$(TEST) 
 	$(CC) $(CFLAGS) $(IFLAG) -c $(TEST_PATH)$(TEST)
 	
-vector_test.o: $(SRC_PATH)$(SOURCE)
+vector.o: $(SRC_PATH)$(SOURCE)
 	$(CC) $(CFLAGS) $(IFLAG) -c $(SRC_PATH)$(SOURCE)
 	
 clean:
