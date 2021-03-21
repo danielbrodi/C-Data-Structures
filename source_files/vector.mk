@@ -14,6 +14,7 @@ IFLAG = -I/home/danielbrod/daniel-brodsky/ds/include/
 RM = rm -rf
 
 OUT = vector
+
 TEST = vector_test.c
 TEST_PATH = /home/danielbrod/daniel-brodsky/ds/test/
 SOURCE = vector.c
