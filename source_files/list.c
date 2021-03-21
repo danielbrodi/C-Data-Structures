@@ -63,8 +63,8 @@ void SlistDestroy(slist_ty *slist)
 	
 	while(NULL != slist->head)
 	{
-		tmp = slist->head;
-		slist->head = temp;
+		temp = slist->head;
+		slist->head = slist->head->next;
 		free(temp);
 	}
 	
@@ -79,28 +79,26 @@ slist_iter_ty SlistIteratorBegin(const slist_ty *slist)
 {
 	assert (slist);
 	
-	slist_iter_ty iterator = slist->head;
-	
-	return(iterator);
+	return(slist->head);
 }
 /******************************************************************************/
 slist_iter_ty SlistIteratorEnd(const slist_ty *slist)
 {
-	slist_iter_ty iterator = slist->head;
+/*	slist_iter_ty iterator = slist->head;*/
 	
 	assert (slist);
 	
-	if (NULL == slist->head)
-	{
-		return(NULL);
-	}
+/*	if (NULL == slist->head)*/
+/*	{*/
+/*		return(NULL);*/
+/*	}*/
+/*	*/
+/*	while (NULL != iterator->next->data)*/
+/*	{*/
+/*		iterator = iterator->next;*/
+/*	}*/
 	
-	while (NULL != iterator->next->data)
-	{
-		iterator = iterator->next;
-	}
-	
-	return(iterator);
+	return(slist->end);
 }
 /******************************************************************************/
 slist_iter_ty SlistIteratorNext(const slist_iter_ty iter)
@@ -135,7 +133,7 @@ void SlistSetData(slist_iter_ty iter, void *data)
 /******************************************************************************/
 slist_iter_ty SlistInsert(slist_iter_ty iter, void *data)
 {
-	slist_iter_ty new_node = NULL;
+	slist_iter_ty new_node = (slist_iter_ty) malloc(sizeof(slist_node));
 	
 	assert(iter);
 	assert(iter->next);
@@ -219,5 +217,23 @@ const slist_iter_ty to_iter, Action_Func)
 	}
 
 	return(SUCCESS);
+}
+
+int SlistForeach(node_t from, node_t to , action_func_t 
+action_func, void *param)
+{
+    int stat = 1;
+
+    while(index != to)
+    {
+        stat = action_func(&(index->data), param);
+        if(0 == stat)
+        {
+            return (stat);
+        }
+        index = index->next;
+    }
+
+    return(stat);
 }
 /******************************************************************************/
