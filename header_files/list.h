@@ -1,11 +1,11 @@
-/***********************************************
+/**********************************FILE-HEADER*********************************\
 * File: list.h						 		   
 * Author: Rostik Angelevich					   
 * Date: 21/03/2021							   
-* Version: 1.0  							  
+* Version: 1.0  							   
 * Reviewer: Daniel							   
 * Description: Single Linked List API		    
-************************************************/
+\******************************************************************************/
 #ifndef	__LIST_H__
 #define	__LIST_H__
 
@@ -44,7 +44,7 @@ slist_iter_ty SlistIteratorEnd(const slist_ty *slist);
 /* Returns iterator to next elemet in the list */
 /* Returns slist_END on the last element in the list */
 /* Complexity: O(1) */
-slist_iter_ty SlistIteratorNext(const slist_ty *slist);
+slist_iter_ty SlistIteratorNext(const slist_iter_ty iter);
 
 /* Returns TRUE if both iterators are of the same item, */
 /* or FALSE otherwise */
