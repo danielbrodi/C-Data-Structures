@@ -52,7 +52,7 @@ slist_ty *SlistCreate(void)
 	new_list->end->data = NULL;
 	new_list->end->next = NULL;
 	
-	return(new_list);
+	return(new_list->head);
 }
 /******************************************************************************/
 void SlistDestroy(slist_ty *slist)
@@ -109,6 +109,115 @@ slist_iter_ty SlistIteratorNext(const slist_iter_ty iter)
 	
 	return(iter->next);
 }
+/******************************************************************************/
+boolean_ty SlistIteratorIsEqual(const slist_iter_ty iter_a, 
+											const slist_iter_ty iter_b)
+{
+   IsMatch_Func(iter_a->data, iter_b->data) ? return(SUCCESS) : return(FAILURE);
+}
+/******************************************************************************/
+void *SlistGetData(const slist_iter_ty iter)
+{
+	assert(iter);
+	assert(iter->next);
+	
+	return(iter->data);
+}
+/******************************************************************************/
+void SlistSetData(slist_iter_ty iter, void *data)
+{
+	assert(iter);
+	assert(iter->next);
+	assert(data);
+	
+	iter->data = data;
+}
+/******************************************************************************/
+slist_iter_ty SlistInsert(slist_iter_ty iter, void *data)
+{
+	slist_iter_ty new_node = NULL;
+	
+	assert(iter);
+	assert(iter->next);
+	assert(data);
+	
+	new_node->data = data;
+	new_node->next = iter->next;
+	iter->next = new_node;
+	
+	return(new_node);
+}
+/******************************************************************************/
+slist_iter_ty SlistRemove(slist_iter_ty iter)
+{
+	assert(iter);
+	assert(iter->next);
+	
+	iter = iter->next;
+	
+	return(iter);
+}
+/******************************************************************************/
+boolean_ty SlistIsEmpty(const slist_ty *slist)
+{
+	assert(slist);
+	
+	NULL == slist->head ? return(TRUE); : return(FALSE);
+}
+/******************************************************************************/
+size_t SlistSize(const slist_ty *slist)
+{
+	size_t counter = 0;
+	
+	slist_iter_ty iterator = slist->head;
+	
+	assert (slist);
+	
+	if (NULL == slist->head)
+	{
+		return(counter);
+	}
+	
+	while (NULL != iterator->data)
+	{
+		iterator = iterator->next;
+		++counter;
+	}
+	
+	return(iterator);
+}
+/******************************************************************************/
+slist_iter_ty SlistFind(const slist_iter_ty from_iter, 
+	const slist_iter_ty to_iter, IsMatch_Func,
+	void *param)
+{
+	assert(from_iter);
+	assert(to_iter);
+	assert(param);
 
+	slist_iter_ty runner = from_iter;
+	
+	while(runner != to_iter->next)
+	{
+	  IsMatch_Func(data, runner->data) ? return(runner) : runner = runner->next;
+	}
 
+	return(to_iter);
+}
+/******************************************************************************/
+status_ty SlistForEach(const slist_iter_ty from_iter,
+const slist_iter_ty to_iter, Action_Func)
+{
+	assert(from_iter);
+	assert(to_iter);
 
+	slist_iter_ty iterator = from_iter;
+	
+	while(iterator != to_iter->next)
+	{
+		Action_Func(iterator) ? iterator = iterator->next : return(FAILURE);
+	}
+
+	return(SUCCESS);
+}
+/******************************************************************************/
