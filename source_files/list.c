@@ -218,22 +218,4 @@ const slist_iter_ty to_iter, Action_Func)
 
 	return(SUCCESS);
 }
-
-int SlistForeach(node_t from, node_t to , action_func_t 
-action_func, void *param)
-{
-    int stat = 1;
-
-    while(index != to)
-    {
-        stat = action_func(&(index->data), param);
-        if(0 == stat)
-        {
-            return (stat);
-        }
-        index = index->next;
-    }
-
-    return(stat);
-}
 /******************************************************************************/
