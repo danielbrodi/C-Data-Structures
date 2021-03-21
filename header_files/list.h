@@ -1,94 +1,99 @@
 /***********************************************
-* File: list.h						 		  *
-* Author: Rostik Angelevich					   *
-* Date: 21/03/2021							   *
-* Version: 1.0  							   *
-* Reviewer: Daniel							   *
-* Description: Single Linked List API		   * 
+* File: list.h						 		   
+* Author: Rostik Angelevich					   
+* Date: 21/03/2021							   
+* Version: 1.0  							  
+* Reviewer: Daniel							   
+* Description: Single Linked List API		    
 ************************************************/
 #ifndef	__LIST_H__
 #define	__LIST_H__
 
 #include <stddef.h>	/* size_t */
 
-#include "utils.h"
+#include "utils.h" /* status_ty, bolean_ty*/
 
-/*typedef struct list list_ty;*/
+typedef struct slist slist_ty;
 
-typedef struct list_iter list_iter_ty
+typedef struct slist_node slist_node_ty;
 
+typedef slist_node_ty *slist_iter_ty;
 
-/* Creates an empty single-linked list and returns iterator to the head */
+typedef boolean_ty (*IsMatch_Func)(void *data, void *param);
+
+typedef status_ty (*Action_Func)(void *data, void *param);
+
+/* Creates an empty single-linked list and returns pointer to the head */
 /* returns NULL on failure*/
 /* Complexity: O(1) */
-list_iter_ty *ListCreate();
+slist_ty *SlistCreate(void);
 
 /* Deletes entire List */
 /* Complexity: O(n) */
-void ListDestroy(list_iter_ty *iterator);
+void SlistDestroy(slist_ty *slist);
 
 /* Returns iterator to beginning of the list */
 /* Returns NULL if list is empty */
 /* Complexity: O(1) */
-list_iter_ty *ListIteratorBegin(list_iter_ty *iterator);
+slist_iter_ty SlistIteratorBegin(const slist_ty *slist);
 
 /* Returns iterator to end of the list */
-/* Returns NULL if list is empty */
 /* Complexity: O(1) */
-list_iter_ty *ListIteratorEnd(list_iter_ty *iterator);
+slist_iter_ty SlistIteratorEnd(const slist_ty *slist);
 
 /* Returns iterator to next elemet in the list */
-/* Returns NULL if on the last element in the list */
+/* Returns slist_END on the last element in the list */
 /* Complexity: O(1) */
-list_iter_ty *ListIteratorNext(list_iter_ty *iterator);
+slist_iter_ty SlistIteratorNext(const slist_ty *slist);
 
-/* Returns SUCCESS if both iterators are of the same item,
-/* or FAILURE otherwise */
+/* Returns TRUE if both iterators are of the same item, */
+/* or FALSE otherwise */
 /* Complexity: O(1) */
-status_ty ListIteratorIsEqual(const list_iter_ty *iterator_a, 
-												const list_iter_ty *iterator_b);
+boolean_ty SlistIteratorIsEqual(const slist_iter_ty iter_a, 
+											const slist_iter_ty iter_b);
 
-/* Returns the element of the the iterator */
-/* Returns NULL if list is empty */
+/* Returns the data of the iterator */
+/* Undefined behaviour if iter is slist_END */
 /* Complexity: O(1) */
-void *ListGetData(const list_iter_ty *iterator);
+void *SlistGetData(const slist_iter_ty iter);
 
 /* Sets the data at the iterator */
-/* Undefined behaviour if list is empty */
+/* Undefined behaviour if iter is slist_END */
 /* Complexity: O(1) */
-void ListSetData(const list_iter_ty *iterator, void *element);
+void SlistSetData(slist_iter_ty iter, void *data);
 
-/* Insters the element after the iterator */
-/* Undefined behaviour if list is empty */
+/* Insters the element after the iterator, returns iterator to the new node */
+/* TODO Undefined behaviour if iter is slist_END */
 /* Complexity: O(1) */
-void ListInsert(list_iter_ty *iterator, void *element);
+slist_iter_ty SlistInsert(slist_iter_ty iter, void *data);
 
 /* Removes the current element from the list, */
-/* the iterator will point to the next element in the list */
-/* Undefined behaviour if list is empty */
+/* returns iterator to the next element in the list */
+/* TODO Undefined behaviour if iter is slist_END */
 /* Complexity: O(1) */
-void ListRemove(list_iter_ty *iterator);
+slist_iter_ty SlistRemove(slist_iter_ty iter);
 
-/* Returns SUCCESS if list is empty or FAILURE otherwise */
+/* Returns TRUE if list is empty or FALSE otherwise */
 /* Complexity: O(1) */
-status_ty ListIsEmpty(const list_iter_ty *iterator);
+boolean_ty SlistIsEmpty(const slist_ty *slist);
 
 /* Returns number of elements in the list */
-/* Complexity: O(1) ? */
-size_t ListSize(const list_iter_ty *iterator);
-
-/* Returns iterator to the found element, or NULL if not found */
-/* Undefined behaviour if list is empty */
 /* Complexity: O(n) */
-list_iter_ty *ListFind(list_iter_ty *iterator, void *element);
+size_t SlistSize(const slist_ty *slist);
 
-/* Perform the function Apply on each element from iterator 'start' */
-/* to iterator 'end' */
-/* Returns SUCCESS if no errors, FAILURE otherwise
-/* Undefined behaviour if list is empty */
-/* Complexity: O(n) * O(Apply) */
-status_ty ListForEach(const list_iter_ty *iterator, 
-											status_ty (*Apply)(void *element), 
-							const list_iter_ty *start, const list_iter_ty *end);
+/* Returns the first iterator to the found element */
+/* in range of [from_iter, to_iter) */
+/* returns to_iter if data not found */
+/* Complexity: O(n) */
+slist_iter_ty SlistFind(const slist_iter_ty from_iter, 
+	const slist_iter_ty to_iter, IsMatch_Func,
+	void *param);
+
+/* Perform the function Action_Func on each element in range */
+/* [from_iter, to_item) until failure */
+/* Returns SUCCESS if no errors, FAILURE otherwise */
+/* Complexity: O(n) */
+status_ty SlistForEach(const slist_iter_ty from_iter,
+const slist_iter_ty to_iter, Action_Func);
 							 
 #endif	/* __LIST_H__ */
