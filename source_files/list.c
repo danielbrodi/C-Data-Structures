@@ -195,9 +195,9 @@ slist_iter_ty SlistFind(const slist_iter_ty from_iter,
 
 	slist_iter_ty runner = from_iter;
 	
-	while(runner != to_iter->next)
+	while(runner != to_iter)
 	{
-	  IsMatch_Func(data, runner->data) ? return(runner) : runner = runner->next;
+	 IsMatch_Func(param, runner->data) ? return(runner) : runner = runner->next;
 	}
 
 	return(to_iter);
@@ -211,7 +211,7 @@ const slist_iter_ty to_iter, Action_Func, void *param)
 
 	slist_iter_ty iterator = from_iter;
 	
-	while(iterator != to_iter->next)
+	while(iterator != to_iter)
 	{
 	 Action_Func(iterator, param) ? iterator = iterator->next : return(FAILURE);
 	}
