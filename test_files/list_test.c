@@ -55,7 +55,7 @@ int main()
 	
 	SlistCreateTest(new_list);
 	SlistIteratorBeginTest(new_list);
-	
+	SlistInsertTest(new_list);
 	
 	SlistDestroy(new_list);
 	
@@ -89,6 +89,7 @@ void SlistIteratorBeginTest(const slist_ty *slist)
 void SlistIteratorEndTest(const slist_ty *slist)
 {
 	printf("SlistIteratorEndTest: ");
+	NULL == (SlistIteratorEndTest(slist)->data) ? PRINT_SUCCESS : PRINT_FAILURE;
 }
 
 /******************************************************************************/
@@ -119,7 +120,12 @@ void SlistSetDataTest(slist_iter_ty iter, void *data)
 /******************************************************************************/
 void SlistInsertTest(slist_iter_ty iter, void *data)
 {
-	printf("SlistIteratorBeginTest: ");
+	slist_iter_ty new_node = ;
+	
+	printf("SlistInsertTest: ");
+	
+	"Messi" == SlistInsert(new_node, "Messi")->data ? PRINT_SUCCESS :
+																PRINT_FAILURE;
 }
 
 /******************************************************************************/

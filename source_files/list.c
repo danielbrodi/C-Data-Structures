@@ -2,7 +2,7 @@
 * File: list.c						 		  								
 * Author: Daniel Brodsky					  								
 * Date: 21/03/2021							   								
-* Version: Beta 							   								
+* Version: 1.0 							   								
 * Reviewer: Olga							   								
 * Description: Single Linked List Functions Implementations.			 
 \******************************************************************************/
@@ -133,7 +133,7 @@ void SlistSetData(slist_iter_ty iter, void *data)
 /******************************************************************************/
 slist_iter_ty SlistInsert(slist_iter_ty iter, void *data)
 {
-	slist_iter_ty new_node = (slist_iter_ty) malloc(sizeof(slist_node));
+	slist_iter_ty new_node = iter;
 	
 	assert(iter);
 	assert(iter->next);
@@ -204,7 +204,7 @@ slist_iter_ty SlistFind(const slist_iter_ty from_iter,
 }
 /******************************************************************************/
 status_ty SlistForEach(const slist_iter_ty from_iter,
-const slist_iter_ty to_iter, Action_Func)
+const slist_iter_ty to_iter, Action_Func, void *param)
 {
 	assert(from_iter);
 	assert(to_iter);
@@ -213,7 +213,7 @@ const slist_iter_ty to_iter, Action_Func)
 	
 	while(iterator != to_iter->next)
 	{
-		Action_Func(iterator) ? iterator = iterator->next : return(FAILURE);
+	 Action_Func(iterator, param) ? iterator = iterator->next : return(FAILURE);
 	}
 
 	return(SUCCESS);

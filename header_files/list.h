@@ -94,6 +94,6 @@ slist_iter_ty SlistFind(const slist_iter_ty from_iter,
 /* Returns SUCCESS if no errors, FAILURE otherwise */
 /* Complexity: O(n) */
 status_ty SlistForEach(const slist_iter_ty from_iter,
-const slist_iter_ty to_iter, Action_Func);
+const slist_iter_ty to_iter, Action_Func, void *param);
 							 
 #endif	/* __LIST_H__ */
