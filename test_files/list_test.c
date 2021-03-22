@@ -88,7 +88,7 @@ void SlistRemoveTest(slist_ty *slist)
 	size_t original_size = SlistSize(slist);
 	printf("Remove & Size Test: ");
 	SlistRemove(SlistIteratorBegin(slist));
-	0 == original_size - 1 ? PRINT_SUCCESS : PRINT_FAILURE;
+	SlistSize(slist) == (original_size - 1) ? PRINT_SUCCESS : PRINT_FAILURE;
 }
 /******************************************************************************/
 void SlistIsEmptyTest(slist_ty *slist)
