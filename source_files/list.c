@@ -208,16 +208,17 @@ slist_iter_ty SlistFind(const slist_iter_ty from_iter,
 	const slist_iter_ty to_iter, IsMatch_Func is_match_func,
 	void *param)
 {
+	slist_iter_ty runner = NULL;
+	
 	assert(from_iter);
 	assert(to_iter);
 	assert(param);
 
-	status_ty result = SUCCESS;
-	slist_iter_ty runner = from_iter;
+	runner = from_iter;
 	
 	while(runner != to_iter)
 	{
-		if(IsMatch_Func(param, runner->data))
+		if(TRUE == is_match_func(param, runner->data))
 		{
 			return(runner);
 		}
@@ -230,17 +231,23 @@ slist_iter_ty SlistFind(const slist_iter_ty from_iter,
 status_ty SlistForEach(slist_iter_ty from_iter,
 const slist_iter_ty to_iter, Action_Func action_func, void *param)
 {
+	slist_iter_ty iterator = NULL;
+		
 	assert(from_iter);
 	assert(to_iter);
-
-	slist_iter_ty iterator = from_iter;
-	status_ty result = SUCCESS;
 	
-	while(iterator != to_iter && SUCCESS == result)
+	iterator = from_iter;
+	
+	while(iterator != to_iter)
 	{
-	 Action_Func(iterator, param) ? iterator = iterator->next : result = FAILURE;
+		if(SUCCESS != action_func(iterator, param))
+		{
+			return(FAILURE);
+		}
+		
+	iterator = iterator->next;
 	}
-
-	return(result);
+	
+	return(SUCCESS);
 }
 /******************************************************************************/

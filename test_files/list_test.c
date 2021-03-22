@@ -10,6 +10,8 @@
 /********************************** Inclusions ********************************/
 
 #include <stdio.h> /* printf, fprintf */
+#include <stdlib.h> /* rand, srand */
+#include<time.h> /* time */
 #include <string.h> /* strcmp */
 
 #include "../include/list.h"
@@ -25,6 +27,9 @@
 #define PRINT_SUCCESS printf (ANSI_COLOR_GREEN "SUCCESS\n" ANSI_COLOR_RESET)
 #define PRINT_FAILURE printf (ANSI_COLOR_RED "FAILURE\n" ANSI_COLOR_RESET)
 
+#define RANDOM_NUM rand() % 100
+
+#define UNUSED(x) (void)(x)
 /****************************Forward Declarations******************************/
 void SlistCreateTest(slist_ty *slist);
 void SlistDestroyTest(slist_ty *slist);
@@ -33,11 +38,20 @@ void SlistInsertTest(slist_ty *slist);
 void SlistRemoveTest(slist_ty *slist);
 void SlistIsEmptyTest(slist_ty *slist);
 void SlistSetDataTest(slist_ty *slist);
+status_ty PrintList(void *data, void *param);
+boolean_ty IsMatch(void *data, void *param);
+void InsertIntToList(slist_ty *slist);
+void SlistForEachTest(slist_ty *slist);
+void SlistFindTest(slist_ty *slist);
 /******************************************************************************/
 /********************************Main Function*********************************/
 int main()	
 {
+	/* Intializes new singly linked list */
 	slist_ty *new_list = SlistCreate();
+	
+	/* Intializes random number generator */
+	srand(time(0));
 	
 	SlistCreateTest(new_list);
 	SlistIteratorBeginTest(new_list);
@@ -45,6 +59,9 @@ int main()
 	SlistRemoveTest(new_list);
 	SlistIsEmptyTest(new_list);
 	SlistSetDataTest(new_list);
+	InsertIntToList(new_list);
+	SlistForEachTest(new_list);
+	SlistFindTest(new_list);
 	SlistDestroyTest(new_list);
 	
 	return(0);
@@ -67,7 +84,7 @@ void SlistDestroyTest(slist_ty *slist)
 /******************************************************************************/
 void SlistIteratorBeginTest(slist_ty *slist)
 {
-	printf("Iter To Begin/End Test: ");
+	printf("Iter To Begin/End + Next Test: ");
 	SlistIteratorEnd(slist) == SlistIteratorNext(SlistIteratorBegin(slist)) ?
 	 											  PRINT_SUCCESS : PRINT_FAILURE;
 }
@@ -113,5 +130,54 @@ void SlistSetDataTest(slist_ty *slist)
 	SlistSetData(new_node, "Ronaldo");
 
 	strcmp(SlistGetData(new_node), "Ronaldo") ? PRINT_FAILURE : PRINT_SUCCESS;
+	
+	SlistRemove(new_node);
 }
 /******************************************************************************/
+void InsertIntToList(slist_ty *slist)
+{	
+	slist_iter_ty new_node = SlistIteratorBegin(slist);
+	
+	int num1 = RANDOM_NUM, num2 = 3, num3 = RANDOM_NUM;
+	
+	printf("\nInserting: %d, %d, %d\n", num1, num2, num3);
+	
+	new_node = SlistInsert(new_node, (void *)(long)num1);
+	new_node = SlistInsert(new_node, (void *)(long)num2);
+	new_node = SlistInsert(new_node, (void *)(long)num3);
+}
+/******************************************************************************/
+status_ty PrintList(void *data, void *param)
+{
+	UNUSED(param);
+	
+	printf("%d, ", (int)(long)data);
+	
+	return(SUCCESS);
+}
+
+/******************************************************************************/
+boolean_ty IsMatch(void *data, void *param)
+{	
+	return(((int)(long)data == (int)(long)param));
+}
+/******************************************************************************/
+void SlistForEachTest(slist_ty *slist)
+{
+	int x = 3;
+	status_ty result = SUCCESS;
+	printf("SlistForEachTest: ");
+	result = SlistForEach(SlistIteratorBegin(slist), SlistIteratorEnd(slist), PrintList, (void *)(long)x);
+	
+	(SUCCESS == result) ? PRINT_SUCCESS : PRINT_FAILURE;
+}
+/******************************************************************************/
+void SlistFindTest(slist_ty *slist)
+{
+	int x = 4;
+	slist_iter_ty new_node = SlistFind(SlistIteratorBegin(slist), SlistIteratorEnd(slist), IsMatch, (void *)&x);
+	printf("SlistFindTest: ");
+	new_node == SlistIteratorEnd(slist) ? PRINT_FAILURE : PRINT_SUCCESS;
+	
+	printf("%d\n", *(int *)SlistGetData(new_node));
+}
