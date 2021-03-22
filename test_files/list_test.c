@@ -2,19 +2,19 @@
 * File: list_test.c						 		  								
 * Author: Daniel Brodsky					  								
 * Date: 21/03/2021							   								
-* Version: 1.0 (Before Review)							   								
+* Version: 2.0 (Before Review)							   								
 * Reviewer: Olga							   								
 * Description: Single Linked List API's Functions Testings.		 
 \******************************************************************************/
 
 /********************************** Inclusions ********************************/
 
-#include <stdio.h> /* printf, fprintf */
+#include <stdio.h>	/* printf, fprintf */
 #include <stdlib.h> /* rand, srand */
-#include<time.h> /* time */
+#include <time.h>	/* time */
 #include <string.h> /* strcmp */
 
-#include "../include/list.h"
+#include "list.h"
 
 /***************************** Macros Definitions *****************************/
 
@@ -27,6 +27,7 @@
 #define PRINT_SUCCESS printf (ANSI_COLOR_GREEN "SUCCESS\n" ANSI_COLOR_RESET)
 #define PRINT_FAILURE printf (ANSI_COLOR_RED "FAILURE\n" ANSI_COLOR_RESET)
 
+/* generates random number from 0 to 99 */
 #define RANDOM_NUM rand() % 100
 
 #define UNUSED(x) (void)(x)
@@ -140,7 +141,7 @@ void InsertIntToList(slist_ty *slist)
 	
 	int num1 = RANDOM_NUM, num2 = 3, num3 = RANDOM_NUM;
 	
-	printf("\nInserting: %d, %d, %d\n", num1, num2, num3);
+	printf("\nInserting to the list: %d, %d, %d\n", num1, num2, num3);
 	
 	new_node = SlistInsert(new_node, (void *)(long)num1);
 	new_node = SlistInsert(new_node, (void *)(long)num2);
@@ -151,7 +152,12 @@ status_ty PrintList(void *data, void *param)
 {
 	UNUSED(param);
 	
-	printf("%d, ", (int)(long)data);
+	if (NULL == data || NULL == param)
+	{
+		return(FAILURE);
+	}
+	
+	printf("%d ", (int)(long)data);
 	
 	return(SUCCESS);
 }
@@ -166,18 +172,18 @@ void SlistForEachTest(slist_ty *slist)
 {
 	int x = 3;
 	status_ty result = SUCCESS;
-	printf("SlistForEachTest: ");
-	result = SlistForEach(SlistIteratorBegin(slist), SlistIteratorEnd(slist), PrintList, (void *)(long)x);
-	
+	printf("Printing List: ");
+	result = SlistForEach(SlistIteratorBegin(slist), SlistIteratorEnd(slist), 
+													PrintList, (void *)(long)x);
+	printf("\nForEach Test(PrintList): ");
 	(SUCCESS == result) ? PRINT_SUCCESS : PRINT_FAILURE;
 }
 /******************************************************************************/
 void SlistFindTest(slist_ty *slist)
 {
-	int x = 4;
-	slist_iter_ty new_node = SlistFind(SlistIteratorBegin(slist), SlistIteratorEnd(slist), IsMatch, (void *)&x);
-	printf("SlistFindTest: ");
+	int x = 3;
+	slist_iter_ty new_node = SlistFind(SlistIteratorBegin(slist),
+							SlistIteratorEnd(slist), IsMatch, (void *)(long)x);
+	printf("Slist Find Test: ");
 	new_node == SlistIteratorEnd(slist) ? PRINT_FAILURE : PRINT_SUCCESS;
-	
-	printf("%d\n", *(int *)SlistGetData(new_node));
 }

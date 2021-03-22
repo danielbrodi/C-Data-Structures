@@ -2,7 +2,7 @@
 * File: list.c						 		  								
 * Author: Daniel Brodsky					  								
 * Date: 21/03/2021							   								
-* Version: 2.0 (Before Review)						   								
+* Version: 2.5 (Before Review)						   								
 * Reviewer: Olga							   								
 * Description: Single Linked List Functions Implementations.			 
 \******************************************************************************/
@@ -12,7 +12,7 @@
 #include <stdlib.h> /* malloc, free */
 #include <assert.h> /* assert */
 
-#include "../include/list.h"
+#include "list.h"
 
 /******************************* Global Definitions ***************************/
 struct slist
@@ -218,7 +218,7 @@ slist_iter_ty SlistFind(const slist_iter_ty from_iter,
 	
 	while(runner != to_iter)
 	{
-		if(TRUE == is_match_func(param, runner->data))
+		if(TRUE == is_match_func(runner->data, param))
 		{
 			return(runner);
 		}
@@ -240,7 +240,7 @@ const slist_iter_ty to_iter, Action_Func action_func, void *param)
 	
 	while(iterator != to_iter)
 	{
-		if(SUCCESS != action_func(iterator, param))
+		if(SUCCESS != action_func(iterator->data, param))
 		{
 			return(FAILURE);
 		}
