@@ -1,7 +1,7 @@
 /**********************************FILE-HEADER*********************************\
-* File: list.c						 		  								
+* File: slist.c						 		  								
 * Author: Daniel Brodsky					  								
-* Date: 21/03/2021							   								
+* Date: 22/03/2021							   								
 * Version: 2.5 (Before Review)						   								
 * Reviewer: Olga							   								
 * Description: Single Linked List Functions Implementations.			 
@@ -12,7 +12,7 @@
 #include <stdlib.h> /* malloc, free */
 #include <assert.h> /* assert */
 
-#include "list.h"
+#include "slist.h"
 
 /******************************* Global Definitions ***************************/
 struct slist

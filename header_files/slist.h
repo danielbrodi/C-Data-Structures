@@ -1,11 +1,11 @@
 /***********************************************
-* File: list.h						 		   *
+* File: slist.h						 		   *
 * Date: 22/03/2021							   *
 * Version: 1.3  							   *
 * Description: Single Linked List API		   * 
 ************************************************/
-#ifndef	__LIST_H__
-#define	__LIST_H__
+#ifndef	__SLIST_H__
+#define	__SLIST_H__
 
 #include <stddef.h>	/* size_t */
 
@@ -95,4 +95,4 @@ slist_iter_ty SlistFind(const slist_iter_ty from_iter,
 status_ty SlistForEach(slist_iter_ty from_iter,
 const slist_iter_ty to_iter, Action_Func action_func, void *param);
 							 
-#endif	/* __LIST_H__ */
+#endif	/* __SLIST_H__ */

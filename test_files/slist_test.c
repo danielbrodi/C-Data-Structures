@@ -1,29 +1,22 @@
 /**********************************FILE-HEADER*********************************\
-* File: list_test.c						 		  								
+* File: slist_test.c						 		  								
 * Author: Daniel Brodsky					  								
-* Date: 21/03/2021							   								
+* Date: 22/03/2021							   								
 * Version: 2.0 (Before Review)							   								
 * Reviewer: Olga							   								
 * Description: Single Linked List API's Functions Testings.		 
 \******************************************************************************/
 
 /********************************** Inclusions ********************************/
-
 #include <stdio.h>	/* printf, fprintf */
 #include <stdlib.h> /* rand, srand */
 #include <time.h>	/* time */
 #include <string.h> /* strcmp */
 
-#include "list.h"
+#include "slist.h"
 
 /***************************** Macros Definitions *****************************/
-
-/* escape keys for printf to color output for StdOut */
-#define ANSI_COLOR_RED     "\x1b[31m"
-#define ANSI_COLOR_GREEN   "\x1b[32m"
-#define ANSI_COLOR_CYAN    "\x1b[36m"
-#define ANSI_COLOR_RESET   "\x1b[0m"
-
+/* prints colored output */
 #define PRINT_SUCCESS printf (ANSI_COLOR_GREEN "SUCCESS\n" ANSI_COLOR_RESET)
 #define PRINT_FAILURE printf (ANSI_COLOR_RED "FAILURE\n" ANSI_COLOR_RESET)
 
