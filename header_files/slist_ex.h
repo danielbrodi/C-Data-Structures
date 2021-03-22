@@ -1,17 +1,13 @@
-/***********************************************
-* File: slist_ex.h						 		   *
-* Date: 23/03/2021							   *
-* Version: 1.0 							   *
-* Description: Single Linked List API		   * 
-************************************************/
+/******************************************************************************\
+* File: slist_ex.h						 		   
+* Date: 23/03/2021							   
+* Version: 1.0 							   
+* Description: Single Linked List API		    
+*******************************************************************************/
 #ifndef	__SLIST_EX_H__
 #define	__SLIST_EX_H__
 
-typedef struct node
-{
-	void *data;
-	struct node *next;
-} node_t;
+typedef struct node node_t;
 
 /* Reverses the order of a given slist. */
 
