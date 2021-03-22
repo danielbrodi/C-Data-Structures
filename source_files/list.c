@@ -111,7 +111,7 @@ slist_iter_ty SlistIteratorNext(const slist_iter_ty iter)
 boolean_ty SlistIteratorIsEqual(const slist_iter_ty iter_a, 
 											const slist_iter_ty iter_b)
 {
-   IsMatch_Func(iter_a->data, iter_b->data) ? return(SUCCESS) : return(FAILURE);
+   IsMatch_Func(iter_a->data, iter_b->data) ? return(TRUE) : return(FALSE);
 }
 /******************************************************************************/
 void *SlistGetData(const slist_iter_ty iter)
@@ -133,7 +133,7 @@ void SlistSetData(slist_iter_ty iter, void *data)
 /******************************************************************************/
 slist_iter_ty SlistInsert(slist_iter_ty iter, void *data)
 {
-	slist_iter_ty new_node = iter;
+	slist_iter_ty new_node = (slist_iter_ty)malloc(sizeof(slist_node_ty));
 	
 	assert(iter);
 	assert(iter->next);
@@ -151,7 +151,13 @@ slist_iter_ty SlistRemove(slist_iter_ty iter)
 	assert(iter);
 	assert(iter->next);
 	
-	iter = iter->next;
+	iter->data = iter->next->data;
+	
+	temp = iter->next->next;
+	
+	free(iter->next);
+	
+	iter->next = temp;
 	
 	return(iter);
 }
@@ -182,7 +188,7 @@ size_t SlistSize(const slist_ty *slist)
 		++counter;
 	}
 	
-	return(iterator);
+	return(counter);
 }
 /******************************************************************************/
 slist_iter_ty SlistFind(const slist_iter_ty from_iter, 

@@ -118,9 +118,9 @@ void SlistSetDataTest(slist_iter_ty iter, void *data)
 }
 
 /******************************************************************************/
-void SlistInsertTest(slist_iter_ty iter, void *data)
+void SlistInsertTest(slist_ty *slist)
 {
-	slist_iter_ty new_node = ;
+	slist_iter_ty new_node = SlistIteratorBegin;
 	
 	printf("SlistInsertTest: ");
 	
