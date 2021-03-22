@@ -28,7 +28,6 @@ struct slist_node
 };
 
 /************************Functions Implementations*****************************/
-
 /******************************************************************************/
 slist_ty *SlistCreate(void)
 {
@@ -40,7 +39,7 @@ slist_ty *SlistCreate(void)
 	}
 	
 	/* create a dummy node that will represent the beginning of the list */
-	new_list->head = (slist_node *)malloc(sizeof(slist_node));
+	new_list->head = (slist_node_ty *)malloc(sizeof(slist_node_ty));
 	if (NULL == new_list->head)
 	{
 		fprintf(stderr, "Failed to allocate memory\n");
@@ -50,8 +49,8 @@ slist_ty *SlistCreate(void)
 	new_list->head->data = NULL;
 	new_list->head->next = NULL;
 	
-	/* create a dummy node that will represent the end of the list */
-	new_list->tail = (slist_node *)malloc(sizeof(slist_node));
+	/* create a dummy node that will represent the  of the list */
+	new_list->tail = (slist_node_ty *)malloc(sizeof(slist_node_ty));
 	if (NULL == new_list->tail)
 	{
 		fprintf(stderr, "Failed to allocate memory\n");
@@ -64,16 +63,16 @@ slist_ty *SlistCreate(void)
 	
 	new_list->head->next = new_list->tail;
 	
-	return(new_list->head);
+	return(new_list);
 }
 /******************************************************************************/
 void SlistDestroy(slist_ty *slist)
 {
-	slist_iter_ty runner = SlistIteratorBegin(slist);
+	slist_iter_ty runner = NULL;
 	
 	assert(slist);
 	
-	while(slist->tail != runner)
+	while(slist->tail != slist->head)
 	{
 		runner = slist->head;
 		slist->head = slist->head->next;
@@ -91,10 +90,15 @@ slist_iter_ty SlistIteratorBegin(const slist_ty *slist)
 {
 	assert (slist);
 	
-	NULL == slist->head->next ? return(slist->head) : return(slist->head->next);
+	if(slist->tail == slist->head->next)
+	{
+		return(slist->head);
+	}
+	
+	return(slist->head->next);
 }
 /******************************************************************************/
-slist_iter_ty SlistIteratortail(const slist_ty *slist)
+slist_iter_ty SlistIteratorEnd(const slist_ty *slist)
 {
 	assert(slist);
 	
@@ -108,12 +112,7 @@ slist_iter_ty SlistIteratorNext(const slist_iter_ty iter)
 	
 	return(iter->next);
 }
-/******************************************************************************/
-boolean_ty SlistIteratorIsEqual(const slist_iter_ty iter_a, 
-											const slist_iter_ty iter_b)
-{
-   IsMatch_Func(iter_a->data, iter_b->data) ? return(TRUE) : return(FALSE);
-}
+
 /******************************************************************************/
 void *SlistGetData(const slist_iter_ty iter)
 {
@@ -180,7 +179,12 @@ boolean_ty SlistIsEmpty(const slist_ty *slist)
 {
 	assert(slist);
 	
-	slist->tail == slist->head->next ? return(TRUE); : return(FALSE);
+	if (slist->tail == slist->head->next)
+	{
+		return(TRUE);
+	}
+	
+	return(FALSE);
 }
 /******************************************************************************/
 size_t SlistSize(const slist_ty *slist)
@@ -208,11 +212,16 @@ slist_iter_ty SlistFind(const slist_iter_ty from_iter,
 	assert(to_iter);
 	assert(param);
 
+	status_ty result = SUCCESS;
 	slist_iter_ty runner = from_iter;
 	
 	while(runner != to_iter)
 	{
-	 IsMatch_Func(param, runner->data) ? return(runner) : runner = runner->next;
+		if(IsMatch_Func(param, runner->data))
+		{
+			return(runner);
+		}
+		runner = runner->next;
 	}
 
 	return(to_iter);
@@ -225,12 +234,13 @@ const slist_iter_ty to_iter, Action_Func action_func, void *param)
 	assert(to_iter);
 
 	slist_iter_ty iterator = from_iter;
+	status_ty result = SUCCESS;
 	
-	while(iterator != to_iter)
+	while(iterator != to_iter && SUCCESS == result)
 	{
-	 Action_Func(iterator, param) ? iterator = iterator->next : return(FAILURE);
+	 Action_Func(iterator, param) ? iterator = iterator->next : result = FAILURE;
 	}
 
-	return(SUCCESS);
+	return(result);
 }
 /******************************************************************************/
