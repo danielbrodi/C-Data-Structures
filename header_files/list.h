@@ -1,11 +1,9 @@
-/**********************************FILE-HEADER*********************************\
-* File: list.h						 		   
-* Author: Rostik Angelevich					   
-* Date: 21/03/2021							   
-* Version: 1.0  							   
-* Reviewer: Daniel							   
-* Description: Single Linked List API		    
-\******************************************************************************/
+/***********************************************
+* File: list.h						 		   *
+* Date: 22/03/2021							   *
+* Version: 1.3  							   *
+* Description: Single Linked List API		   * 
+************************************************/
 #ifndef	__LIST_H__
 #define	__LIST_H__
 
@@ -23,26 +21,26 @@ typedef boolean_ty (*IsMatch_Func)(void *data, void *param);
 
 typedef status_ty (*Action_Func)(void *data, void *param);
 
-/* Creates an empty single-linked list and returns pointer to the head */
+/* Creates an empty singly-linked list and returns pointer to handler struct */
 /* returns NULL on failure*/
 /* Complexity: O(1) */
 slist_ty *SlistCreate(void);
 
-/* Deletes entire List */
+/* Frees entire List */
 /* Complexity: O(n) */
 void SlistDestroy(slist_ty *slist);
 
-/* Returns iterator to beginning of the list */
-/* Returns NULL if list is empty */
+/* Returns iterator to first element of the list */
 /* Complexity: O(1) */
 slist_iter_ty SlistIteratorBegin(const slist_ty *slist);
 
-/* Returns iterator to end of the list */
+/* Returns iterator to the dummy end of the list */
 /* Complexity: O(1) */
 slist_iter_ty SlistIteratorEnd(const slist_ty *slist);
 
 /* Returns iterator to next elemet in the list */
 /* Returns slist_END on the last element in the list */
+/* Undefined if iter is slist_END */
 /* Complexity: O(1) */
 slist_iter_ty SlistIteratorNext(const slist_iter_ty iter);
 
@@ -58,18 +56,19 @@ boolean_ty SlistIteratorIsEqual(const slist_iter_ty iter_a,
 void *SlistGetData(const slist_iter_ty iter);
 
 /* Sets the data at the iterator */
-/* Undefined behaviour if iter is slist_END */
+/* Undefined behaviour if iter is slist_END or slist is empty*/
 /* Complexity: O(1) */
 void SlistSetData(slist_iter_ty iter, void *data);
 
 /* Insters the element after the iterator, returns iterator to the new node */
-/* TODO Undefined behaviour if iter is slist_END */
+/* On failure returns the same iterator */
+/* Undefined behaviour if iter is slist_END */
 /* Complexity: O(1) */
 slist_iter_ty SlistInsert(slist_iter_ty iter, void *data);
 
 /* Removes the current element from the list, */
 /* returns iterator to the next element in the list */
-/* TODO Undefined behaviour if iter is slist_END */
+/* Beware: removing the last element will change the iterator slist_END */
 /* Complexity: O(1) */
 slist_iter_ty SlistRemove(slist_iter_ty iter);
 
@@ -86,14 +85,14 @@ size_t SlistSize(const slist_ty *slist);
 /* returns to_iter if data not found */
 /* Complexity: O(n) */
 slist_iter_ty SlistFind(const slist_iter_ty from_iter, 
-	const slist_iter_ty to_iter, IsMatch_Func,
+	const slist_iter_ty to_iter, IsMatch_Func is_match_func,
 	void *param);
 
 /* Perform the function Action_Func on each element in range */
 /* [from_iter, to_item) until failure */
 /* Returns SUCCESS if no errors, FAILURE otherwise */
 /* Complexity: O(n) */
-status_ty SlistForEach(const slist_iter_ty from_iter,
-const slist_iter_ty to_iter, Action_Func, void *param);
+status_ty SlistForEach(slist_iter_ty from_iter,
+const slist_iter_ty to_iter, Action_Func action_func, void *param);
 							 
 #endif	/* __LIST_H__ */

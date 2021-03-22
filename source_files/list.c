@@ -9,7 +9,7 @@
 
 /********************************** Inclusions ********************************/
 #include <stdio.h> /* fprintf */
-#include <stdlib.h> /* malloc, realloc, free */
+#include <stdlib.h> /* malloc, free */
 #include <assert.h> /* assert */
 
 #include "../include/list.h"
@@ -192,7 +192,7 @@ size_t SlistSize(const slist_ty *slist)
 }
 /******************************************************************************/
 slist_iter_ty SlistFind(const slist_iter_ty from_iter, 
-	const slist_iter_ty to_iter, IsMatch_Func,
+	const slist_iter_ty to_iter, IsMatch_Func is_match_func,
 	void *param)
 {
 	assert(from_iter);
@@ -209,8 +209,8 @@ slist_iter_ty SlistFind(const slist_iter_ty from_iter,
 	return(to_iter);
 }
 /******************************************************************************/
-status_ty SlistForEach(const slist_iter_ty from_iter,
-const slist_iter_ty to_iter, Action_Func, void *param)
+status_ty SlistForEach(slist_iter_ty from_iter,
+const slist_iter_ty to_iter, Action_Func action_func, void *param)
 {
 	assert(from_iter);
 	assert(to_iter);

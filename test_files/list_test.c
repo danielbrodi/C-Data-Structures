@@ -10,6 +10,7 @@
 /********************************** Inclusions ********************************/
 
 #include <stdio.h> /* printf, fprintf */
+#include <string.h> /* strcmp */
 
 #include "../include/list.h"
 
@@ -119,13 +120,16 @@ void SlistSetDataTest(slist_iter_ty iter, void *data)
 
 /******************************************************************************/
 void SlistInsertTest(slist_ty *slist)
-{
+{	
 	slist_iter_ty new_node = SlistIteratorBegin;
+	
+	assert(slist);
 	
 	printf("SlistInsertTest: ");
 	
-	"Messi" == SlistInsert(new_node, "Messi")->data ? PRINT_SUCCESS :
-																PRINT_FAILURE;
+	new_node = SlistInsert(new_node, "Messi");
+	
+	strcmp(SlistGetData(new_node), "Messi") ? PRINT_FAILURE : PRINT_SUCCESS;
 }
 
 /******************************************************************************/
