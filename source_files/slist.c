@@ -7,6 +7,12 @@
 * Description: Single Linked List Functions Implementations.			 
 \******************************************************************************/
 
+/****************************** Macros Definitions ****************************/
+
+#define ITER_TO_NODE_PTR(iter) (slist_node_ty *)iter
+#define NODE_PTR_TO_ITER(iter) (slist_iter_ty)(node)
+#define IS_END(iter) (ITER_TO_NODE_PTR(iter)->next == NULL)
+
 /********************************** Inclusions ********************************/
 #include <assert.h> /* assert */
 #include <stddef.h>	/* size_t */
@@ -110,28 +116,37 @@ slist_iter_ty SlistIteratorEnd(const slist_ty *slist)
 /******************************************************************************/
 slist_iter_ty SlistIteratorNext(const slist_iter_ty iter)
 {
-	assert(iter);
-	assert(iter->next);
+	assert(ITER_TO_NODE_PTR(iter));
+	assert(ITER_TO_NODE_PTR(iter)->next);
 	
-	return(iter->next);
+	return(ITER_TO_NODE_PTR(iter)->next);
 }
 
 /******************************************************************************/
 void *SlistGetData(const slist_iter_ty iter)
 {
 	assert(iter);
-	assert(iter->next);
+	assert(ITER_TO_NODE_PTR(iter)->next);
 	
-	return(iter->data);
+	return(ITER_TO_NODE_PTR(iter)->data);
 }
 /******************************************************************************/
 void SlistSetData(slist_iter_ty iter, void *data)
 {
 	assert(iter);
-	assert(iter->next);
+	assert(ITER_TO_NODE_PTR(iter)->next);
 	assert(data);
 	
-	iter->data = data;
+	(ITER_TO_NODE_PTR(iter))->data = data;
+}
+/******************************************************************************/
+boolean_ty SlistIteratorIsEqual(const slist_iter_ty iter_a, 
+											const slist_iter_ty iter_b)
+{
+	assert(iter_a);
+	assert(iter_b);
+	
+	return(iter_a == iter_b);
 }
 /******************************************************************************/
 slist_iter_ty SlistInsert(slist_iter_ty iter, void *data)
@@ -139,7 +154,7 @@ slist_iter_ty SlistInsert(slist_iter_ty iter, void *data)
 	slist_iter_ty new_node = NULL;
 	
 	assert(iter);
-	assert(iter->next);
+	assert(ITER_TO_NODE_PTR(iter)->next);
 	assert(data);
 	
 	new_node = (slist_iter_ty)malloc(sizeof(slist_node_ty));
@@ -149,8 +164,8 @@ slist_iter_ty SlistInsert(slist_iter_ty iter, void *data)
 	}
 	
 	new_node->data = data;
-	new_node->next = iter->next;
-	iter->next = new_node;
+	new_node->next = ITER_TO_NODE_PTR(iter)->next;
+	(ITER_TO_NODE_PTR(iter))->next = new_node;
 	
 	return(new_node);
 }
@@ -160,20 +175,20 @@ slist_iter_ty SlistRemove(slist_iter_ty iter)
 	slist_iter_ty temp = NULL;
 	
 	assert(iter);
-	assert(iter->next);
+	assert(ITER_TO_NODE_PTR(iter)->next);
 	
-	iter->data = iter->next->data;
+	(ITER_TO_NODE_PTR(iter))->data = (ITER_TO_NODE_PTR(iter))->next->data;
 	
-	temp = iter->next->next;
+	temp = (ITER_TO_NODE_PTR(iter))->next->next;
 	
 	if(NULL == temp)
 	{
-		((slist_ty *)iter->data)->tail = iter;
+		((slist_ty *)(ITER_TO_NODE_PTR(iter))->data)->tail = iter;
 	}
 	
-	free(iter->next);
+	free((ITER_TO_NODE_PTR(iter))->next);
 	
-	iter->next = temp;
+	(ITER_TO_NODE_PTR(iter))->next = temp;
 	
 	return(iter);
 }
