@@ -2,7 +2,7 @@
 * File: slist.c						 		  								
 * Author: Daniel Brodsky					  								
 * Date: 22/03/2021							   								
-* Version: 2.5 (Before Review)						   								
+* Version: 3.0 (After Review)						   								
 * Reviewer: Olga							   								
 * Description: Single Linked List Functions Implementations.			 
 \******************************************************************************/
@@ -72,7 +72,7 @@ void SlistDestroy(slist_ty *slist)
 	
 	assert(slist);
 	
-	while(slist->tail != slist->head)
+	while(!SlistIsEmpty(slist))
 	{
 		runner = slist->head;
 		slist->head = slist->head->next;

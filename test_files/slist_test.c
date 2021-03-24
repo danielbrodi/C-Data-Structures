@@ -2,7 +2,7 @@
 * File: slist_test.c						 		  								
 * Author: Daniel Brodsky					  								
 * Date: 22/03/2021							   								
-* Version: 2.0 (Before Review)							   								
+* Version: 2.0 (After Review)							   								
 * Reviewer: Olga							   								
 * Description: Single Linked List API's Functions Testings.		 
 \******************************************************************************/
@@ -25,18 +25,18 @@
 
 #define UNUSED(x) (void)(x)
 /****************************Forward Declarations******************************/
-void SlistCreateTest(slist_ty *slist);
-void SlistDestroyTest(slist_ty *slist);
-void SlistIteratorBeginTest(slist_ty *slist);
-void SlistInsertTest(slist_ty *slist);
-void SlistRemoveTest(slist_ty *slist);
-void SlistIsEmptyTest(slist_ty *slist);
-void SlistSetDataTest(slist_ty *slist);
-status_ty PrintList(void *data, void *param);
-boolean_ty IsMatch(void *data, void *param);
-void InsertIntToList(slist_ty *slist);
-void SlistForEachTest(slist_ty *slist);
-void SlistFindTest(slist_ty *slist);
+static void SlistCreateTest(slist_ty *slist);
+static void SlistDestroyTest(slist_ty *slist);
+static void SlistIteratorBeginTest(slist_ty *slist);
+static void SlistInsertTest(slist_ty *slist);
+static void SlistRemoveTest(slist_ty *slist);
+static void SlistIsEmptyTest(slist_ty *slist);
+static void SlistSetDataTest(slist_ty *slist);
+static status_ty PrintList(void *data, void *param);
+static boolean_ty IsMatch(void *data, void *param);
+static void InsertIntToList(slist_ty *slist);
+static void SlistForEachTest(slist_ty *slist);
+static void SlistFindTest(slist_ty *slist);
 /******************************************************************************/
 /********************************Main Function*********************************/
 int main()	
@@ -63,27 +63,27 @@ int main()
 /******************************************************************************/
 /************************Test Functions Implementations************************/
 /******************************************************************************/
-void SlistCreateTest(slist_ty *slist)
+static void SlistCreateTest(slist_ty *slist)
 {
 	printf("\nLinked List Creatation Test: ");
 	NULL == slist ? PRINT_FAILURE : PRINT_SUCCESS;
 }
 
 /******************************************************************************/
-void SlistDestroyTest(slist_ty *slist)
+static void SlistDestroyTest(slist_ty *slist)
 {
 	SlistDestroy(slist);
 	printf (ANSI_COLOR_CYAN "\nThe List has been deleted\n\n" ANSI_COLOR_RESET);
 }
 /******************************************************************************/
-void SlistIteratorBeginTest(slist_ty *slist)
+static void SlistIteratorBeginTest(slist_ty *slist)
 {
 	printf("Iter To Begin/End + Next Test: ");
 	SlistIteratorEnd(slist) == SlistIteratorNext(SlistIteratorBegin(slist)) ?
 	 											  PRINT_SUCCESS : PRINT_FAILURE;
 }
 /******************************************************************************/
-void SlistInsertTest(slist_ty *slist)
+static void SlistInsertTest(slist_ty *slist)
 {	
 	slist_iter_ty new_node = SlistIteratorBegin(slist);
 	
@@ -94,7 +94,7 @@ void SlistInsertTest(slist_ty *slist)
 	strcmp(SlistGetData(new_node), "Messi") ? PRINT_FAILURE : PRINT_SUCCESS;
 }
 /******************************************************************************/
-void SlistRemoveTest(slist_ty *slist)
+static void SlistRemoveTest(slist_ty *slist)
 {
 	size_t original_size = SlistSize(slist);
 	printf("Remove & Size Test: ");
@@ -102,13 +102,13 @@ void SlistRemoveTest(slist_ty *slist)
 	SlistSize(slist) == (original_size - 1) ? PRINT_SUCCESS : PRINT_FAILURE;
 }
 /******************************************************************************/
-void SlistIsEmptyTest(slist_ty *slist)
+static void SlistIsEmptyTest(slist_ty *slist)
 {
 	printf("Slist IsEmpty Test: ");
 	TRUE == SlistIsEmpty(slist) ? PRINT_SUCCESS : PRINT_FAILURE;
 }
 /******************************************************************************/
-void SlistSetDataTest(slist_ty *slist)
+static void SlistSetDataTest(slist_ty *slist)
 {
 	slist_iter_ty new_node = SlistIteratorBegin(slist);
 	
@@ -128,7 +128,7 @@ void SlistSetDataTest(slist_ty *slist)
 	SlistRemove(new_node);
 }
 /******************************************************************************/
-void InsertIntToList(slist_ty *slist)
+static void InsertIntToList(slist_ty *slist)
 {	
 	slist_iter_ty new_node = SlistIteratorBegin(slist);
 	
@@ -141,7 +141,7 @@ void InsertIntToList(slist_ty *slist)
 	new_node = SlistInsert(new_node, (void *)(long)num3);
 }
 /******************************************************************************/
-status_ty PrintList(void *data, void *param)
+static status_ty PrintList(void *data, void *param)
 {
 	UNUSED(param);
 	
@@ -156,12 +156,12 @@ status_ty PrintList(void *data, void *param)
 }
 
 /******************************************************************************/
-boolean_ty IsMatch(void *data, void *param)
+static boolean_ty IsMatch(void *data, void *param)
 {	
 	return(((int)(long)data == (int)(long)param));
 }
 /******************************************************************************/
-void SlistForEachTest(slist_ty *slist)
+static void SlistForEachTest(slist_ty *slist)
 {
 	int x = 3;
 	status_ty result = SUCCESS;
@@ -172,7 +172,7 @@ void SlistForEachTest(slist_ty *slist)
 	(SUCCESS == result) ? PRINT_SUCCESS : PRINT_FAILURE;
 }
 /******************************************************************************/
-void SlistFindTest(slist_ty *slist)
+static void SlistFindTest(slist_ty *slist)
 {
 	int x = 3;
 	slist_iter_ty new_node = SlistFind(SlistIteratorBegin(slist),
