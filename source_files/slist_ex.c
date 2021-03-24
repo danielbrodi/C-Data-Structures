@@ -9,18 +9,18 @@
 
 /****************************** Inclusions ************************************/
 
-#include "../include/slist_ex.h"
+#include <stddef.h> /* NULL */
+
+#include "slist_ex.h"
 
 /************************Functions Implementations*****************************/
 
 /******************************************************************************/
 node_t *Flip(node_t *head)
 {
-	node_t prev = NULL;
-	node_t current = head;
-	node_t next = NULL;
-	
-	assert(head);
+	node_t *prev = NULL;
+	node_t *current = head;
+	node_t *next = NULL;
 	
 	while (current != NULL)
 	{
@@ -34,15 +34,14 @@ node_t *Flip(node_t *head)
 		prev = current;
 		current = next;
 	}
-	head = prev;
+	
+	return(prev);
 }
 /******************************************************************************/
 int HasLoop(const node_t *head)
 {
-	node_t runner = head;
-	node_t runner2 = NULL;
-	
-	assert(head);
+	node_t *runner = (node_t *)head;
+	node_t *runner2 = NULL;
 	
 	runner2 = head->next;
 	
@@ -62,12 +61,9 @@ int HasLoop(const node_t *head)
 /******************************************************************************/	
 node_t *FindIntersection(node_t *head_1, node_t *head_2)
 {
-	node_t list1_runner = head_1;
-	node_t list2_runner = head_2;
-	
-	assert(head_1);
-	assert(head_2);
-	
+	node_t *list1_runner = head_1;
+	node_t *list2_runner = head_2;
+
 	while(NULL != list1_runner)
 	{
 		while(NULL != list2_runner)
@@ -79,6 +75,7 @@ node_t *FindIntersection(node_t *head_1, node_t *head_2)
 			list2_runner = list2_runner->next;
 		}
 		list1_runner = list1_runner->next;
+		list2_runner = head_2;
 	}
 	
 	return(NULL);

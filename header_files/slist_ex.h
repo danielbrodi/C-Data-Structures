@@ -8,11 +8,11 @@
 #define	__SLIST_EX_H__
 
 /******************************************************************************/
-typedef struct node;
+typedef struct node
 {
 	void *data;
 	struct node *next;
-} node_t;
+}node_t;
 
 /* Reverses the order of a given slist. */
 
