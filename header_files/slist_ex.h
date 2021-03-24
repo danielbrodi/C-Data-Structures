@@ -7,7 +7,12 @@
 #ifndef	__SLIST_EX_H__
 #define	__SLIST_EX_H__
 
-typedef struct node node_t;
+/******************************************************************************/
+typedef struct node;
+{
+	void *data;
+	struct node *next;
+} node_t;
 
 /* Reverses the order of a given slist. */
 
@@ -20,5 +25,6 @@ int HasLoop(const node_t *head);
 /* Returns a pointer to a first node matual to both slists, if any. */
 
 node_t *FindIntersection(node_t *head_1, node_t *head_2);	
-				 
+/******************************************************************************/
+
 #endif	/* __SLIST_EX_H__ */

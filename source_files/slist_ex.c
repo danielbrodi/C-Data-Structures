@@ -1,46 +1,86 @@
 /**********************************FILE-HEADER*********************************\
 * File: slist_ex.c						 		  								
 * Author: Daniel Brodsky					  								
-* Date: 23/03/2021							   								
+* Date: 24/03/2021							   								
 * Version: 1.0 (Before Review)						   								
 * Reviewer: Olga							   								
 * Description: Single Linked List Advanced Functions Implementations.			 
 \******************************************************************************/
 
-/********************************** Inclusions ********************************/
+/****************************** Inclusions ************************************/
 
-#include "slist_ex.h"
-
-/******************************* Global Definitions ***************************/
-struct node;
-{
-	void *data;
-	struct node *next;
-};
+#include "../include/slist_ex.h"
 
 /************************Functions Implementations*****************************/
-/******************************************************************************/
 
-/* Reverses the order of a given slist. */
-/* pseudo code */
+/******************************************************************************/
 node_t *Flip(node_t *head)
 {
-
-	runner = list->head;
-	next1 = list>head;
-	next2 = list->head->next;
+	node_t prev = NULL;
+	node_t current = head;
+	node_t next = NULL;
 	
-	/* stop when reach last node */
-	while(NULL != next2)
+	assert(head);
+	
+	while (current != NULL)
 	{
-		next1 = next2;
-		next2 = next2->next;
-		next1->next = runner;
-		runner=next1;
+/*		Store next*/
+		next = current->next;
+
+/*		 Reverse current node's pointer*/
+		current->next = prev;
+
+		/* Move pointers one position ahead. */
+		prev = current;
+		current = next;
+	}
+	head = prev;
+}
+/******************************************************************************/
+int HasLoop(const node_t *head)
+{
+	node_t runner = head;
+	node_t runner2 = NULL;
+	
+	assert(head);
+	
+	runner2 = head->next;
+	
+	while(NULL != runner2 && NULL != runner2->next)
+	{
+		if(runner == runner2)
+		{
+			return(1);
+		}
+		
+		runner = runner->next;
+		runner2 = runner2->next->next;
 	}
 	
-	list->head->next = NULL;
-	
-	return(runner);
+	return(0); /* there is no loop */
 }
-
+/******************************************************************************/	
+node_t *FindIntersection(node_t *head_1, node_t *head_2)
+{
+	node_t list1_runner = head_1;
+	node_t list2_runner = head_2;
+	
+	assert(head_1);
+	assert(head_2);
+	
+	while(NULL != list1_runner)
+	{
+		while(NULL != list2_runner)
+		{
+			if(list1_runner == list2_runner)
+			{
+				return(list1_runner);
+			}
+			list2_runner = list2_runner->next;
+		}
+		list1_runner = list1_runner->next;
+	}
+	
+	return(NULL);
+}
+/******************************************************************************/
