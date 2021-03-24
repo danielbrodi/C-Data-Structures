@@ -90,7 +90,7 @@ slist_iter_ty SlistIteratorBegin(const slist_ty *slist)
 {
 	assert (slist);
 	
-	if(slist->tail == slist->head->next)
+	if(SlistIsEmpty(slist))
 	{
 		return(slist->head);
 	}
