@@ -8,11 +8,13 @@
 \******************************************************************************/
 
 /********************************** Inclusions ********************************/
+#include <stddef.h>	/* size_t */
 #include <stdio.h>	/* printf, fprintf */
 #include <stdlib.h> /* rand, srand */
-#include <time.h>	/* time */
 #include <string.h> /* strcmp */
+#include <time.h>	/* time */
 
+#include "utils.h" /* status_ty, bolean_ty, ANSI_COLOR_*/
 #include "slist.h"
 
 /***************************** Macros Definitions *****************************/

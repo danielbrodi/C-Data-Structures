@@ -8,11 +8,14 @@
 \******************************************************************************/
 
 /********************************** Inclusions ********************************/
+#include <assert.h> /* assert */
+#include <stddef.h>	/* size_t */
 #include <stdio.h> /* fprintf */
 #include <stdlib.h> /* malloc, free */
-#include <assert.h> /* assert */
 
+#include "utils.h" /* status_ty, bolean_ty*/
 #include "slist.h"
+
 
 /******************************* Global Definitions ***************************/
 struct slist
@@ -72,7 +75,7 @@ void SlistDestroy(slist_ty *slist)
 	
 	assert(slist);
 	
-	while(!SlistIsEmpty(slist))
+	while(slist->tail != slist->head)
 	{
 		runner = slist->head;
 		slist->head = slist->head->next;
