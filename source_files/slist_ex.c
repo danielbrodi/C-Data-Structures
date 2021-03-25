@@ -22,7 +22,9 @@ node_t *Flip(node_t *head)
 	node_t *current = head;
 	node_t *next = NULL;
 	
-	while (current != NULL)
+	assert(head);
+	
+	while (NULL != current)
 	{
 /*		Store next*/
 		next = current->next;
@@ -40,8 +42,10 @@ node_t *Flip(node_t *head)
 /******************************************************************************/
 int HasLoop(const node_t *head)
 {
-	node_t *runner = (node_t *)head;
-	node_t *runner2 = NULL;
+	const node_t *runner = head;
+	const node_t *runner2 = NULL;
+	
+	assert(head);
 	
 	runner2 = head->next;
 	
@@ -63,6 +67,9 @@ node_t *FindIntersection(node_t *head_1, node_t *head_2)
 {
 	node_t *list1_runner = head_1;
 	node_t *list2_runner = head_2;
+
+	assert(head_1);
+	assert(head_2);
 
 	while(NULL != list1_runner)
 	{
