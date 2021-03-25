@@ -2,7 +2,7 @@
 * File: slist_ex.c						 		  								
 * Author: Daniel Brodsky					  								
 * Date: 24/03/2021							   								
-* Version: 1.0 (Before Review)						   								
+* Version: 1.0 (After Review)						   								
 * Reviewer: Olga							   								
 * Description: Single Linked List Advanced Functions Implementations.			 
 \******************************************************************************/
