@@ -23,12 +23,12 @@ void QueueDestroy(queue_ty *queue);
 /* Adds a new node after rear and moves rear to the next node. */
 /* Undefined behaviour if iter is queue_END */
 /* Complexity: O(1) */
-queue_iter_ty EnQueue(queue_iter_ty iter, void *data);
+status_ty EnQueue(queue_ty *queue, void *data);
 
 /* Removes the front node and moves front to the next node. */
 /* Undefined behaviour if the queue is empty */
 /* Complexity: O(1) */
-queue_iter_ty DeQueue(queue_iter_ty iter);
+status_ty DeQueue(queue_ty *queue);
 
 /* Returns TRUE if queue is empty or FALSE otherwise */
 /* Complexity: O(1) */

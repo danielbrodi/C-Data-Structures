@@ -7,7 +7,7 @@
 * Description: Queue implementation wrapped by Singly Linked List's API.			 
 \******************************************************************************/
 
-/******************************** Inclusions **********************************/
+/****************************** Inclusions ************************************/
 
 #include <assert.h> /* assert */
 #include <stddef.h>	/* size_t */
@@ -17,7 +17,7 @@
 #include "slist.h" /* singly linked list API wrapper */
 #include "queue.h"
 
-/******************************* Global Definitions ***************************/
+/************************** Global Definitions ********************************/
 
 struct queue
 {
@@ -34,7 +34,7 @@ queue_ty *QueueCreate()
 	queue_ty *new_queue = (queue_ty *)malloc(sizeof(queue_ty));
 	if (NULL == new_queue)
 	{
-		fprintf(stderr, "Failed to allocate memory\n");
+		fprintf(stderr, "Failed to allocate memory for a new queue\n");
 		return(NULL);
 	}
 	
@@ -42,7 +42,7 @@ queue_ty *QueueCreate()
 	if (NULL == new_queue->list)
 	{
 		free(new_queue);
-		fprintf(stderr, "Failed to allocate memory\n");
+		fprintf(stderr, "Failed to allocate memory for a new queue\n");
 		return(NULL);
 	}
 	
@@ -51,20 +51,68 @@ queue_ty *QueueCreate()
 	{
 		free(new_queue->list);
 		free(new_queue);
-		fprintf(stderr, "Failed to allocate memory\n");
+		fprintf(stderr, "Failed to allocate memory for a new queue\n");
 		return(NULL);
 	}
 	
-	new_queue->rear = new_queue->list->tail;
+	new_queue->rear = new_queue->list->head;
 	if (NULL == new_queue->rear)
 	{
 		free(new_queue->front);
 		free(new_queue->list);
 		free(new_queue);
-		fprintf(stderr, "Failed to allocate memory\n");
+		fprintf(stderr, "Failed to allocate memory for a new queue\n");
 		return(NULL);
 	}
 	
 	return(new_queue);
 }
 /******************************************************************************/
+void QueueDestroy(queue_ty *queue)
+{
+	assert (queue);
+	
+	SlistDestroy(queue->list);
+	
+	free(queue->front);
+	queue->front = NULL;
+	
+	free(queue->rear);
+	queue->front = NULL;
+	
+	free(queue);
+	queue = NULL;
+}
+/******************************************************************************/
+status_ty EnQueue(queue_ty *queue, void *data)
+{
+	slist_iter_ty node = NULL;
+	
+	assert(queue);
+	
+	node = SlistInsert(SlistIteratorBegin(queue->list), data);
+	
+	if (SlistIteratorBegin(queue->list) != node)
+	{
+		if(QueueIsEmpty(queue))
+		{
+			queue->front = node;
+		}
+		else
+		{
+			queue->rear->next = node;
+		}
+		queue->rear = node;
+		return(SUCCESS);
+	}
+	else
+	{
+		return(FAILURE);
+	}
+}
+/******************************************************************************/
+status_ty DeQueue(queue_ty *queue)
+{
+	assert (queue);
+	
+}
