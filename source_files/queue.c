@@ -111,8 +111,4 @@ status_ty EnQueue(queue_ty *queue, void *data)
 	}
 }
 /******************************************************************************/
-status_ty DeQueue(queue_ty *queue)
-{
-	assert (queue);
-	
-}
+
