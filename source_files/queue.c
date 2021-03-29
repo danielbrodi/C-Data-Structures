@@ -2,7 +2,7 @@
 * File: queue.c						 		  								
 * Author: Daniel Brodsky					  								
 * Date: 29/03/2021							   								
-* Version: 1.0 (Before Review)					   								
+* Version: 1.0 (After Review)					   								
 * Reviewer: Ariel							   								
 * Description: Queue implementation wrapped by Singly Linked List's API.			 
 \******************************************************************************/
@@ -15,6 +15,7 @@
 #include <stdlib.h> /* malloc, free */
 
 #include "slist.h" /* singly linked list API wrapper */
+#include "utils.h" /* status_ty, bolean_ty */
 #include "queue.h"
 
 /************************** Global Definitions ********************************/
