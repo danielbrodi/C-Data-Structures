@@ -8,7 +8,7 @@
 \******************************************************************************/
 
 /********************************** Inclusions ********************************/
-#include <stddef.h>	/* size_t */
+#include <stddef.h>	/* size_t, NULL */
 #include <stdio.h>	/* printf */
 #include <stdlib.h> /* rand, srand */
 #include <time.h>	/* time */

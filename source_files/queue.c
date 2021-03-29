@@ -14,8 +14,8 @@
 #include <stdio.h> /* fprintf */
 #include <stdlib.h> /* malloc, free */
 
-#include "../include/slist.h" /* singly linked list API wrapper */
-#include "../include/queue.h"
+#include "slist.h" /* singly linked list API wrapper */
+#include "queue.h"
 
 /************************** Global Definitions ********************************/
 
@@ -23,7 +23,7 @@ struct queue
 {
 	slist_ty *list;
 	slist_iter_ty rear;		/* stores the last node in the queue which is not
-																a dummy node */
+															the dummy node */
 };
 
 /************************Functions Implementations*****************************/
@@ -126,31 +126,5 @@ void QueueAppend(queue_ty *dest_queue, queue_ty *src_queue)
 	
 	dest_queue->rear = src_queue->rear;
 	src_queue->rear = SlistIteratorBegin(src_queue->list);
-}
-/******************************************************************************/
-/*----------------------------------------------------------------------------*/
-/* for testing purposes */
-void PrintQueue(queue_ty *queue)
-{
-	
-	size_t i = 0;
-	
-	slist_iter_ty iter = NULL;
-	assert(queue);
-	
-	if(FALSE == QueueIsEmpty(queue))
-	{
-		iter = SlistIteratorBegin(queue->list);
-		for(i = 0; i < QueueSize(queue); ++i)
-		{
-			printf("%ld\n",(unsigned long)SlistGetData(iter));
-			iter = SlistIteratorNext(iter);
-		}
-		printf("\n");
-	}
-	else
-	{
-	printf("Queue is empty!\n");
-	}
 }
 /******************************************************************************/
