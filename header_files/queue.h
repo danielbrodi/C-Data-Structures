@@ -51,9 +51,6 @@ void *QueuePeek(const queue_ty *queue);
 
 /* Appends queue_src to the end of queue_dest */
 /* Complexity: O(1) */
-void QueueAppend(queue_ty *queue_dest, queue_ty *queue_src);
-
-void PrintQueue(queue_ty *queue);
-							 
+void QueueAppend(queue_ty *queue_dest, queue_ty *queue_src);							 
 /******************************************************************************/
 #endif	/* __QUEUE_H__ */
