@@ -38,7 +38,7 @@ static void QueueAppendTest(queue_ty *queue, queue_ty *other_queue);
 /********************************Main Function*********************************/
 int main()	
 {
-	/* Intializes new singly linked list */
+	/* Intializes two empty queues */
 	queue_ty *new_queue = QueueCreate();
 	queue_ty *other_queue = QueueCreate();
 	
@@ -52,6 +52,7 @@ int main()
 	QueueIsEmptyTest(new_queue);
 	QueueAppendTest(new_queue, other_queue);
 	QueueDestroyTest(new_queue);
+	QueueDestroyTest(other_queue);
 	
 	return(0);
 }
@@ -122,21 +123,36 @@ void QueueAppendTest(queue_ty *queue, queue_ty *other_queue)
 	
 	printf("\n\nQueue Append Test:\n");
 	
+	printf("SIZE: %lu", QueueSize(queue));
+	/* queue filling */
+	printf("\nQueue A:\n");
+	printf("Inserts element:");
 	SUCCESS == Enqueue(queue, (void *)(long)num1) ? PRINT_SUCCESS : PRINT_FAILURE;
+	printf("Inserts element:");
 	SUCCESS == Enqueue(queue, (void *)(long)num2) ? PRINT_SUCCESS : PRINT_FAILURE;
+	printf("Inserts element:");
 	SUCCESS == Enqueue(queue, (void *)(long)num3) ? PRINT_SUCCESS : PRINT_FAILURE;
-	SUCCESS == Enqueue(other_queue, (void *)(long)num4) ? PRINT_SUCCESS : PRINT_FAILURE;
-	SUCCESS == Enqueue(other_queue, (void *)(long)num5) ? PRINT_SUCCESS : PRINT_FAILURE;
-	SUCCESS == Enqueue(other_queue, (void *)(long)num6) ? PRINT_SUCCESS : PRINT_FAILURE;
-	printf("Queue A:\n");
+	printf("\nList:\n");
+	printf("SIZE: %lu", QueueSize(queue));
 	PrintQueue(queue);
-	printf("Queue B:\n");
+	
+	/* other_queue filling */
+	printf("\nQueue B:\n");
+	printf("Inserts element:");
+	SUCCESS == Enqueue(other_queue, (void *)(long)num4) ? PRINT_SUCCESS : PRINT_FAILURE;
+	printf("Inserts element:");
+	SUCCESS == Enqueue(other_queue, (void *)(long)num5) ? PRINT_SUCCESS : PRINT_FAILURE;
+	printf("Inserts element:");
+	SUCCESS == Enqueue(other_queue, (void *)(long)num6) ? PRINT_SUCCESS : PRINT_FAILURE;
+	printf("\nList:\n");
 	PrintQueue(other_queue);
 	
-	printf("Queue Append Test:\n");
+	printf (ANSI_COLOR_CYAN "\nAfter Merge:\n\n" ANSI_COLOR_RESET);
 	QueueAppend(queue, other_queue);
+	
 	printf("Queue A:\n");
 	PrintQueue(queue);
+	
 	printf("Queue B:\n");
 	PrintQueue(other_queue);
 }

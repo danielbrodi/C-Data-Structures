@@ -85,7 +85,12 @@ void Dequeue(queue_ty *queue)
 	assert(!QueueIsEmpty(queue));
 
 	/* frees and removes the front node from list */
-	SlistRemove(SlistIteratorBegin(queue->list)); 
+	SlistRemove(SlistIteratorBegin(queue->list));
+	
+	if (SlistIsEmpty(queue->list))
+	{
+	 	queue->rear = SlistIteratorBegin(queue->list);
+	}
 }
 /******************************************************************************/
 boolean_ty QueueIsEmpty(const queue_ty *queue)
@@ -125,16 +130,22 @@ void QueueAppend(queue_ty *dest_queue, queue_ty *src_queue)
 /* for testing purposes */
 void PrintQueue(queue_ty *queue)
 {
+	
 	size_t i = 0;
 	
 	slist_iter_ty iter = NULL;
-	iter = SlistIteratorBegin(queue->list);
+	assert(queue);
 	
-	for(i = 0; i < QueueSize(queue);++i)
+	if(FALSE == QueueIsEmpty(queue))
 	{
-		printf("%ld\n",(unsigned long)SlistGetData(iter));
-		iter = SlistIteratorNext(iter);
+		iter = SlistIteratorBegin(queue->list);
+		
+		for(i = 0; i < QueueSize(queue); ++i)
+		{
+			printf("%ld\n",(unsigned long)SlistGetData(iter));
+			iter = SlistIteratorNext(iter);
+		}
+		printf("\n");
 	}
-	printf("\n");
 }
 /******************************************************************************/
