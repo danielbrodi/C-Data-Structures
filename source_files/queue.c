@@ -89,10 +89,8 @@ status_ty EnQueue(queue_ty *queue, void *data)
 		queue->rear = node;
 		return(SUCCESS);
 	}
-	else
-	{
-		return(FAILURE);
-	}
+	
+	return(FAILURE);
 }
 /******************************************************************************/
 void DeQueue(queue_ty *queue)
