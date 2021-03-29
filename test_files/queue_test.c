@@ -9,26 +9,25 @@
 
 /********************************** Inclusions ********************************/
 #include <stddef.h>	/* size_t */
-#include <stdio.h>	/* printf, fprintf */
+#include <stdio.h>	/* printf */
 #include <stdlib.h> /* rand, srand */
-#include <string.h> /* strcmp */
 #include <time.h>	/* time */
 
-#include "../include/utils.h" /* status_ty, bolean_ty, ANSI_COLOR_*/
-#include "../include/queue.h"
+#include "utils.h" /* status_ty, bolean_ty, ANSI_COLOR_*/
+#include "queue.h"
 
 /***************************** Macros Definitions *****************************/
 /* prints colored output */
 #define PRINT_SUCCESS printf (ANSI_COLOR_GREEN "SUCCESS\n" ANSI_COLOR_RESET)
 #define PRINT_FAILURE printf (ANSI_COLOR_RED "FAILURE\n" ANSI_COLOR_RESET)
 
-/* generates random number from 0 to 99 */
-#define RANDOM_NUM rand() % 100
+/* generates random number from 1 to 100 */
+#define RANDOM_NUM (rand() % 100 + 1)
 
 #define UNUSED(x) (void)(x)
 /****************************Forward Declarations******************************/
 static void QueueCreateTest(queue_ty *queue);
-static void QueueDestroyTest(queue_ty *queue);
+static void QueueDestroyTest(queue_ty *queue, queue_ty *second_queue);
 static void QueueEnqueueTest(queue_ty *queue);
 static void QueueDequeueTest(queue_ty *queue);
 static void QueueIsEmptyTest(queue_ty *queue);
@@ -40,7 +39,7 @@ int main()
 {
 	/* Intializes two empty queues */
 	queue_ty *new_queue = QueueCreate();
-	queue_ty *other_queue = QueueCreate();
+	queue_ty *second_queue = QueueCreate();
 	
 	/* Intializes random number generator */
 	srand(time(0));
@@ -50,9 +49,8 @@ int main()
 	QueuePeekTest(new_queue);
 	QueueDequeueTest(new_queue);
 	QueueIsEmptyTest(new_queue);
-	QueueAppendTest(new_queue, other_queue);
-	QueueDestroyTest(new_queue);
-	QueueDestroyTest(other_queue);
+	QueueAppendTest(new_queue, second_queue);
+	QueueDestroyTest(new_queue, second_queue);
 	
 	return(0);
 }
@@ -64,12 +62,12 @@ void QueueCreateTest(queue_ty *queue)
 	printf("\nQueue Creatation Test: ");
 	NULL == queue ? PRINT_FAILURE : PRINT_SUCCESS;
 }
-
 /******************************************************************************/
-void QueueDestroyTest(queue_ty *queue)
+void QueueDestroyTest(queue_ty *queue, queue_ty *second_queue)
 {
 	QueueDestroy(queue);
-	printf (ANSI_COLOR_CYAN "\nThe queue has been deleted\n\n"
+	QueueDestroy(second_queue);
+	printf (ANSI_COLOR_CYAN "\nThe queues have been deleted\n"
 															 ANSI_COLOR_RESET);
 }
 /******************************************************************************/
@@ -120,39 +118,43 @@ void QueueAppendTest(queue_ty *queue, queue_ty *other_queue)
 	
 	int num1 = RANDOM_NUM, num2 = 3, num3 = RANDOM_NUM;
 	int num4 = RANDOM_NUM, num5 = 3, num6 = RANDOM_NUM;
+	size_t status = 1;
+	size_t original_size = 0;
+	size_t original_other_size = 0;
 	
-	printf("\n\nQueue Append Test:\n");
+	printf("Queue Append Test: ");
 	
-	printf("SIZE: %lu", QueueSize(queue));
-	/* queue filling */
-	printf("\nQueue A:\n");
-	printf("Inserts element:");
-	SUCCESS == Enqueue(queue, (void *)(long)num1) ? PRINT_SUCCESS : PRINT_FAILURE;
-	printf("Inserts element:");
-	SUCCESS == Enqueue(queue, (void *)(long)num2) ? PRINT_SUCCESS : PRINT_FAILURE;
-	printf("Inserts element:");
-	SUCCESS == Enqueue(queue, (void *)(long)num3) ? PRINT_SUCCESS : PRINT_FAILURE;
-	printf("\nList:\n");
-	printf("SIZE: %lu", QueueSize(queue));
-	PrintQueue(queue);
+	/* filling up first queue */
+	Enqueue(queue, (void *)(long)num1);
+	Enqueue(queue, (void *)(long)num2);
+	Enqueue(queue, (void *)(long)num3);
+	/* filling up second queue */
+	Enqueue(other_queue, (void *)(long)num4);
+	Enqueue(other_queue, (void *)(long)num5);
+	Enqueue(other_queue, (void *)(long)num6);
 	
-	/* other_queue filling */
-	printf("\nQueue B:\n");
-	printf("Inserts element:");
-	SUCCESS == Enqueue(other_queue, (void *)(long)num4) ? PRINT_SUCCESS : PRINT_FAILURE;
-	printf("Inserts element:");
-	SUCCESS == Enqueue(other_queue, (void *)(long)num5) ? PRINT_SUCCESS : PRINT_FAILURE;
-	printf("Inserts element:");
-	SUCCESS == Enqueue(other_queue, (void *)(long)num6) ? PRINT_SUCCESS : PRINT_FAILURE;
-	printf("\nList:\n");
-	PrintQueue(other_queue);
+	original_size = QueueSize(queue);
+	original_other_size = QueueSize(other_queue);
 	
-	printf (ANSI_COLOR_CYAN "\nAfter Merge:\n\n" ANSI_COLOR_RESET);
 	QueueAppend(queue, other_queue);
 	
-	printf("Queue A:\n");
-	PrintQueue(queue);
+	status *= (original_size + original_other_size == QueueSize(queue)) ? 1 : 0;
 	
-	printf("Queue B:\n");
-	PrintQueue(other_queue);
+	status *= (num1 == (int)(long)QueuePeek(queue)) ? 1 : 0;
+	Dequeue(queue);
+	status *= (num2 == (int)(long)QueuePeek(queue)) ? 1 : 0;
+	Dequeue(queue);
+	status *= (num3 == (int)(long)QueuePeek(queue)) ? 1 : 0;
+	Dequeue(queue);
+	status *= (num4 == (int)(long)QueuePeek(queue)) ? 1 : 0;
+	Dequeue(queue);
+	status *= (num5 == (int)(long)QueuePeek(queue)) ? 1 : 0;
+	Dequeue(queue);
+	status *= (num6 == (int)(long)QueuePeek(queue)) ? 1 : 0;
+	Dequeue(queue);
+	
+	status *= (QueueIsEmpty(queue)) ? 1 : 0;
+	
+	(status) ? PRINT_SUCCESS : PRINT_FAILURE;
 }
+/******************************************************************************/

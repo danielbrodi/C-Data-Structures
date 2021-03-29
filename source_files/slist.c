@@ -283,10 +283,12 @@ void SlistAppend(slist_ty *dest_slist, slist_ty *src_slist)
 	dest_slist->tail->next = src_slist->head->next->next;
 	dest_slist->tail->data = src_slist->head->next->data;
 	/* switch tail dummy of src with tail dummy of dest */
-	dest_slist->tail = src_slist->tail;
 	src_slist->tail->data = dest_slist;
+	dest_slist->tail = src_slist->tail;
 	/* make sure src list is empty */
 	src_slist->head->next->next = NULL;
 	src_slist->head->next->data = src_slist;
+	src_slist->tail = src_slist->head->next;
+	
 }
 /******************************************************************************/

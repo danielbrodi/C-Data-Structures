@@ -53,7 +53,9 @@ queue_ty *QueueCreate()
 /******************************************************************************/
 void QueueDestroy(queue_ty *queue)
 {
+	
 	assert(queue);
+	assert(queue->list);
 	
 	SlistDestroy(queue->list);
 	queue->list = NULL;
@@ -139,13 +141,16 @@ void PrintQueue(queue_ty *queue)
 	if(FALSE == QueueIsEmpty(queue))
 	{
 		iter = SlistIteratorBegin(queue->list);
-		
 		for(i = 0; i < QueueSize(queue); ++i)
 		{
 			printf("%ld\n",(unsigned long)SlistGetData(iter));
 			iter = SlistIteratorNext(iter);
 		}
 		printf("\n");
+	}
+	else
+	{
+	printf("Queue is empty!\n");
 	}
 }
 /******************************************************************************/
