@@ -10,7 +10,7 @@
 /****************************** Inclusions ************************************/
 
 #include <assert.h> /* assert */
-#include <stddef.h>	/* size_t */
+#include <stddef.h>	/* size_t, NULL */
 #include <stdio.h> /* fprintf */
 #include <stdlib.h> /* malloc, free */
 
@@ -46,31 +46,15 @@ queue_ty *QueueCreate()
 		return(NULL);
 	}
 	
-	new_queue->front = new_queue->list->head;
-	if (NULL == new_queue->front)
-	{
-		free(new_queue->list);
-		free(new_queue);
-		fprintf(stderr, "Failed to allocate memory for a new queue\n");
-		return(NULL);
-	}
-	
-	new_queue->rear = new_queue->list->head;
-	if (NULL == new_queue->rear)
-	{
-		free(new_queue->front);
-		free(new_queue->list);
-		free(new_queue);
-		fprintf(stderr, "Failed to allocate memory for a new queue\n");
-		return(NULL);
-	}
+	new_queue->front = NULL;
+	new_queue->rear = NULL;
 	
 	return(new_queue);
 }
 /******************************************************************************/
 void QueueDestroy(queue_ty *queue)
 {
-	assert (queue);
+	assert(queue);
 	
 	SlistDestroy(queue->list);
 	
@@ -78,7 +62,7 @@ void QueueDestroy(queue_ty *queue)
 	queue->front = NULL;
 	
 	free(queue->rear);
-	queue->front = NULL;
+	queue->rear = NULL;
 	
 	free(queue);
 	queue = NULL;
@@ -111,4 +95,47 @@ status_ty EnQueue(queue_ty *queue, void *data)
 	}
 }
 /******************************************************************************/
+void DeQueue(queue_ty *queue)
+{
+	slist_iter_ty node = NULL;
+	
+	assert(queue);
+	assert(!QueueIsEmpty(queue));
+	
+	node = queue->front;
+	queue->front = queue-front->next;
+	
+	if(NULL == queue->front)
+	{
+		queue->rear = NULL;
+	}
+	
+	SlistRemove(node); /* frees and removes the front node from list */
+}
+/******************************************************************************/
+boolean_ty QueueIsEmpty(const queue_ty *queue)
+{
+	assert(queue);
+	
+	return(NULL == queue->front && NULL == queue->rear);
+}
+/******************************************************************************/
+size_t QueueGetSize(const queue_ty *queue)
+{
+	assert(queue);
+	
+	return(SlistSize(queue->list));
+}
+/******************************************************************************/
+void *QueuePeek(const queue_ty *queue);
+{
+	assert(queue);
+	assert(!QueueIsEmpty(queue));
+	
+	return(queue->front->data);
+}
+/******************************************************************************/
+void QueueAppend(queue_iter_ty iter, void *data)
+{
 
+}
