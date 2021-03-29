@@ -2,7 +2,7 @@
 * File: queue.c						 		  								
 * Author: Daniel Brodsky					  								
 * Date: 29/03/2021							   								
-* Version: Beta					   								
+* Version: 1.0 (Before Review)					   								
 * Reviewer: Ariel							   								
 * Description: Queue implementation wrapped by Singly Linked List's API.			 
 \******************************************************************************/
@@ -14,15 +14,16 @@
 #include <stdio.h> /* fprintf */
 #include <stdlib.h> /* malloc, free */
 
-#include "slist.h" /* singly linked list API wrapper */
-#include "queue.h"
+#include "../include/slist.h" /* singly linked list API wrapper */
+#include "../include/queue.h"
 
 /************************** Global Definitions ********************************/
 
 struct queue
 {
 	slist_ty *list;
-	slist_iter_ty rear;		/* stores the last active node */
+	slist_iter_ty rear;		/* stores the last node in the queue which is not
+																a dummy node */
 };
 
 /************************Functions Implementations*****************************/
@@ -61,7 +62,7 @@ void QueueDestroy(queue_ty *queue)
 	queue = NULL;
 }
 /******************************************************************************/
-status_ty EnQueue(queue_ty *queue, void *data)
+status_ty Enqueue(queue_ty *queue, void *data)
 {
 	slist_iter_ty node = NULL;
 	
@@ -78,13 +79,13 @@ status_ty EnQueue(queue_ty *queue, void *data)
 	return(FAILURE);
 }
 /******************************************************************************/
-void DeQueue(queue_ty *queue)
+void Dequeue(queue_ty *queue)
 {
 	assert(queue);
 	assert(!QueueIsEmpty(queue));
 
 	/* frees and removes the front node from list */
-	SlistRemove(SlistIteratorBegin); 
+	SlistRemove(SlistIteratorBegin(queue->list)); 
 }
 /******************************************************************************/
 boolean_ty QueueIsEmpty(const queue_ty *queue)
@@ -94,14 +95,14 @@ boolean_ty QueueIsEmpty(const queue_ty *queue)
 	return(SlistIsEmpty(queue->list));
 }
 /******************************************************************************/
-size_t QueueGetSize(const queue_ty *queue)
+size_t QueueSize(const queue_ty *queue)
 {
 	assert(queue);
 	
 	return(SlistSize(queue->list));
 }
 /******************************************************************************/
-void *QueuePeek(const queue_ty *queue);
+void *QueuePeek(const queue_ty *queue)
 {
 	assert(queue);
 	assert(!QueueIsEmpty(queue));
@@ -119,3 +120,21 @@ void QueueAppend(queue_ty *dest_queue, queue_ty *src_queue)
 	dest_queue->rear = src_queue->rear;
 	src_queue->rear = SlistIteratorBegin(src_queue->list);
 }
+/******************************************************************************/
+/*----------------------------------------------------------------------------*/
+/* for testing purposes */
+void PrintQueue(queue_ty *queue)
+{
+	size_t i = 0;
+	
+	slist_iter_ty iter = NULL;
+	iter = SlistIteratorBegin(queue->list);
+	
+	for(i = 0; i < QueueSize(queue);++i)
+	{
+		printf("%ld\n",(unsigned long)SlistGetData(iter));
+		iter = SlistIteratorNext(iter);
+	}
+	printf("\n");
+}
+/******************************************************************************/

@@ -19,8 +19,8 @@
 #include <stdio.h> /* fprintf */
 #include <stdlib.h> /* malloc, free */
 
-#include "utils.h" /* status_ty, bolean_ty*/
-#include "slist.h"
+#include "../include/utils.h" /* status_ty, bolean_ty*/
+#include "../include/slist.h"
 
 
 /******************************* Global Definitions ***************************/
