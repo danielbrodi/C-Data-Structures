@@ -22,8 +22,7 @@
 struct queue
 {
 	slist_ty *list;
-	slist_iter_ty front;	/* stores the first node */
-	slist_iter_ty rear;		/* stores the last node */
+	slist_iter_ty rear;		/* stores the last active node */
 };
 
 /************************Functions Implementations*****************************/
@@ -46,8 +45,7 @@ queue_ty *QueueCreate()
 		return(NULL);
 	}
 	
-	new_queue->front = NULL;
-	new_queue->rear = NULL;
+	new_queue->rear = SlistIteratorBegin(new_queue->list);
 	
 	return(new_queue);
 }
@@ -57,12 +55,7 @@ void QueueDestroy(queue_ty *queue)
 	assert(queue);
 	
 	SlistDestroy(queue->list);
-	
-	free(queue->front);
-	queue->front = NULL;
-	
-	free(queue->rear);
-	queue->rear = NULL;
+	queue->list = NULL;
 	
 	free(queue);
 	queue = NULL;
@@ -74,18 +67,10 @@ status_ty EnQueue(queue_ty *queue, void *data)
 	
 	assert(queue);
 	
-	node = SlistInsert(SlistIteratorBegin(queue->list), data);
+	node = SlistInsert(queue->rear, data);
 	
-	if (SlistIteratorBegin(queue->list) != node)
+	if (queue->rear != node)
 	{
-		if(QueueIsEmpty(queue))
-		{
-			queue->front = node;
-		}
-		else
-		{
-			queue->rear->next = node;
-		}
 		queue->rear = node;
 		return(SUCCESS);
 	}
@@ -95,27 +80,18 @@ status_ty EnQueue(queue_ty *queue, void *data)
 /******************************************************************************/
 void DeQueue(queue_ty *queue)
 {
-	slist_iter_ty node = NULL;
-	
 	assert(queue);
 	assert(!QueueIsEmpty(queue));
-	
-	node = queue->front;
-	queue->front = queue-front->next;
-	
-	if(NULL == queue->front)
-	{
-		queue->rear = NULL;
-	}
-	
-	SlistRemove(node); /* frees and removes the front node from list */
+
+	/* frees and removes the front node from list */
+	SlistRemove(SlistIteratorBegin); 
 }
 /******************************************************************************/
 boolean_ty QueueIsEmpty(const queue_ty *queue)
 {
 	assert(queue);
 	
-	return(NULL == queue->front && NULL == queue->rear);
+	return(SlistIsEmpty(queue->list));
 }
 /******************************************************************************/
 size_t QueueGetSize(const queue_ty *queue)
@@ -130,10 +106,16 @@ void *QueuePeek(const queue_ty *queue);
 	assert(queue);
 	assert(!QueueIsEmpty(queue));
 	
-	return(queue->front->data);
+	return(SlistGetData(SlistIteratorBegin(queue->list)));
 }
 /******************************************************************************/
-void QueueAppend(queue_iter_ty iter, void *data)
-{
-
+void QueueAppend(queue_ty *dest_queue, queue_ty *src_queue)
+{	
+	assert(dest_queue);
+	assert(src_queue);
+	
+	SlistAppend(dest_queue->list, src_queue->list);
+	
+	dest_queue->rear = src_queue->rear;
+	src_queue->rear = SlistIteratorBegin(src_queue->list);
 }

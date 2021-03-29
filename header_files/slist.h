@@ -94,5 +94,9 @@ slist_iter_ty SlistFind(const slist_iter_ty from_iter,
 /* Complexity: O(n) */
 status_ty SlistForEach(slist_iter_ty from_iter,
 const slist_iter_ty to_iter, Action_Func action_func, void *param);
+
+/* Appends src list to the end of dest list and keeps src list empty */
+/* Complexity: O(n) */
+void SlistAppend(slist_ty *dest_slist, slist_ty *src_slist);
 							 
 #endif	/* __SLIST_H__ */

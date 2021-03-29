@@ -11,7 +11,11 @@
 
 #include <stddef.h>	/* size_t */
 
-typedef queue queue_ty;
+#include "utils.h" /* status_ty, bolean_ty*/
+
+/******************************************************************************/
+
+typedef struct queue queue_ty;
 
 /* Creates an empty queue and returns pointer to handler struct */
 /* returns NULL on failure*/
@@ -22,15 +26,16 @@ queue_ty *QueueCreate(void);
 /* Complexity: O(n) */
 void QueueDestroy(queue_ty *queue);
 
-/* Adds a new node after rear and moves rear to the next node. */
-/* Undefined behaviour if iter is queue_END */
+/* Inserts the element in the end of the queue */
+/* Return value: On success - SUCCESS  */
+/* 				 On failure - FAILURE */
 /* Complexity: O(1) */
-status_ty EnQueue(queue_ty *queue, void *data);
+status_ty Enqueue(queue_ty *queue, void *data);
 
-/* Removes the front node and moves front to the next node. */
-/* Undefined behaviour if the queue is empty */
+/* Removes the first element from the queue */
+/* undefined - if the queue is empty */
 /* Complexity: O(1) */
-void DeQueue(queue_ty *queue);
+void Dequeue(queue_ty *queue);
 
 /* Returns TRUE if queue is empty or FALSE otherwise */
 /* Complexity: O(1) */
@@ -38,17 +43,15 @@ boolean_ty QueueIsEmpty(const queue_ty *queue);
 
 /* Returns number of elements in the queue */
 /* Complexity: O(n) */
-size_t QueueGetSize(const queue_ty *queue);
+size_t QueueSize(const queue_ty *queue);
 
-/* Returns the data of the iterator */
-/* Undefined behaviour if iter is queue_END */
+/* Returns the first element */
 /* Complexity: O(1) */
 void *QueuePeek(const queue_ty *queue);
 
-/* Insters the element after the iterator, returns iterator to the new node */
-/* On failure returns the same iterator */
-/* Undefined behaviour if iter is queue_END */
+/* Appends queue_src to the end of queue_dest */
 /* Complexity: O(1) */
-void QueueAppend(queue_iter_ty iter, void *data);
-
+void QueueAppend(queue_ty *queue_dest, queue_ty *queue_src);
+							 
+/******************************************************************************/
 #endif	/* __QUEUE_H__ */

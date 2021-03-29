@@ -269,3 +269,24 @@ const slist_iter_ty to_iter, Action_Func action_func, void *param)
 	return(SUCCESS);
 }
 /******************************************************************************/
+void SlistAppend(slist_ty *dest_slist, slist_ty *src_slist)
+{
+	assert(dest_slist);
+	assert(src_slist);
+	
+	if (SlistIsEmpty(src_slist))
+	{
+		return;
+	}
+	
+	/* switch tail dummy of dest with first node in src */
+	dest_slist->tail->next = src_slist->head->next->next;
+	dest_slist->tail->data = src_slist->head->next->data;
+	/* switch tail dummy of src with tail dummy of dest */
+	dest_slist->tail = src_slist->tail;
+	src_slist->tail->data = dest_slist;
+	/* make sure src list is empty */
+	src_slist->head->next->next = NULL;
+	src_slist->head->next->data = src_slist;
+}
+/******************************************************************************/
