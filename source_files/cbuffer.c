@@ -85,10 +85,14 @@ size_t CBufferFreeSpace(const cbuffer_ty *cbuf)
 {
 	assert(cbuf);
 	
-    if (cbuf->write >= cbuf->read)
-        return(cbuf->capacity - (cbuf->write - cbuf->read));
-    else
-        return(cbuf->read - cbuf->write - 1);
+	if (cbuf->write >= cbuf->read)
+	{
+		return((cbuf->capacity) - (cbuf->write - cbuf->read));
+	}
+	else
+	{
+		return(cbuf->read - cbuf->write - 1);
+	}
 }
 /******************************************************************************/
 boolean_ty CBufferIsEmpty(const cbuffer_ty *cbuf)
