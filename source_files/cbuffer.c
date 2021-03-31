@@ -60,10 +60,12 @@ void CBufferDestroy(cbuffer_ty *cbuf)
 /******************************************************************************/
 ssize_t CBufferWriteTo(cbuffer_ty *cbuf, const void *src, size_t count)
 {
+	size_t bytes_counter = 0
+	;
 	assert(cbuf);
 	assert(src);
 	
-	while(*src && count > 0)
+	while(*src && bytes_counter < count)
 	{
 	
 		if (0 == CBufferFreeSpace(cbuf))
@@ -74,8 +76,9 @@ ssize_t CBufferWriteTo(cbuffer_ty *cbuf, const void *src, size_t count)
 		*write = *src;
 		write = cbuf->arr + ((ARR_END_INDEX + (++write)) % BUFFER_CAPACITY);
 		++src;
-		--count;
+		++bytes_counter;
 	}
+	return(bytes_counter);
 }
 /******************************************************************************/
 size_t CBufferFreeSpace(const cbuffer_ty *cbuf)
