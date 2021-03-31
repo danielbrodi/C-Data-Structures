@@ -7,7 +7,7 @@
 * Description: Circular Buffer functions implementations.			 
 \******************************************************************************/
 
-#define BUFFER_CAPACITY (cbuf->capacity)
+#define BUFFER_CAPACITY (cbuf->capacity-1)
 #define ARR_END_INDEX (cbuf->arr+cbuf->capacity)
 
 /****************************** Inclusions ************************************/
@@ -45,7 +45,8 @@ cbuffer_ty *CBufferCreate(size_t capacity)
 	
 	new_cbuffer->read = new_cbuffer->arr;
 	new_cbuffer->write = new_cbuffer->arr;
-	new_cbuffer->capacity = capacity;
+	/* One byte is used for detecting the full condition. */
+	new_cbuffer->capacity = capacity + 1; 
 	
 	return(new_cbuffer);
 }
@@ -87,7 +88,7 @@ size_t CBufferFreeSpace(const cbuffer_ty *cbuf)
 	
 	if (cbuf->write >= cbuf->read)
 	{
-		return((cbuf->capacity) - (cbuf->write - cbuf->read));
+		return((cbuf->capacity) - 1 - (cbuf->write - cbuf->read));
 	}
 	else
 	{
@@ -99,12 +100,12 @@ boolean_ty CBufferIsEmpty(const cbuffer_ty *cbuf)
 {
 	assert(cbuf);
 	
-	return(CBufferFreeSpace(cbuf) == cbuf->capacity);
+	return(CBufferFreeSpace(cbuf) == cbuf->capacity - 1);
 }
 /******************************************************************************/
 size_t CBufferSize(const cbuffer_ty *cbuf)
 {
 	assert(cbuf);
 	
-	return(cbuf->capacity - CBufferFreeSpace(cbuf));
+	return(cbuf->capacity - 1 - CBufferFreeSpace(cbuf));
 }

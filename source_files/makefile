@@ -1,6 +1,6 @@
-IDIR =../include/
-SDIR =../source/
-TDIR =../test/
+IDIR = ../include/
+SDIR = ../source/
+TDIR = ../test/
 
 DEPS = utils.h
 
