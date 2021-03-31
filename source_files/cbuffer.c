@@ -36,7 +36,7 @@ struct cbuffer
 cbuffer_ty *CBufferCreate(size_t capacity)
 {
 	cbuffer_ty *new_cbuffer = (cbuffer_ty *)malloc(sizeof(cbuffer_ty) + 
-													sizeof(char * capacity));
+													sizeof(char * (capacity+1)));
 	if(NULL == new_cbuffer)
 	{
 		fprintf("Memory allocation for a new cbuffer has been failed");
@@ -45,7 +45,7 @@ cbuffer_ty *CBufferCreate(size_t capacity)
 	
 	new_cbuffer->read = new_cbuffer->arr;
 	new_cbuffer->write = new_cbuffer->arr;
-	/* One byte is used for detecting the full condition. */
+	/* One byte is used for detecting if the buffer is full. */
 	new_cbuffer->capacity = capacity + 1; 
 	
 	return(new_cbuffer);
@@ -61,8 +61,8 @@ void CBufferDestroy(cbuffer_ty *cbuf)
 /******************************************************************************/
 ssize_t CBufferWriteTo(cbuffer_ty *cbuf, const void *src, size_t count)
 {
-	size_t bytes_counter = 0
-	;
+	size_t bytes_counter = 0;
+	
 	assert(cbuf);
 	assert(src);
 	
