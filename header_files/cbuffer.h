@@ -1,9 +1,9 @@
-/***********************************************
-* File: 		cbuffer.h					   *
-* Date: 		29/03/2021					   *
-* Version: 		1.1  						   *
-* Description: 	Circular Buffer API			   * 
-************************************************/
+/****************************** File Header ***********************************\
+* File: 		cbuffer.h					   
+* Date: 		29/03/2021					   
+* Version: 		1.1  						   
+* Description: 	Circular Buffer API			    
+\******************************************************************************/
 
 #ifndef	__CBUFFER_H__
 #define	__CBUFFER_H__
@@ -11,7 +11,7 @@
 #include <stddef.h>	/* size_t */
 #include <sys/types.h> /* ssize_t */
 
-#include "utils.h" /* bolean_ty */
+#include "../include/utils.h" /* bolean_ty */
 
 typedef struct cbuffer cbuffer_ty;
 
