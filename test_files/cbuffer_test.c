@@ -13,8 +13,8 @@
 #include <stdlib.h> /* rand, srand */
 #include <time.h>	/* time */
 
-#include "../include/utils.h" /* status_ty, bolean_ty, ANSI_COLOR_*/
-#include "../include/cbuffer.h"
+#include "utils.h" /* status_ty, bolean_ty, ANSI_COLOR_*/
+#include "cbuffer.h"
 
 /***************************** Macros Definitions *****************************/
 /* prints colored output */

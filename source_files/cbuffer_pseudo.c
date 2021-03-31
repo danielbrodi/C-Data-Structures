@@ -22,12 +22,12 @@ cbuffer_ty *CBufferCreate(size_t capacity)
 {
 	/*
 	memory allocation for a new cbuffer ptr: 
-	size of cbuffer struct + sizeof ( (capacity + 1) * char)
+	size of cbuffer struct + (sizeof(char) * (capacity + 1))
 	Extra one byte is used for detecting if the buffer is full. 
 	
 	Reset write and read pointers to the beginning of the buffer:
-	assign the address of arr to write pointer
-	assign the address of arr to write pointer
+	assign the address of arr to the write pointer
+	assign the address of arr to the read pointer
 	
 	set cbuffer->capacity as capacity + 1 (due to the extra one byte);
 	*/

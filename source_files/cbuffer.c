@@ -17,15 +17,15 @@
 #include <stdio.h> /* fprintf */
 #include <stdlib.h> /* malloc, free */
 
-#include "../include/utils.h" /* status_ty, bolean_ty */
-#include "../include/cbuffer.h"
+#include "utils.h" /* status_ty, bolean_ty */
+#include "cbuffer.h"
 
 /************************** Global Definitions ********************************/
 
 struct cbuffer
 {
 	char *read;
-	char *write;
+	char *(cbuf->write);
 	size_t capacity;
 	char arr[1];
 };
@@ -36,7 +36,7 @@ struct cbuffer
 cbuffer_ty *CBufferCreate(size_t capacity)
 {
 	cbuffer_ty *new_cbuffer = (cbuffer_ty *)malloc(sizeof(cbuffer_ty) + 
-													sizeof(char * (capacity+1)));
+												(sizeof(char) * capacity+1));
 	if(NULL == new_cbuffer)
 	{
 		fprintf("Memory allocation for a new cbuffer has been failed");
@@ -44,7 +44,7 @@ cbuffer_ty *CBufferCreate(size_t capacity)
 	}
 	
 	new_cbuffer->read = new_cbuffer->arr;
-	new_cbuffer->write = new_cbuffer->arr;
+	new_cbuffer->cbuf->write = new_cbuffer->arr;
 	/* One byte is used for detecting if the buffer is full. */
 	new_cbuffer->capacity = capacity + 1; 
 	
@@ -66,19 +66,54 @@ ssize_t CBufferWriteTo(cbuffer_ty *cbuf, const void *src, size_t count)
 	assert(cbuf);
 	assert(src);
 	
-	while(*src && bytes_counter < count)
-	{
-	
-		if (0 == CBufferFreeSpace(cbuf))
+	if (0 == CBufferFreeSpace(cbuf))
 		{
 			return(-1); /*buffer is full */
 		}
-
-		*write = *src;
-		write = cbuf->arr + ((ARR_END_INDEX + (++write)) % BUFFER_CAPACITY);
+	
+	if(count > CBufferFreeSpace(cbuf))
+	{
+		count = CBufferFreeSpace(cbuf);
+	}
+	
+	while(*src && bytes_counter < count)
+	{
+		*(cbuf->write) = *src;
+		cbuf->write = cbuf->arr + ((ARR_END_INDEX + (++cbuf->write)) 
+															% BUFFER_CAPACITY);
 		++src;
 		++bytes_counter;
 	}
+	
+	return(bytes_counter);
+}
+/******************************************************************************/
+ssize_t CBufferReadFrom(cbuffer_ty *cbuf, void *dest, size_t count)
+{
+	size_t bytes_counter = 0;
+	
+	assert(cbuf);
+	assert(dest);
+	
+	if (CBufferIsEmpty(cbuf))
+		{
+			return(-1); /*buffer is empty, nothing to read */
+		}
+	
+	if(count > BUFFER_CAPACITY)
+	{
+		count = BUFFER_CAPACITY;
+	}
+	
+	while(*dest && bytes_counter < count)
+	{
+		*dest = *(cbuf->read);
+		cbuf->read = cbuf->arr + ((ARR_END_INDEX + (++cbuf->read))
+															 % BUFFER_CAPACITY);
+		++src;
+		++bytes_counter;
+	}
+	
 	return(bytes_counter);
 }
 /******************************************************************************/
