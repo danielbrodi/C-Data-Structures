@@ -18,7 +18,7 @@ queue: $(IDIR)queue.h queue.c $(TDIR)queue_test.c $(IDIR)$(DEPS) $(IDIR)slist.h 
 	$(CC) $(CFLAGS) -o $@ $^
 
 %: $(TDIR)%_test.c %.c $(IDIR)%.h $(IDIR)$(DEPS)
-	$(CC) $(CFLAGS) -o $@ $^
+	$(CC) $(CFLAGS) -o a.out $^
 
 clean:
 	$(RM) *.o $(TARGETS)

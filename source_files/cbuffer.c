@@ -2,23 +2,20 @@
 * File: cbuffer.c						 		  								
 * Author: Daniel Brodsky					  								
 * Date: 30/03/2021							   								
-* Version: Beta				   								
+* Version: 1.0 (Before Review)		   								
 * Reviewer: Kobi							   								
 * Description: Circular Buffer functions implementations.			 
 \******************************************************************************/
 
-#define BUFFER_CAPACITY (cbuf->capacity-1)
-#define ARR_END_INDEX (cbuf->arr+cbuf->capacity)
-
 /****************************** Inclusions ************************************/
 
-#include <assert.h> /* assert */
+#include <assert.h>	/* assert */
 #include <stddef.h>	/* size_t, NULL */
-#include <stdio.h> /* fprintf */
-#include <stdlib.h> /* malloc, free */
+#include <stdio.h>	/* fprintf */
+#include <stdlib.h>	/* malloc, free */
 
-#include "utils.h" /* status_ty, bolean_ty */
 #include "cbuffer.h"
+#include "utils.h"	/* status_ty, bolean_ty */
 
 /************************** Global Definitions ********************************/
 
@@ -36,7 +33,7 @@ struct cbuffer
 cbuffer_ty *CBufferCreate(size_t capacity)
 {
 	cbuffer_ty *new_cbuffer = (cbuffer_ty *)malloc(sizeof(cbuffer_ty) + 
-												(sizeof(char) * capacity+1));
+												(sizeof(char) * capacity + 1));
 	if(NULL == new_cbuffer)
 	{
 		fprintf(stderr, "Failed to allocate memory for a new queue\n");
@@ -77,8 +74,9 @@ ssize_t CBufferWriteTo(cbuffer_ty *cbuf, const void *src, size_t count)
 	while(0 != CBufferFreeSpace(cbuf) && bytes_counter < count)
 	{
 		*(cbuf->write) = *src_runner;
-		cbuf->write = cbuf->arr + ((ARR_END_INDEX + (cbuf->write + 1)) 
-															% BUFFER_CAPACITY);
+		
+		cbuf->write = (cbuf->write) == (cbuf->arr + cbuf->capacity - 1) ? 
+													cbuf->arr : cbuf->write + 1;
 		++src_runner;
 		++bytes_counter;
 	}
@@ -88,8 +86,9 @@ ssize_t CBufferWriteTo(cbuffer_ty *cbuf, const void *src, size_t count)
 /******************************************************************************/
 ssize_t CBufferReadFrom(cbuffer_ty *cbuf, void *dest, size_t count)
 {
-	size_t bytes_counter = 0;
 	char *dest_runner = NULL;
+	size_t bytes_counter = 0;
+	
 	assert(cbuf);
 	assert(dest);
 	
@@ -103,8 +102,8 @@ ssize_t CBufferReadFrom(cbuffer_ty *cbuf, void *dest, size_t count)
 	while(!CBufferIsEmpty(cbuf) && bytes_counter < count)
 	{
 		*dest_runner = *(cbuf->read);
-		cbuf->read = cbuf->arr + ((ARR_END_INDEX + (cbuf->read + 1))
-															 % BUFFER_CAPACITY);
+		cbuf->read = (cbuf->read) == (cbuf->arr + cbuf->capacity - 1) ?
+													 cbuf->arr : cbuf->read + 1;
 		++dest_runner;
 		++bytes_counter;
 	}

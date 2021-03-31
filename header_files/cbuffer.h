@@ -8,10 +8,10 @@
 #ifndef	__CBUFFER_H__
 #define	__CBUFFER_H__
 
-#include <stddef.h>	/* size_t */
-#include <sys/types.h> /* ssize_t */
+#include <stddef.h>		/* size_t */
+#include <sys/types.h>	/* ssize_t */
 
-#include "../include/utils.h" /* bolean_ty */
+#include "utils.h"		/* bolean_ty */
 
 typedef struct cbuffer cbuffer_ty;
 
