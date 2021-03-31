@@ -25,7 +25,7 @@
 struct cbuffer
 {
 	char *read;
-	char *(cbuf->write);
+	char *write;
 	size_t capacity;
 	char arr[1];
 };
@@ -39,12 +39,12 @@ cbuffer_ty *CBufferCreate(size_t capacity)
 												(sizeof(char) * capacity+1));
 	if(NULL == new_cbuffer)
 	{
-		fprintf("Memory allocation for a new cbuffer has been failed");
+		fprintf(stderr, "Failed to allocate memory for a new queue\n");
 		return(NULL);
 	}
 	
 	new_cbuffer->read = new_cbuffer->arr;
-	new_cbuffer->cbuf->write = new_cbuffer->arr;
+	new_cbuffer->write = new_cbuffer->arr;
 	/* One byte is used for detecting if the buffer is full. */
 	new_cbuffer->capacity = capacity + 1; 
 	
@@ -62,26 +62,24 @@ void CBufferDestroy(cbuffer_ty *cbuf)
 ssize_t CBufferWriteTo(cbuffer_ty *cbuf, const void *src, size_t count)
 {
 	size_t bytes_counter = 0;
+	char *src_runner = NULL;
 	
 	assert(cbuf);
 	assert(src);
+	
+	src_runner = (char *)src;
 	
 	if (0 == CBufferFreeSpace(cbuf))
 		{
 			return(-1); /*buffer is full */
 		}
 	
-	if(count > CBufferFreeSpace(cbuf))
+	while(0 != CBufferFreeSpace(cbuf) && bytes_counter < count)
 	{
-		count = CBufferFreeSpace(cbuf);
-	}
-	
-	while(*src && bytes_counter < count)
-	{
-		*(cbuf->write) = *src;
-		cbuf->write = cbuf->arr + ((ARR_END_INDEX + (++cbuf->write)) 
+		*(cbuf->write) = *src_runner;
+		cbuf->write = cbuf->arr + ((ARR_END_INDEX + (cbuf->write + 1)) 
 															% BUFFER_CAPACITY);
-		++src;
+		++src_runner;
 		++bytes_counter;
 	}
 	
@@ -91,26 +89,23 @@ ssize_t CBufferWriteTo(cbuffer_ty *cbuf, const void *src, size_t count)
 ssize_t CBufferReadFrom(cbuffer_ty *cbuf, void *dest, size_t count)
 {
 	size_t bytes_counter = 0;
-	
+	char *dest_runner = NULL;
 	assert(cbuf);
 	assert(dest);
+	
+	dest_runner = (char *)dest;
 	
 	if (CBufferIsEmpty(cbuf))
 		{
 			return(-1); /*buffer is empty, nothing to read */
 		}
 	
-	if(count > BUFFER_CAPACITY)
+	while(!CBufferIsEmpty(cbuf) && bytes_counter < count)
 	{
-		count = BUFFER_CAPACITY;
-	}
-	
-	while(*dest && bytes_counter < count)
-	{
-		*dest = *(cbuf->read);
-		cbuf->read = cbuf->arr + ((ARR_END_INDEX + (++cbuf->read))
+		*dest_runner = *(cbuf->read);
+		cbuf->read = cbuf->arr + ((ARR_END_INDEX + (cbuf->read + 1))
 															 % BUFFER_CAPACITY);
-		++src;
+		++dest_runner;
 		++bytes_counter;
 	}
 	

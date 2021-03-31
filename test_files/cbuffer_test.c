@@ -26,3 +26,38 @@
 
 #define UNUSED(x) (void)(x)
 /****************************Forward Declarations******************************/
+static void CBufferCreateTest(cbuffer_ty *cbuf);
+/*static void CBufferDestroyTest(cbuffer_ty *cbuf);*/
+/*static void CBufferWriteToTest(cbuffer_ty *cbuf);*/
+/*static void CBufferReadFromTest(cbuffer_ty *cbuf);*/
+/*static void CBufferIsEmptyTest(cbuffer_ty *cbuf);*/
+/*static void CBufferSizeTest(cbuffer_ty *cbuf);*/
+/*static void CBufferFreeSpaceTest(cbuffer_ty *cbuf);*/
+/******************************************************************************/
+/********************************Main Function*********************************/
+int main()	
+{
+	/* Intializes an empty CBuffer with 10 bytes capacity */
+	cbuffer_ty *new_CBuffer = CBufferCreate(10);
+	
+	/* Intializes random number generator */
+	srand(time(0));
+	
+	CBufferCreateTest(new_CBuffer);
+/*	CBufferEnCBufferTest(new_CBuffer);*/
+/*	CBufferPeekTest(new_CBuffer);*/
+/*	CBufferDeCBufferTest(new_CBuffer);*/
+/*	CBufferIsEmptyTest(new_CBuffer);*/
+/*	CBufferAppendTest(new_CBuffer, second_CBuffer);*/
+/*	CBufferDestroyTest(new_CBuffer, second_CBuffer);*/
+	
+	return(0);
+}
+/******************************************************************************/
+/************************Test Functions Implementations************************/
+/******************************************************************************/
+static void CBufferCreateTest(cbuffer_ty *cbuf)
+{
+	printf("\nCBuffer Creatation Test: ");
+	NULL == cbuf ? PRINT_FAILURE : PRINT_SUCCESS;
+}
