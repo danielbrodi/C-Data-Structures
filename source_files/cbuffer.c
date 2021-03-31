@@ -7,6 +7,9 @@
 * Description: Circular Buffer functions implementations.			 
 \******************************************************************************/
 
+#define BUFFER_CAPACITY (cbuf->capacity)
+#define ARR_END_INDEX (cbuf->arr+cbuf->capacity)
+
 /****************************** Inclusions ************************************/
 
 #include <assert.h> /* assert */
@@ -69,7 +72,7 @@ ssize_t CBufferWriteTo(cbuffer_ty *cbuf, const void *src, size_t count)
 		}
 
 		*write = *src;
-		write = cbuf->arr + ((++write) - cbuf->arr) % (cbuf->arr + cbuf->capacity);
+		write = cbuf->arr + ((ARR_END_INDEX + (++write)) % BUFFER_CAPACITY);
 		++src;
 		--count;
 	}
