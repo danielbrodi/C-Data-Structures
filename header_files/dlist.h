@@ -1,15 +1,15 @@
-/***********************************************
-* File: dlist.h						 		   *
-* Date: 01/04/2021							   *
-* Version: 1.2								   *
-* Description: Double Linked List API		   * 
-************************************************/
+/******************************************************************************\
+* File: dlist_test.c						 		  												  								
+* Date: 01/04/2021							   								
+* Version: 1.2			   													   								
+* Description: Doubly Linked List API		 
+\******************************************************************************/
 #ifndef	__DLIST_H__
 #define	__DLIST_H__
 
-#include <stddef.h>	/* size_t */
+#include <stddef.h>		/* size_t */
 
-#include "utils.h" /* status_ty, bolean_ty*/
+#include "utils.h"		/* status_ty, bolean_ty*/
 
 typedef struct dlist dlist_ty;
 
