@@ -8,7 +8,7 @@ CC = gcc
 CFLAGS = -ansi -pedantic-errors -Wall -Wextra -g -I$(IDIR)
 RM = rm -rf
 
-TARGETS := vector slist slist_ex queue cbuffer
+TARGETS := vector slist slist_ex queue cbuffer dlist
 
 .PHONY = all clean
 
