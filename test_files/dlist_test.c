@@ -35,7 +35,7 @@ static void DlistRemoveTest(dlist_ty *dlist);
 static void DlistIsEmptyTest(dlist_ty *dlist);
 static void DlistSetDataTest(dlist_ty *dlist);
 static status_ty PrintList(void *data, void *param);
-static boolean_ty IsMatch(void *data, void *param);
+static boolean_ty IsMatch(const void *data, void *param);
 static void InsertIntToList(dlist_ty *dlist);
 static void DlistForEachTest(dlist_ty *dlist);
 static void DlistFindTest(dlist_ty *dlist);
@@ -158,7 +158,7 @@ static status_ty PrintList(void *data, void *param)
 }
 
 /******************************************************************************/
-static boolean_ty IsMatch(void *data, void *param)
+static boolean_ty IsMatch(const void *data, void *param)
 {	
 	return(((int)(long)data == (int)(long)param));
 }

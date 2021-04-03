@@ -152,22 +152,36 @@ dlist_iter_ty DlistInsertBefore(dlist_iter_ty iter, void *data)
 	dlist_iter_ty new_node = NULL;
 	
 	assert(iter);
-	assert(ITER_TO_NODE_PTR(iter)->previous);
 	assert(data);
-	
+
 	new_node = (dlist_iter_ty)malloc(sizeof(dlist_node_ty));
 	if (NULL == new_node)
 	{
 		return(iter);
 	}
 	
-	new_node->data = data;
-	new_node->previous = ITER_TO_NODE_PTR(iter)->previous;
-	new_node->next = NODE_PTR_TO_ITER(iter);
-	
-	new_node->previous->next = new_node;
-	
-	(ITER_TO_NODE_PTR(iter))->previous = new_node;
+		
+	if (NULL == iter->previous) /* switch HEAD element */
+	{
+		new_node->data = iter->data;
+		new_node->previous = iter;
+		new_node->next = iter->next;
+		
+		new_node->next->previous = new_node;
+		
+		iter->next = new_node;
+		iter->data = data;
+	}
+	else
+	{
+		new_node->data = data;
+		new_node->previous = iter->previous;
+		new_node->next = iter;
+		
+		new_node->previous->next = new_node;
+		
+		iter->previous = new_node;
+	}
 	
 	return(new_node);
 }
@@ -178,9 +192,8 @@ dlist_iter_ty DlistRemove(dlist_iter_ty iter)
 	
 	assert(iter);
 	assert(ITER_TO_NODE_PTR(iter)->next);
-	assert(ITER_TO_NODE_PTR(iter)->previous);
 	
-	(ITER_TO_NODE_PTR(iter))->data = (ITER_TO_NODE_PTR(iter))->next->data;
+	iter->data = iter->next->data;
 	
 	new_node = (ITER_TO_NODE_PTR(iter))->next->next;
 	
@@ -193,7 +206,10 @@ dlist_iter_ty DlistRemove(dlist_iter_ty iter)
 	
 	(ITER_TO_NODE_PTR(iter))->next = new_node;
 	
+	if (NULL != new_node)
+	{
 	(ITER_TO_NODE_PTR(new_node))->previous = iter;
+	}
 	
 	return(iter);
 }
@@ -203,26 +219,17 @@ dlist_iter_ty DlistRemove(dlist_iter_ty iter)
 /* Complexity: O(1) */
 dlist_iter_ty DlistPushFront(dlist_ty *dlist, void *data)
 {
-	dlist_iter_ty new_node = NULL;
+	dlist_iter_ty pushed_node = 
+							DlistInsertBefore(DlistIteratorBegin(dlist), data);
 	
 	assert (dlist);
 	assert(data);
 	
-	new_node = (dlist_iter_ty)malloc(sizeof(dlist_node_ty));
-	if (NULL == new_node)
+	if (DlistIteratorIsEqual(DlistIteratorBegin(dlist), pushed_node))
 	{
-		return(dlist->tail);
+		return (DlistIteratorEnd(dlist));
 	}
-	
-	new_node->data = data;
-	new_node->previous = NULL;
-	new_node->next = dlist->head;
-	
-	dlist->head->previous = new_node;
-	
-	dlist->head = new_node;
-	
-	return(new_node);
+	return (pushed_node);
 	
 }
 /******************************************************************************/
@@ -243,22 +250,13 @@ dlist_iter_ty DlistPushBack(dlist_ty *dlist, void *data)
 /* Complexity: O(1) */
 void *DlistPopFront(dlist_ty *dlist)
 {
-	dlist_iter_ty temp = NULL;
 	void *ret = NULL;
 	
 	assert(!DlistIsEmpty(dlist));
 	
-	ret = dlist->head->data;
+	ret = DlistGetData(DlistIteratorBegin(dlist));
 	
-	dlist->head->data = dlist->head->next->data;
-	
-	temp = dlist->head->next->next;
-	
-	free(dlist->head->next);
-	
-	dlist->head->next = temp;
-	
-	temp->previous = dlist->head;
+	DlistRemove(DlistIteratorBegin(dlist));
 	
 	return (ret);
 }
@@ -269,24 +267,13 @@ void *DlistPopFront(dlist_ty *dlist)
 /* Complexity: O(1) */
 void *DlistPopBack(dlist_ty *dlist)
 {
-	dlist_iter_ty new_node = NULL;
 	void *ret = NULL;
 	
-	assert(dlist);
 	assert(!DlistIsEmpty(dlist));
 	
-	ret = dlist->tail->previous->data;
+	ret = DlistGetData(DlistIteratorPrevious(DlistIteratorEnd(dlist)));
 	
-	dlist->tail->previous->data = dlist;
-	
-	dlist->tail = dlist->tail->previous;
-	
-	free(dlist->tail->previous->next);
-	
-	dlist->tail->previous->next = NULL;
-	
-	(ITER_TO_NODE_PTR(new_node))->previous = iter;
-	
+	DlistRemove(DlistIteratorPrevious(DlistIteratorEnd(dlist)));
 	
 	return (ret);
 }
@@ -295,21 +282,19 @@ boolean_ty DlistIsEmpty(const dlist_ty *dlist)
 {
 	assert(dlist);
 	
-	if (dlist->tail == dlist->head)
-	{
-		return (TRUE);
-	}
-	
-	return (FALSE);
+	return (DlistIteratorIsEqual(DlistIteratorBegin(dlist), 
+								 					DlistIteratorEnd(dlist)));
 }
 /******************************************************************************/
 size_t DlistSize(const dlist_ty *dlist)
 {
 	size_t counter = 0;
 	
-	(dlist_node_ty *)nodes_runner = dlist->head;
+	dlist_node_ty *nodes_runner = NULL;
 	
 	assert (dlist);
+	
+	nodes_runner = dlist->head;
 	
 	while (dlist->tail != nodes_runner)
 	{
@@ -321,8 +306,9 @@ size_t DlistSize(const dlist_ty *dlist)
 }
 /******************************************************************************/
 dlist_iter_ty DlistFind(const dlist_iter_ty from_iter, 
-	const dlist_iter_ty to_iter, IsMatch_Func is_match_func,
-	void *param)
+								const dlist_iter_ty to_iter, 
+										IsMatch_Func_ty match_func,
+												void *param)
 {
 	dlist_iter_ty runner = NULL;
 	
@@ -379,7 +365,8 @@ size_t DlistMultiFind(const dlist_iter_ty from_iter,
 }
 /******************************************************************************/
 status_ty DlistForEach(dlist_iter_ty from_iter,
-const dlist_iter_ty to_iter, Action_Func action_func, void *param)
+			const dlist_iter_ty to_iter, Action_Func_ty action_func,
+													 void *param)
 {
 	dlist_iter_ty iterator = NULL;
 		
@@ -399,30 +386,24 @@ const dlist_iter_ty to_iter, Action_Func action_func, void *param)
 	}
 	
 	return(SUCCESS);
-}
+}	
 /******************************************************************************/
-dlist_iter_ty Splice(dlist_iter_ty dest_iter, 
+dlist_iter_ty DlistSplice(dlist_iter_ty dest_iter, 
 								dlist_iter_ty src_from, dlist_iter_ty src_to)
 {
 	assert(dest_iter);
 	assert(src_from);
 	assert(src_to);
+		
+	src_from->prev->next = src_to;
+	src_to->prev->next = dest_iter;
+	dest_iter->prev->next = src_from;
 	
-	if (DlistIsEmpty(src_Dlist))
-	{
-		return;
-	}
+	src_from->prev = dest_iter->prev;
+	dest_iter->prev = src_to->prev;
+	src_to->prev = src_from->prev;
 	
-	/* switch tail dummy of dest with first node in src */
-	dest_dlist->tail->next = src_dlist->head->next->next;
-	dest_dlist->tail->data = src_dlist->head->next->data;
-	/* switch tail dummy of src with tail dummy of dest */
-	src_dlist->tail->data = dest_Dlist;
-	dest_dlist->tail = src_dlist->tail;
-	/* make sure src list is empty */
-	src_dlist->head->next->next = NULL;
-	src_dlist->head->next->data = src_Dlist;
-	src_dlist->tail = src_dlist->head->next;
+	return (src_from);
 	
 }
 /******************************************************************************/

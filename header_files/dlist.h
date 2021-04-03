@@ -1,15 +1,15 @@
-/******************************************************************************\
-* File: dlist_test.c						 		  												  								
-* Date: 01/04/2021							   								
-* Version: 1.2			   													   								
-* Description: Doubly Linked List API		 
-\******************************************************************************/
+/***********************************************
+* File: dlist.h						 		   *
+* Date: 01/04/2021							   *
+* Version: 1.2								   *
+* Description: Double Linked List API		   * 
+************************************************/
 #ifndef	__DLIST_H__
 #define	__DLIST_H__
 
-#include <stddef.h>		/* size_t */
+#include <stddef.h>	/* size_t */
 
-#include "utils.h"		/* status_ty, bolean_ty*/
+#include "utils.h" /* status_ty, bolean_ty*/
 
 typedef struct dlist dlist_ty;
 
@@ -75,6 +75,7 @@ dlist_iter_ty DlistInsertBefore(dlist_iter_ty iter, void *data);
 
 /* Removes the element from the list, */
 /* returns iterator to the next element in the list */
+/* Undefined behaviour if iter is dlist_END */
 /* Complexity: O(1) */
 dlist_iter_ty DlistRemove(dlist_iter_ty iter);
 
@@ -84,7 +85,7 @@ dlist_iter_ty DlistRemove(dlist_iter_ty iter);
 dlist_iter_ty DlistPushFront(dlist_ty *dlist, void *data);
 
 /* Inserts a new element to the end of the list */
-/* returns iterator to the new node on success or dlist_END on failure */
+/* returns iterator to the new nod on success or dlist_END on failure */
 /* Complexity: O(1) */
 dlist_iter_ty DlistPushBack(dlist_ty *dlist, void *data);
 
@@ -138,7 +139,7 @@ status_ty DlistForEach(dlist_iter_ty from_iter,
 /* Inserts sublist in range [src_from, src_to) before dest_iter */
 /* Returns src_from  */
 /* Complexity: O(1) */
-dlist_iter_ty Splice(dlist_iter_ty dest_iter, 
+dlist_iter_ty DlistSplice(dlist_iter_ty dest_iter, 
 								dlist_iter_ty src_from, dlist_iter_ty src_to);
 							 
 #endif	/* __DLIST_H__ */
