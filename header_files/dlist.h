@@ -141,5 +141,6 @@ status_ty DlistForEach(dlist_iter_ty from_iter,
 /* Complexity: O(1) */
 dlist_iter_ty DlistSplice(dlist_iter_ty dest_iter, 
 								dlist_iter_ty src_from, dlist_iter_ty src_to);
+								
 							 
 #endif	/* __DLIST_H__ */

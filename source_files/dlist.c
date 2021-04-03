@@ -19,8 +19,8 @@
 #include <stdio.h> 		/* fprintf, NULL */
 #include <stdlib.h>		/* malloc, free */
 
-#include "../include/dlist.h"
-#include "../include/utils.h"		/* status_ty, bolean_ty*/
+#include "dlist.h"
+#include "utils.h"		/* status_ty, bolean_ty*/
 
 /************************ Global Definitions **********************************/
 struct dlist
@@ -154,23 +154,28 @@ dlist_iter_ty DlistInsertBefore(dlist_iter_ty iter, void *data)
 	assert(iter);
 	assert(data);
 
-	new_node = (dlist_iter_ty)malloc(sizeof(dlist_node_ty));
+	new_node = (dlist_node_ty *)malloc(sizeof(dlist_node_ty));
 	if (NULL == new_node)
 	{
 		return(iter);
 	}
 	
 		
-	if (NULL == iter->previous) /* switch HEAD element */
+	if (NULL == iter->previous) /* switch HEAD element, Insert After HEAD */
 	{
 		new_node->data = iter->data;
 		new_node->previous = iter;
 		new_node->next = iter->next;
 		
+		if (NULL != new_node->next)
+		{
 		new_node->next->previous = new_node;
+		}
 		
 		iter->next = new_node;
 		iter->data = data;
+		
+		return (iter);
 	}
 	else
 	{
@@ -282,8 +287,12 @@ boolean_ty DlistIsEmpty(const dlist_ty *dlist)
 {
 	assert(dlist);
 	
-	return (DlistIteratorIsEqual(DlistIteratorBegin(dlist), 
-								 					DlistIteratorEnd(dlist)));
+	if (dlist->tail == dlist->head)
+	{
+		return(TRUE);
+	}
+	
+	return(FALSE);
 }
 /******************************************************************************/
 size_t DlistSize(const dlist_ty *dlist)
@@ -294,11 +303,11 @@ size_t DlistSize(const dlist_ty *dlist)
 	
 	assert (dlist);
 	
-	nodes_runner = dlist->head;
+	nodes_runner = dlist->tail;
 	
-	while (dlist->tail != nodes_runner)
+	while (dlist->head != nodes_runner)
 	{
-		nodes_runner = nodes_runner->next;
+		nodes_runner = nodes_runner->previous;
 		++counter;
 	}
 	
@@ -320,7 +329,7 @@ dlist_iter_ty DlistFind(const dlist_iter_ty from_iter,
 	
 	while(runner != to_iter)
 	{
-		if(TRUE == is_match_func(runner->data, param))
+		if(TRUE == match_func(runner->data, param))
 		{
 			return(runner);
 		}
@@ -352,7 +361,7 @@ size_t DlistMultiFind(const dlist_iter_ty from_iter,
 	
 	while(runner != to_iter)
 	{
-		if(TRUE == is_match_func(runner->data, param))
+		if(TRUE == match_func(runner->data, param))
 		{
 			DlistPushFront(dlist_output, runner->data);
 			++matches_counter;
@@ -395,13 +404,13 @@ dlist_iter_ty DlistSplice(dlist_iter_ty dest_iter,
 	assert(src_from);
 	assert(src_to);
 		
-	src_from->prev->next = src_to;
-	src_to->prev->next = dest_iter;
-	dest_iter->prev->next = src_from;
+	src_from->previous->next = src_to;
+	src_to->previous->next = dest_iter;
+	dest_iter->previous->next = src_from;
 	
-	src_from->prev = dest_iter->prev;
-	dest_iter->prev = src_to->prev;
-	src_to->prev = src_from->prev;
+	src_from->previous = dest_iter->previous;
+	dest_iter->previous = src_to->previous;
+	src_to->previous = src_from->previous;
 	
 	return (src_from);
 	

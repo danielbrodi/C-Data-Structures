@@ -67,7 +67,7 @@ int main()
 /******************************************************************************/
 static void DlistCreateTest(dlist_ty *dlist)
 {
-	printf("\nLinked List Creatation Test: ");
+	printf("\nDoubly Linked List Creation Test: ");
 	NULL == dlist ? PRINT_FAILURE : PRINT_SUCCESS;
 }
 
@@ -80,18 +80,18 @@ static void DlistDestroyTest(dlist_ty *dlist)
 /******************************************************************************/
 static void DlistIteratorBeginTest(dlist_ty *dlist)
 {
-	printf("Iter To Begin/End + Next Test: ");
-	DlistIteratorEnd(dlist) == DlistIteratorNext(DlistIteratorBegin(dlist)) ?
+	printf("Iter To Begin/End/IsEqual Test: ");
+	DlistIteratorIsEqual(DlistIteratorBegin(dlist), DlistIteratorEnd(dlist)) ?
 	 											  PRINT_SUCCESS : PRINT_FAILURE;
 }
 /******************************************************************************/
 static void DlistInsertBeforeTest(dlist_ty *dlist)
 {	
-	dlist_iter_ty new_node = DlistIteratorBegin(dlist);
+	dlist_iter_ty new_node = NULL;
 	
 	printf("Dlist Insert Test: ");
 	
-	new_node = DlistInsertBefore(new_node, "Messi");
+	new_node = DlistInsertBefore(DlistIteratorBegin(dlist), "Messi");
 	
 	strcmp(DlistGetData(new_node), "Messi") ? PRINT_FAILURE : PRINT_SUCCESS;
 }
@@ -99,14 +99,18 @@ static void DlistInsertBeforeTest(dlist_ty *dlist)
 static void DlistRemoveTest(dlist_ty *dlist)
 {
 	size_t original_size = DlistSize(dlist);
+	DlistInsertBefore(DlistIteratorBegin(dlist), "Messi");
+	printf(ANSI_COLOR_CYAN "\nList's size is: %lu\n" ANSI_COLOR_RESET, DlistSize(dlist));
 	printf("Remove & Size Test: ");
 	DlistRemove(DlistIteratorBegin(dlist));
+	printf(ANSI_COLOR_CYAN "\nList's size is: %lu\n" ANSI_COLOR_RESET, DlistSize(dlist));
 	DlistSize(dlist) == (original_size - 1) ? PRINT_SUCCESS : PRINT_FAILURE;
 }
 /******************************************************************************/
 static void DlistIsEmptyTest(dlist_ty *dlist)
 {
 	printf("Dlist IsEmpty Test: ");
+	printf(ANSI_COLOR_CYAN "\nList's size is: %lu\n" ANSI_COLOR_RESET, DlistSize(dlist));
 	TRUE == DlistIsEmpty(dlist) ? PRINT_SUCCESS : PRINT_FAILURE;
 }
 /******************************************************************************/
@@ -118,6 +122,8 @@ static void DlistSetDataTest(dlist_ty *dlist)
 	
 	new_node = DlistInsertBefore(new_node, "Messi");
 	
+	printf(ANSI_COLOR_CYAN "\nList's size is(AFTER INSERT): %lu\n" ANSI_COLOR_RESET, DlistSize(dlist));
+	
 	if(strcmp(DlistGetData(new_node), "Messi"))
 	{
 		PRINT_FAILURE;
@@ -128,6 +134,8 @@ static void DlistSetDataTest(dlist_ty *dlist)
 	strcmp(DlistGetData(new_node), "Ronaldo") ? PRINT_FAILURE : PRINT_SUCCESS;
 	
 	DlistRemove(new_node);
+	
+	printf(ANSI_COLOR_CYAN "\nList's size is(AFTER REMOVE): %lu\n" ANSI_COLOR_RESET, DlistSize(dlist));
 }
 /******************************************************************************/
 static void InsertIntToList(dlist_ty *dlist)
@@ -141,19 +149,21 @@ static void InsertIntToList(dlist_ty *dlist)
 	new_node = DlistInsertBefore(new_node, (void *)(long)num1);
 	new_node = DlistInsertBefore(new_node, (void *)(long)num2);
 	new_node = DlistInsertBefore(new_node, (void *)(long)num3);
+	
+	printf(ANSI_COLOR_CYAN "\nList's size is(AFTER 3 INSERT): %lu\n" ANSI_COLOR_RESET, DlistSize(dlist));
 }
 /******************************************************************************/
 static status_ty PrintList(void *data, void *param)
 {
+	printf(ANSI_COLOR_CYAN "PRINTLIST FUNCTION" ANSI_COLOR_RESET);
 	UNUSED(param);
-	
+	printf(ANSI_COLOR_CYAN "PRINTLIST FUNCTION" ANSI_COLOR_RESET);
 	if (NULL == data || NULL == param)
 	{
 		return(FAILURE);
 	}
 	
 	printf("%d ", (int)(long)data);
-	
 	return(SUCCESS);
 }
 
@@ -166,7 +176,7 @@ static boolean_ty IsMatch(const void *data, void *param)
 static void DlistForEachTest(dlist_ty *dlist)
 {
 	int x = 3;
-	status_ty result = SUCCESS;
+	status_ty result = FAILURE;
 	printf("Printing List: ");
 	result = DlistForEach(DlistIteratorBegin(dlist), DlistIteratorEnd(dlist), 
 													PrintList, (void *)(long)x);
