@@ -10,7 +10,7 @@
 /************************** Macros Definitions ********************************/
 
 #define ITER_TO_NODE_PTR(iter) (dlist_node_ty *)iter
-#define NODE_PTR_TO_ITER(iter) (dlist_iter_ty)(node)
+#define NODE_PTR_TO_ITER(iter) (dlist_iter_ty)(iter)
 #define IS_END(iter) (ITER_TO_NODE_PTR(iter)->next == NULL)
 
 /**************************** Inclusions **************************************/
@@ -19,11 +19,11 @@
 #include <stdio.h> 		/* fprintf, NULL */
 #include <stdlib.h>		/* malloc, free */
 
-#include "dlist.h"
-#include "utils.h"		/* status_ty, bolean_ty*/
+#include "../include/dlist.h"
+#include "../include/utils.h"		/* status_ty, bolean_ty*/
 
 /************************ Global Definitions **********************************/
-struct Dlist
+struct dlist
 {
 	dlist_iter_ty head;			/* represents the beginning of the list */
 	dlist_iter_ty tail;			/* represents the end of the list */
@@ -80,7 +80,7 @@ void DlistDestroy(dlist_ty *dlist)
 	while(!DlistIsEmpty(dlist))
 	{
 		runner = dlist->head;
-		slist->head = slist->head->next;
+		dlist->head = dlist->head->next;
 		free(runner);
 	}
 	
@@ -94,11 +94,6 @@ void DlistDestroy(dlist_ty *dlist)
 dlist_iter_ty DlistIteratorBegin(const dlist_ty *dlist)
 {
 	assert(dlist);
-	
-	if(DlistIsEmpty(dlist))
-	{
-		return(dlist->tail);
-	}
 	
 	return(dlist->head);
 }
@@ -157,6 +152,7 @@ dlist_iter_ty DlistInsertBefore(dlist_iter_ty iter, void *data)
 	dlist_iter_ty new_node = NULL;
 	
 	assert(iter);
+	assert(ITER_TO_NODE_PTR(iter)->previous);
 	assert(data);
 	
 	new_node = (dlist_iter_ty)malloc(sizeof(dlist_node_ty));
@@ -169,6 +165,8 @@ dlist_iter_ty DlistInsertBefore(dlist_iter_ty iter, void *data)
 	new_node->previous = ITER_TO_NODE_PTR(iter)->previous;
 	new_node->next = NODE_PTR_TO_ITER(iter);
 	
+	new_node->previous->next = new_node;
+	
 	(ITER_TO_NODE_PTR(iter))->previous = new_node;
 	
 	return(new_node);
@@ -176,27 +174,121 @@ dlist_iter_ty DlistInsertBefore(dlist_iter_ty iter, void *data)
 /******************************************************************************/
 dlist_iter_ty DlistRemove(dlist_iter_ty iter)
 {
-	dlist_iter_ty temp = NULL;
+	dlist_iter_ty new_node = NULL;
 	
 	assert(iter);
 	assert(ITER_TO_NODE_PTR(iter)->next);
+	assert(ITER_TO_NODE_PTR(iter)->previous);
 	
 	(ITER_TO_NODE_PTR(iter))->data = (ITER_TO_NODE_PTR(iter))->next->data;
 	
-	temp = (ITER_TO_NODE_PTR(iter))->next->next;
+	new_node = (ITER_TO_NODE_PTR(iter))->next->next;
 	
-	if(NULL == temp)
+	if(NULL == new_node)
 	{
 		((dlist_ty *)(ITER_TO_NODE_PTR(iter))->data)->tail = iter;
 	}
 	
 	free((ITER_TO_NODE_PTR(iter))->next);
 	
-	(ITER_TO_NODE_PTR(iter))->next = temp;
+	(ITER_TO_NODE_PTR(iter))->next = new_node;
 	
-	(ITER_TO_NODE_PTR(temp))->previous = iter;
+	(ITER_TO_NODE_PTR(new_node))->previous = iter;
 	
 	return(iter);
+}
+/******************************************************************************/
+/* Inserts a new element to the beginning of the list */
+/* returns iterator to the new element on success or dlist_END on failure */
+/* Complexity: O(1) */
+dlist_iter_ty DlistPushFront(dlist_ty *dlist, void *data)
+{
+	dlist_iter_ty new_node = NULL;
+	
+	assert (dlist);
+	assert(data);
+	
+	new_node = (dlist_iter_ty)malloc(sizeof(dlist_node_ty));
+	if (NULL == new_node)
+	{
+		return(dlist->tail);
+	}
+	
+	new_node->data = data;
+	new_node->previous = NULL;
+	new_node->next = dlist->head;
+	
+	dlist->head->previous = new_node;
+	
+	dlist->head = new_node;
+	
+	return(new_node);
+	
+}
+/******************************************************************************/
+/* Inserts a new element to the end of the list */
+/* returns iterator to the new node on success or dlist_END on failure */
+/* Complexity: O(1) */
+dlist_iter_ty DlistPushBack(dlist_ty *dlist, void *data)
+{
+	assert(dlist);
+	assert(data);
+
+	return (DlistInsertBefore(DlistIteratorEnd(dlist), data));
+}
+/******************************************************************************/
+/* Removes an element from the beginning of the list */
+/* Returns the popped element */
+/* Undefined if dlist is empty */
+/* Complexity: O(1) */
+void *DlistPopFront(dlist_ty *dlist)
+{
+	dlist_iter_ty temp = NULL;
+	void *ret = NULL;
+	
+	assert(!DlistIsEmpty(dlist));
+	
+	ret = dlist->head->data;
+	
+	dlist->head->data = dlist->head->next->data;
+	
+	temp = dlist->head->next->next;
+	
+	free(dlist->head->next);
+	
+	dlist->head->next = temp;
+	
+	temp->previous = dlist->head;
+	
+	return (ret);
+}
+/******************************************************************************/
+/* Removes an element from the end of the list */
+/* Returns the popped element */
+/* Undefined if dlist is empty */
+/* Complexity: O(1) */
+void *DlistPopBack(dlist_ty *dlist)
+{
+	dlist_iter_ty new_node = NULL;
+	void *ret = NULL;
+	
+	assert(dlist);
+	assert(!DlistIsEmpty(dlist));
+	
+	ret = dlist->tail->previous->data;
+	
+	dlist->tail->previous->data = dlist;
+	
+	dlist->tail = dlist->tail->previous;
+	
+	free(dlist->tail->previous->next);
+	
+	dlist->tail->previous->next = NULL;
+	
+	(ITER_TO_NODE_PTR(new_node))->previous = iter;
+	
+	
+	return (ret);
 }
 /******************************************************************************/
 boolean_ty DlistIsEmpty(const dlist_ty *dlist)
@@ -205,23 +297,23 @@ boolean_ty DlistIsEmpty(const dlist_ty *dlist)
 	
 	if (dlist->tail == dlist->head)
 	{
-		return(TRUE);
+		return (TRUE);
 	}
 	
-	return(FALSE);
+	return (FALSE);
 }
 /******************************************************************************/
 size_t DlistSize(const dlist_ty *dlist)
 {
 	size_t counter = 0;
 	
-	dlist_iter_ty iterator = dlist->head;
+	(dlist_node_ty *)nodes_runner = dlist->head;
 	
-	assert (Dlist);
+	assert (dlist);
 	
-	while (dlist->tail != iterator)
+	while (dlist->tail != nodes_runner)
 	{
-		iterator = iterator->next;
+		nodes_runner = nodes_runner->next;
 		++counter;
 	}
 	
@@ -252,6 +344,40 @@ dlist_iter_ty DlistFind(const dlist_iter_ty from_iter,
 	return(to_iter);
 }
 /******************************************************************************/
+/* Stores each matching data in an element in dlist_output, */
+/* in range of [from_iter, to_iter) */
+/* Returns the number of matches */
+/* returns 0 if data not found */
+/* Complexity: O(n) */
+size_t DlistMultiFind(const dlist_iter_ty from_iter, 
+								const dlist_iter_ty to_iter, 
+									IsMatch_Func_ty match_func, void *param,
+														dlist_ty *dlist_output)
+{	
+	dlist_iter_ty runner = NULL;
+	size_t matches_counter = 0;
+	
+	assert(from_iter);
+	assert(to_iter);
+	assert(dlist_output);
+	assert(param);
+	
+	runner = from_iter;
+	
+	while(runner != to_iter)
+	{
+		if(TRUE == is_match_func(runner->data, param))
+		{
+			DlistPushFront(dlist_output, runner->data);
+			++matches_counter;
+		}
+		runner = runner->next;
+	}
+
+	return(matches_counter);
+	
+}
+/******************************************************************************/
 status_ty DlistForEach(dlist_iter_ty from_iter,
 const dlist_iter_ty to_iter, Action_Func action_func, void *param)
 {
@@ -275,10 +401,12 @@ const dlist_iter_ty to_iter, Action_Func action_func, void *param)
 	return(SUCCESS);
 }
 /******************************************************************************/
-void DlistAppend(dlist_ty *dest_Dlist, dlist_ty *src_Dlist)
+dlist_iter_ty Splice(dlist_iter_ty dest_iter, 
+								dlist_iter_ty src_from, dlist_iter_ty src_to)
 {
-	assert(dest_Dlist);
-	assert(src_Dlist);
+	assert(dest_iter);
+	assert(src_from);
+	assert(src_to);
 	
 	if (DlistIsEmpty(src_Dlist))
 	{

@@ -84,7 +84,7 @@ dlist_iter_ty DlistRemove(dlist_iter_ty iter);
 dlist_iter_ty DlistPushFront(dlist_ty *dlist, void *data);
 
 /* Inserts a new element to the end of the list */
-/* returns iterator to the new nod on success or dlist_END on failure */
+/* returns iterator to the new node on success or dlist_END on failure */
 /* Complexity: O(1) */
 dlist_iter_ty DlistPushBack(dlist_ty *dlist, void *data);
 
