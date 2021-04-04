@@ -25,8 +25,8 @@
 /************************ Global Definitions **********************************/
 struct dlist
 {
-	dlist_iter_ty head;			/* represents the beginning of the list */
-	dlist_iter_ty tail;			/* represents the end of the list */
+	dlist_iter_ty head;			/* points to the first node in the list */
+	dlist_iter_ty tail;			/* points to the end dummy of the list */
 };
 
 struct dlist_node
@@ -227,9 +227,6 @@ dlist_iter_ty DlistRemove(dlist_iter_ty iter)
 	return (iter);
 }
 /******************************************************************************/
-/* Inserts a new element to the beginning of the list */
-/* returns iterator to the new element on success or dlist_END on failure */
-/* Complexity: O(1) */
 dlist_iter_ty DlistPushFront(dlist_ty *dlist, void *data)
 {
 	dlist_iter_ty pushed_node = NULL;
@@ -247,9 +244,6 @@ dlist_iter_ty DlistPushFront(dlist_ty *dlist, void *data)
 	return (pushed_node);
 }
 /******************************************************************************/
-/* Inserts a new element to the end of the list */
-/* returns iterator to the new node on success or dlist_END on failure */
-/* Complexity: O(1) */
 dlist_iter_ty DlistPushBack(dlist_ty *dlist, void *data)
 {
 	assert(dlist);
@@ -258,10 +252,6 @@ dlist_iter_ty DlistPushBack(dlist_ty *dlist, void *data)
 	return (DlistInsertBefore(DlistIteratorEnd(dlist), data));
 }
 /******************************************************************************/
-/* Removes an element from the beginning of the list */
-/* Returns the popped element */
-/* Undefined if dlist is empty */
-/* Complexity: O(1) */
 void *DlistPopFront(dlist_ty *dlist)
 {
 	void *ret = NULL;
@@ -275,10 +265,6 @@ void *DlistPopFront(dlist_ty *dlist)
 	return (ret);
 }
 /******************************************************************************/
-/* Removes an element from the end of the list */
-/* Returns the popped element */
-/* Undefined if dlist is empty */
-/* Complexity: O(1) */
 void *DlistPopBack(dlist_ty *dlist)
 {
 	void *ret = NULL;
@@ -348,11 +334,6 @@ dlist_iter_ty DlistFind(const dlist_iter_ty from_iter,
 	return (to_iter);
 }
 /******************************************************************************/
-/* Stores each matching data in an element in dlist_output, */
-/* in range of [from_iter, to_iter) */
-/* Returns the number of matches */
-/* returns 0 if data not found */
-/* Complexity: O(n) */
 size_t DlistMultiFind(const dlist_iter_ty from_iter, 
 								const dlist_iter_ty to_iter, 
 									IsMatch_Func_ty match_func, void *param,
@@ -409,26 +390,22 @@ status_ty DlistForEach(dlist_iter_ty from_iter,
 dlist_iter_ty DlistSplice(dlist_iter_ty dest_iter, 
 								dlist_iter_ty src_from, dlist_iter_ty src_to)
 {
+	dlist_node_ty *nodes_runner = NULL;
+	dlist_node_ty *temp = NULL;
+	
 	assert(dest_iter);
 	assert(src_from);
 	assert(src_to);
 	
-	if (NULL != src_from->previous)
-	{
-	src_from->previous->next = src_to;
-	}
-	if (NULL != src_to->previous)
-	{
-	src_to->previous->next = dest_iter;
-	}
-	if (NULL != dest_iter->previous)
-	{
-	dest_iter->previous->next = src_from;
-	}
+	nodes_runner = src_to->previous;
 	
-	src_from->previous = dest_iter->previous;
-	dest_iter->previous = src_to->previous;
-	src_to->previous = src_from->previous;
+	while (nodes_runner != src_from->previous)
+	{
+		DlistInsertBefore(dest_iter, DlistGetData(nodes_runner));
+		temp = nodes_runner->previous;
+		DlistRemove(nodes_runner);
+		nodes_runner = temp;
+	}
 	
 	return (src_from);
 }
