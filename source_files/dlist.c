@@ -2,7 +2,7 @@
 * File: dlist.c						 		  								
 * Author: Daniel Brodsky					  								
 * Date: 01/04/2021							   								
-* Version: Beta				   								
+* Version: 1.0 (Before Review)				   								
 * Reviewer: Danel						   								
 * Description: Doubly Linked List Functions Implementations.			 
 \******************************************************************************/
@@ -66,6 +66,7 @@ dlist_ty *DlistCreate(void)
 	
 	return(new_list);
 }
+
 /******************************************************************************/
 void DlistDestroy(dlist_ty *dlist)
 {
@@ -170,6 +171,13 @@ dlist_iter_ty DlistInsertBefore(dlist_iter_ty iter, void *data)
 		if (NULL != new_node->next)
 		{
 		new_node->next->previous = new_node;
+		}
+		
+		if(NULL == iter->next) /* if the list is empty update both tail and
+																head pointers */
+		{
+		((dlist_ty *)(ITER_TO_NODE_PTR(iter))->data)->tail = new_node;
+		((dlist_ty *)(ITER_TO_NODE_PTR(iter))->data)->head = iter;
 		}
 		
 		iter->next = new_node;

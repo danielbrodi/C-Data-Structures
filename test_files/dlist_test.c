@@ -2,7 +2,7 @@
 * File: dlist_test.c						 		  								
 * Author: Daniel Brodsky					  								
 * Date: 01/04/2021							   								
-* Version: Beta				   								
+* Version: 1.0 (Before Review)				   								
 * Reviewer: Danel						   								
 * Description: Doubly Linked List API's Functions Testings.		 
 \******************************************************************************/
@@ -28,7 +28,7 @@
 #define UNUSED(x) (void)(x)
 /****************************Forward Declarations******************************/
 static void DlistCreateTest(dlist_ty *dlist);
-static void DlistDestroyTest(dlist_ty *dlist);
+static void DlistDestroyTest(dlist_ty *dlist, dlist_ty *dlist_output);
 static void DlistIteratorBeginTest(dlist_ty *dlist);
 static void DlistInsertBeforeTest(dlist_ty *dlist);
 static void DlistRemoveTest(dlist_ty *dlist);
@@ -39,12 +39,14 @@ static boolean_ty IsMatch(const void *data, void *param);
 static void InsertIntToList(dlist_ty *dlist);
 static void DlistForEachTest(dlist_ty *dlist);
 static void DlistFindTest(dlist_ty *dlist);
+static void DlistMultiFindTest(dlist_ty *dlist, dlist_ty *dlist_output);
 /******************************************************************************/
 /********************************Main Function*********************************/
 int main()	
 {
-	/* Intializes new singly linked list */
+	/* Intializes new doubly linked list */
 	dlist_ty *new_list = DlistCreate();
+	dlist_ty *dlist_output = DlistCreate();
 	
 	/* Intializes random number generator */
 	srand(time(0));
@@ -58,7 +60,8 @@ int main()
 	InsertIntToList(new_list);
 	DlistForEachTest(new_list);
 	DlistFindTest(new_list);
-	DlistDestroyTest(new_list);
+	DlistMultiFindTest(new_list, dlist_output);
+	DlistDestroyTest(new_list, dlist_output);
 	
 	return(0);
 }
@@ -72,10 +75,12 @@ static void DlistCreateTest(dlist_ty *dlist)
 }
 
 /******************************************************************************/
-static void DlistDestroyTest(dlist_ty *dlist)
+static void DlistDestroyTest(dlist_ty *dlist, dlist_ty *dlist_output)
 {
 	DlistDestroy(dlist);
-	printf (ANSI_COLOR_CYAN "\nThe List has been deleted\n\n" ANSI_COLOR_RESET);
+	DlistDestroy(dlist_output);
+	printf (ANSI_COLOR_CYAN "\nThe Lists have been deleted\n\n" 
+															ANSI_COLOR_RESET);
 }
 /******************************************************************************/
 static void DlistIteratorBeginTest(dlist_ty *dlist)
@@ -87,30 +92,33 @@ static void DlistIteratorBeginTest(dlist_ty *dlist)
 /******************************************************************************/
 static void DlistInsertBeforeTest(dlist_ty *dlist)
 {	
+
+	status_ty status = FAILURE;
 	dlist_iter_ty new_node = NULL;
 	
 	printf("Dlist Insert Test: ");
 	
 	new_node = DlistInsertBefore(DlistIteratorBegin(dlist), "Messi");
 	
-	strcmp(DlistGetData(new_node), "Messi") ? PRINT_FAILURE : PRINT_SUCCESS;
+	status = DlistIteratorIsEqual(DlistIteratorBegin(dlist), new_node) ?
+	 											  			SUCCESS : FAILURE;
+	
+	status = strcmp(DlistGetData(new_node), "Messi") ? FAILURE : SUCCESS;
+	
+	SUCCESS == status ? PRINT_SUCCESS : PRINT_FAILURE;
 }
 /******************************************************************************/
 static void DlistRemoveTest(dlist_ty *dlist)
 {
 	size_t original_size = DlistSize(dlist);
-	DlistInsertBefore(DlistIteratorBegin(dlist), "Messi");
-	printf(ANSI_COLOR_CYAN "\nList's size is: %lu\n" ANSI_COLOR_RESET, DlistSize(dlist));
 	printf("Remove & Size Test: ");
 	DlistRemove(DlistIteratorBegin(dlist));
-	printf(ANSI_COLOR_CYAN "\nList's size is: %lu\n" ANSI_COLOR_RESET, DlistSize(dlist));
 	DlistSize(dlist) == (original_size - 1) ? PRINT_SUCCESS : PRINT_FAILURE;
 }
 /******************************************************************************/
 static void DlistIsEmptyTest(dlist_ty *dlist)
 {
 	printf("Dlist IsEmpty Test: ");
-	printf(ANSI_COLOR_CYAN "\nList's size is: %lu\n" ANSI_COLOR_RESET, DlistSize(dlist));
 	TRUE == DlistIsEmpty(dlist) ? PRINT_SUCCESS : PRINT_FAILURE;
 }
 /******************************************************************************/
@@ -122,8 +130,6 @@ static void DlistSetDataTest(dlist_ty *dlist)
 	
 	new_node = DlistInsertBefore(new_node, "Messi");
 	
-	printf(ANSI_COLOR_CYAN "\nList's size is(AFTER INSERT): %lu\n" ANSI_COLOR_RESET, DlistSize(dlist));
-	
 	if(strcmp(DlistGetData(new_node), "Messi"))
 	{
 		PRINT_FAILURE;
@@ -134,8 +140,6 @@ static void DlistSetDataTest(dlist_ty *dlist)
 	strcmp(DlistGetData(new_node), "Ronaldo") ? PRINT_FAILURE : PRINT_SUCCESS;
 	
 	DlistRemove(new_node);
-	
-	printf(ANSI_COLOR_CYAN "\nList's size is(AFTER REMOVE): %lu\n" ANSI_COLOR_RESET, DlistSize(dlist));
 }
 /******************************************************************************/
 static void InsertIntToList(dlist_ty *dlist)
@@ -149,15 +153,11 @@ static void InsertIntToList(dlist_ty *dlist)
 	new_node = DlistInsertBefore(new_node, (void *)(long)num1);
 	new_node = DlistInsertBefore(new_node, (void *)(long)num2);
 	new_node = DlistInsertBefore(new_node, (void *)(long)num3);
-	
-	printf(ANSI_COLOR_CYAN "\nList's size is(AFTER 3 INSERT): %lu\n" ANSI_COLOR_RESET, DlistSize(dlist));
 }
 /******************************************************************************/
 static status_ty PrintList(void *data, void *param)
 {
-	printf(ANSI_COLOR_CYAN "PRINTLIST FUNCTION" ANSI_COLOR_RESET);
 	UNUSED(param);
-	printf(ANSI_COLOR_CYAN "PRINTLIST FUNCTION" ANSI_COLOR_RESET);
 	if (NULL == data || NULL == param)
 	{
 		return(FAILURE);
@@ -192,4 +192,12 @@ static void DlistFindTest(dlist_ty *dlist)
 	printf("Dlist Find Test: ");
 	new_node == DlistIteratorEnd(dlist) ? PRINT_FAILURE : PRINT_SUCCESS;
 }
-
+/******************************************************************************/
+static void DlistMultiFindTest(dlist_ty *dlist, dlist_ty *dlist_output)
+{
+	int x = 3;
+	printf("Dlist MultiFind Test: ");
+	1 == DlistMultiFind(DlistIteratorBegin(dlist), DlistIteratorEnd(dlist), 
+					IsMatch, (void *)(long)x, dlist_output) ? PRINT_SUCCESS :
+					 											PRINT_FAILURE;
+}
