@@ -391,6 +391,7 @@ dlist_iter_ty DlistSplice(dlist_iter_ty dest_iter,
 								dlist_iter_ty src_from, dlist_iter_ty src_to)
 {
 	dlist_node_ty *nodes_runner = NULL;
+	dlist_node_ty *temp = NULL;
 	
 	assert(dest_iter);
 	assert(src_from);
@@ -398,13 +399,16 @@ dlist_iter_ty DlistSplice(dlist_iter_ty dest_iter,
 	
 	nodes_runner = src_from;
 	
+	/* if dest_iter is the HEAD elemenet in it's list */
 	if (NULL == dest_iter->previous)
 	{
 		nodes_runner = src_to->previous;
-		while (nodes_runner != src_to)
+		while (nodes_runner != src_from->previous)
 		{
 			DlistInsertBefore(dest_iter, DlistGetData(nodes_runner));
-			nodes_runner = DlistRemove(nodes_runner);
+			temp = nodes_runner->previous;
+			DlistRemove(nodes_runner);
+			nodes_runner = temp;
 		}
 	}
 	else

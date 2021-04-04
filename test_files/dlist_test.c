@@ -343,13 +343,13 @@ static void DlistSpliceTest(dlist_ty *dlist_dest, dlist_ty *dlist_src)
 	DlistInsertBefore(DlistIteratorBegin(dlist_dest), (void *)(long)num1);
 	DlistInsertBefore(DlistIteratorBegin(dlist_dest), (void *)(long)num2);
 	DlistInsertBefore(DlistIteratorBegin(dlist_dest), (void *)(long)num3);
-	printf("Printing List DEST: ");
+	printf("\nPrinting List DEST: \n");
 	DlistForEach(DlistIteratorBegin(dlist_dest), DlistIteratorEnd(dlist_dest), 
 													PrintList, (void *)(long)x);
 	DlistInsertBefore(DlistIteratorBegin(dlist_src), (void *)(long)num4);
 	DlistInsertBefore(DlistIteratorBegin(dlist_src), (void *)(long)num5);
 	DlistInsertBefore(DlistIteratorBegin(dlist_src), (void *)(long)num6);
-	printf("Printing List SRC: ");
+	printf("\nPrinting List SRC: \n");
 	DlistForEach(DlistIteratorBegin(dlist_src), DlistIteratorEnd(dlist_src), 
 													PrintList, (void *)(long)x);
 		
@@ -360,10 +360,10 @@ static void DlistSpliceTest(dlist_ty *dlist_dest, dlist_ty *dlist_src)
 	
 	printf("**AFTER SPLICE:**\n");
 	printf("\n TAIL->PREVIOUS in DEST: %d\n", (int)(long)DlistGetData(DlistIteratorPrevious(DlistIteratorEnd(dlist_dest))));
-		printf("Printing List SRC: ");
+		printf("\nPrinting List SRC:\n ");
 	DlistForEach(DlistIteratorBegin(dlist_src), DlistIteratorEnd(dlist_src), 
 													PrintList, (void *)(long)x);
-				printf("Printing List DEST: ");
+				printf("\nPrinting List DEST:\n ");
 	DlistForEach(DlistIteratorBegin(dlist_dest), DlistIteratorEnd(dlist_dest), 
 													PrintList, (void *)(long)x);										
 }
