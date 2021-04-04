@@ -48,7 +48,7 @@ static void DlistMultiFindTest(dlist_ty *dlist, dlist_ty *dlist_output);
 /********************************Main Function*********************************/
 int main()	
 {
-	/* Intializes new doubly linked list */
+	/* Intializes two empty new doubly linked lists */
 	dlist_ty *new_list = DlistCreate();
 	dlist_ty *dlist_output = DlistCreate();
 	
@@ -71,7 +71,7 @@ int main()
 	DlistMultiFindTest(new_list, dlist_output);
 	DlistDestroyTest(new_list, dlist_output);
 	
-	return(0);
+	return (0);
 }
 /******************************************************************************/
 /************************Test Functions Implementations************************/
@@ -251,7 +251,7 @@ static void DlistSetDataTest(dlist_ty *dlist)
 	
 	new_node = DlistInsertBefore(new_node, "Messi");
 	
-	if(strcmp(DlistGetData(new_node), "Messi"))
+	if (strcmp(DlistGetData(new_node), "Messi"))
 	{
 		PRINT_FAILURE;
 	}
@@ -281,17 +281,17 @@ static status_ty PrintList(void *data, void *param)
 	UNUSED(param);
 	if (NULL == data || NULL == param)
 	{
-		return(FAILURE);
+		return (FAILURE);
 	}
 	
 	printf("%d ", (int)(long)data);
-	return(SUCCESS);
+	return (SUCCESS);
 }
 
 /******************************************************************************/
 static boolean_ty IsMatch(const void *data, void *param)
 {	
-	return(((int)(long)data == (int)(long)param));
+	return (((int)(long)data == (int)(long)param));
 }
 /******************************************************************************/
 static void DlistForEachTest(dlist_ty *dlist)

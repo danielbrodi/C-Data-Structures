@@ -44,7 +44,7 @@ dlist_ty *DlistCreate(void)
 	if (NULL == new_list)
 	{
 		fprintf(stderr, "Failed to allocate memory\n");
-		return(NULL);
+		return (NULL);
 	}
 	
 	/* create a dummy node that will represent the end of the list */
@@ -53,7 +53,7 @@ dlist_ty *DlistCreate(void)
 	{
 		fprintf(stderr, "Failed to allocate memory\n");
 		free(new_list);
-		return(NULL);
+		return (NULL);
 	}
 	
 	/* tail node points to null because it's the last node in the list */
@@ -64,7 +64,7 @@ dlist_ty *DlistCreate(void)
 	/* the first (and only) node of an empty list is the end dummy node */
 	new_list->head = new_list->tail;
 	
-	return(new_list);
+	return (new_list);
 }
 
 /******************************************************************************/
@@ -78,7 +78,7 @@ void DlistDestroy(dlist_ty *dlist)
 		return;
 	}
 	
-	while(!DlistIsEmpty(dlist))
+	while (!DlistIsEmpty(dlist))
 	{
 		runner = dlist->head;
 		dlist->head = dlist->head->next;
@@ -96,14 +96,14 @@ dlist_iter_ty DlistIteratorBegin(const dlist_ty *dlist)
 {
 	assert(dlist);
 	
-	return(dlist->head);
+	return (dlist->head);
 }
 /******************************************************************************/
 dlist_iter_ty DlistIteratorEnd(const dlist_ty *dlist)
 {
 	assert(dlist);
 	
-	return(dlist->tail);
+	return (dlist->tail);
 }
 /******************************************************************************/
 dlist_iter_ty DlistIteratorNext(const dlist_iter_ty iter)
@@ -111,7 +111,7 @@ dlist_iter_ty DlistIteratorNext(const dlist_iter_ty iter)
 	assert(ITER_TO_NODE_PTR(iter));
 	assert(ITER_TO_NODE_PTR(iter)->next);
 	
-	return(ITER_TO_NODE_PTR(iter)->next);
+	return (ITER_TO_NODE_PTR(iter)->next);
 }
 /******************************************************************************/
 dlist_iter_ty DlistIteratorPrevious(const dlist_iter_ty iter)
@@ -119,7 +119,7 @@ dlist_iter_ty DlistIteratorPrevious(const dlist_iter_ty iter)
 	assert(ITER_TO_NODE_PTR(iter));
 	assert(ITER_TO_NODE_PTR(iter)->previous);
 	
-	return(ITER_TO_NODE_PTR(iter)->previous);
+	return (ITER_TO_NODE_PTR(iter)->previous);
 }
 /******************************************************************************/
 void *DlistGetData(const dlist_iter_ty iter)
@@ -127,7 +127,7 @@ void *DlistGetData(const dlist_iter_ty iter)
 	assert(iter);
 	assert(ITER_TO_NODE_PTR(iter)->next);
 	
-	return(ITER_TO_NODE_PTR(iter)->data);
+	return (ITER_TO_NODE_PTR(iter)->data);
 }
 /******************************************************************************/
 void DlistSetData(dlist_iter_ty iter, void *data)
@@ -158,7 +158,7 @@ dlist_iter_ty DlistInsertBefore(dlist_iter_ty iter, void *data)
 	new_node = (dlist_node_ty *)malloc(sizeof(dlist_node_ty));
 	if (NULL == new_node)
 	{
-		return(iter);
+		return (iter);
 	}
 	
 		
@@ -173,7 +173,7 @@ dlist_iter_ty DlistInsertBefore(dlist_iter_ty iter, void *data)
 		new_node->next->previous = new_node;
 		}
 		
-		if(NULL == iter->next) /* if the list is empty update both tail and
+		if (NULL == iter->next) /* if the list is empty update both tail and
 																head pointers */
 		{
 		((dlist_ty *)(ITER_TO_NODE_PTR(iter))->data)->tail = new_node;
@@ -196,7 +196,7 @@ dlist_iter_ty DlistInsertBefore(dlist_iter_ty iter, void *data)
 		iter->previous = new_node;
 	}
 	
-	return(new_node);
+	return (new_node);
 }
 /******************************************************************************/
 dlist_iter_ty DlistRemove(dlist_iter_ty iter)
@@ -210,7 +210,7 @@ dlist_iter_ty DlistRemove(dlist_iter_ty iter)
 	
 	new_node = (ITER_TO_NODE_PTR(iter))->next->next;
 	
-	if(NULL == new_node)
+	if (NULL == new_node)
 	{
 		((dlist_ty *)(ITER_TO_NODE_PTR(iter))->data)->tail = iter;
 	}
@@ -224,7 +224,7 @@ dlist_iter_ty DlistRemove(dlist_iter_ty iter)
 	(ITER_TO_NODE_PTR(new_node))->previous = iter;
 	}
 	
-	return(iter);
+	return (iter);
 }
 /******************************************************************************/
 /* Inserts a new element to the beginning of the list */
@@ -298,10 +298,10 @@ boolean_ty DlistIsEmpty(const dlist_ty *dlist)
 	
 	if (dlist->tail == dlist->head)
 	{
-		return(TRUE);
+		return (TRUE);
 	}
 	
-	return(FALSE);
+	return (FALSE);
 }
 /******************************************************************************/
 size_t DlistSize(const dlist_ty *dlist)
@@ -320,7 +320,7 @@ size_t DlistSize(const dlist_ty *dlist)
 		++counter;
 	}
 	
-	return(counter);
+	return (counter);
 }
 /******************************************************************************/
 dlist_iter_ty DlistFind(const dlist_iter_ty from_iter, 
@@ -336,16 +336,16 @@ dlist_iter_ty DlistFind(const dlist_iter_ty from_iter,
 
 	runner = from_iter;
 	
-	while(runner != to_iter)
+	while (runner != to_iter)
 	{
-		if(TRUE == match_func(runner->data, param))
+		if (TRUE == match_func(runner->data, param))
 		{
-			return(runner);
+			return (runner);
 		}
 		runner = runner->next;
 	}
 
-	return(to_iter);
+	return (to_iter);
 }
 /******************************************************************************/
 /* Stores each matching data in an element in dlist_output, */
@@ -368,9 +368,9 @@ size_t DlistMultiFind(const dlist_iter_ty from_iter,
 	
 	runner = from_iter;
 	
-	while(runner != to_iter)
+	while (runner != to_iter)
 	{
-		if(TRUE == match_func(runner->data, param))
+		if (TRUE == match_func(runner->data, param))
 		{
 			DlistPushFront(dlist_output, runner->data);
 			++matches_counter;
@@ -378,7 +378,7 @@ size_t DlistMultiFind(const dlist_iter_ty from_iter,
 		runner = runner->next;
 	}
 
-	return(matches_counter);
+	return (matches_counter);
 	
 }
 /******************************************************************************/
@@ -393,17 +393,17 @@ status_ty DlistForEach(dlist_iter_ty from_iter,
 	
 	iterator = from_iter;
 	
-	while(iterator != to_iter)
+	while (iterator != to_iter)
 	{
-		if(SUCCESS != action_func(iterator->data, param))
+		if (SUCCESS != action_func(iterator->data, param))
 		{
-			return(FAILURE);
+			return (FAILURE);
 		}
 		
 	iterator = iterator->next;
 	}
 	
-	return(SUCCESS);
+	return (SUCCESS);
 }	
 /******************************************************************************/
 dlist_iter_ty DlistSplice(dlist_iter_ty dest_iter, 
@@ -422,6 +422,5 @@ dlist_iter_ty DlistSplice(dlist_iter_ty dest_iter,
 	src_to->previous = src_from->previous;
 	
 	return (src_from);
-	
 }
 /******************************************************************************/
