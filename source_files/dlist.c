@@ -1,7 +1,7 @@
 /**********************************FILE-HEADER*********************************\
 * File: dlist.c						 		  								
 * Author: Daniel Brodsky					  								
-* Date: 01/04/2021							   								
+* Date: 04/04/2021							   								
 * Version: 1.0 (Before Review)				   								
 * Reviewer: Danel						   								
 * Description: Doubly Linked List Functions Implementations.			 
@@ -145,7 +145,7 @@ boolean_ty DlistIteratorIsEqual(const dlist_iter_ty iter_a,
 	assert(iter_a);
 	assert(iter_b);
 	
-	return(NODE_PTR_TO_ITER(iter_a) == NODE_PTR_TO_ITER(iter_b));
+	return (iter_a == iter_b);
 }
 /******************************************************************************/
 dlist_iter_ty DlistInsertBefore(dlist_iter_ty iter, void *data)
@@ -232,18 +232,19 @@ dlist_iter_ty DlistRemove(dlist_iter_ty iter)
 /* Complexity: O(1) */
 dlist_iter_ty DlistPushFront(dlist_ty *dlist, void *data)
 {
-	dlist_iter_ty pushed_node = 
-							DlistInsertBefore(DlistIteratorBegin(dlist), data);
+	dlist_iter_ty pushed_node = NULL;
 	
 	assert (dlist);
 	assert(data);
 	
-	if (DlistIteratorIsEqual(DlistIteratorBegin(dlist), pushed_node))
+	pushed_node = DlistInsertBefore(DlistIteratorBegin(dlist), data);
+	
+	if (!DlistIteratorIsEqual(DlistIteratorBegin(dlist), pushed_node))
 	{
 		return (DlistIteratorEnd(dlist));
 	}
-	return (pushed_node);
 	
+	return (pushed_node);
 }
 /******************************************************************************/
 /* Inserts a new element to the end of the list */
