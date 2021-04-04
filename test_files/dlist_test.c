@@ -81,7 +81,6 @@ static void DlistCreateTest(dlist_ty *dlist)
 	printf("\nDoubly Linked List Creation Test: ");
 	NULL == dlist ? PRINT_FAILURE : PRINT_SUCCESS;
 }
-
 /******************************************************************************/
 static void DlistDestroyTest(dlist_ty *dlist, dlist_ty *dlist_output)
 {
@@ -174,7 +173,6 @@ static void DlistPushBackTest(dlist_ty *dlist)
 	
 	DlistRemove(node);
 }
-
 /******************************************************************************/
 static void DlistPopFrontTest(dlist_ty *dlist)
 {
@@ -267,7 +265,7 @@ static void InsertIntToList(dlist_ty *dlist)
 {	
 	dlist_iter_ty new_node = DlistIteratorBegin(dlist);
 	
-	int num1 = RANDOM_NUM, num2 = 3, num3 = RANDOM_NUM;
+	int num1 = RANDOM_NUM, num2 = -1, num3 = RANDOM_NUM;
 	
 	printf("\nInserting to the list: %d, %d, %d\n", num1, num2, num3);
 	
@@ -287,7 +285,6 @@ static status_ty PrintList(void *data, void *param)
 	printf("%d ", (int)(long)data);
 	return (SUCCESS);
 }
-
 /******************************************************************************/
 static boolean_ty IsMatch(const void *data, void *param)
 {	
@@ -296,7 +293,7 @@ static boolean_ty IsMatch(const void *data, void *param)
 /******************************************************************************/
 static void DlistForEachTest(dlist_ty *dlist)
 {
-	int x = 3;
+	int x = -1;
 	status_ty result = FAILURE;
 	printf("Printing List: ");
 	result = DlistForEach(DlistIteratorBegin(dlist), DlistIteratorEnd(dlist), 
@@ -307,7 +304,7 @@ static void DlistForEachTest(dlist_ty *dlist)
 /******************************************************************************/
 static void DlistFindTest(dlist_ty *dlist)
 {
-	int x = 3;
+	int x = -1;
 	dlist_iter_ty new_node = DlistFind(DlistIteratorBegin(dlist),
 							DlistIteratorEnd(dlist), IsMatch, (void *)(long)x);
 	printf("Dlist Find Test: ");
@@ -316,7 +313,7 @@ static void DlistFindTest(dlist_ty *dlist)
 /******************************************************************************/
 static void DlistMultiFindTest(dlist_ty *dlist, dlist_ty *dlist_output)
 {
-	int x = 3;
+	int x = -1;
 	printf("Dlist MultiFind Test: ");
 	1 == DlistMultiFind(DlistIteratorBegin(dlist), DlistIteratorEnd(dlist), 
 					IsMatch, (void *)(long)x, dlist_output) ? PRINT_SUCCESS :
