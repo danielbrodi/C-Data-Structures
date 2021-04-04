@@ -412,10 +412,19 @@ dlist_iter_ty DlistSplice(dlist_iter_ty dest_iter,
 	assert(dest_iter);
 	assert(src_from);
 	assert(src_to);
-		
+	
+	if (NULL != src_from->previous)
+	{
 	src_from->previous->next = src_to;
+	}
+	if (NULL != src_to->previous)
+	{
 	src_to->previous->next = dest_iter;
+	}
+	if (NULL != dest_iter->previous)
+	{
 	dest_iter->previous->next = src_from;
+	}
 	
 	src_from->previous = dest_iter->previous;
 	dest_iter->previous = src_to->previous;

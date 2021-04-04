@@ -22,8 +22,8 @@
 #define PRINT_SUCCESS printf (ANSI_COLOR_GREEN "SUCCESS\n" ANSI_COLOR_RESET)
 #define PRINT_FAILURE printf (ANSI_COLOR_RED "FAILURE\n" ANSI_COLOR_RESET)
 
-/* generates random number from 0 to 99 */
-#define RANDOM_NUM rand() % 100
+/* generates random number from 1 to 100 */
+#define RANDOM_NUM (rand() % 100) + 1
 
 #define UNUSED(x) (void)(x)
 /****************************Forward Declarations******************************/
@@ -44,6 +44,7 @@ static void InsertIntToList(dlist_ty *dlist);
 static void DlistForEachTest(dlist_ty *dlist);
 static void DlistFindTest(dlist_ty *dlist);
 static void DlistMultiFindTest(dlist_ty *dlist, dlist_ty *dlist_output);
+static void DlistSpliceTest(dlist_ty *dlist_dest, dlist_ty *dlist_src);
 /******************************************************************************/
 /********************************Main Function*********************************/
 int main()	
@@ -69,6 +70,7 @@ int main()
 	DlistForEachTest(new_list);
 	DlistFindTest(new_list);
 	DlistMultiFindTest(new_list, dlist_output);
+	DlistSpliceTest(new_list, dlist_output);
 	DlistDestroyTest(new_list, dlist_output);
 	
 	return (0);
@@ -320,3 +322,39 @@ static void DlistMultiFindTest(dlist_ty *dlist, dlist_ty *dlist_output)
 					 											PRINT_FAILURE;
 }
 /******************************************************************************/
+static void DlistSpliceTest(dlist_ty *dlist_dest, dlist_ty *dlist_src)
+{
+	int num1 = 1, num2 = 2, num3 = 3, num4 = 4, num5 = 5, num6 = 6;
+	int x = -1;
+	
+	printf("Dlist Splice Test: ");
+	
+	/** Empty both lists **/
+	while(!DlistIsEmpty(dlist_dest))
+	{
+		DlistRemove(DlistIteratorBegin(dlist_dest));
+	}
+	
+	while(!DlistIsEmpty(dlist_src))
+	{
+		DlistRemove(DlistIteratorBegin(dlist_src));
+	}
+	
+	DlistInsertBefore(DlistIteratorBegin(dlist_dest), (void *)(long)num1);
+	DlistInsertBefore(DlistIteratorBegin(dlist_dest), (void *)(long)num2);
+	DlistInsertBefore(DlistIteratorBegin(dlist_dest), (void *)(long)num3);
+	printf("Printing List DEST: ");
+	DlistForEach(DlistIteratorBegin(dlist_dest), DlistIteratorEnd(dlist_dest), 
+													PrintList, (void *)(long)x);
+	DlistInsertBefore(DlistIteratorBegin(dlist_src), (void *)(long)num4);
+	DlistInsertBefore(DlistIteratorBegin(dlist_src), (void *)(long)num5);
+	DlistInsertBefore(DlistIteratorBegin(dlist_src), (void *)(long)num6);
+	printf("Printing List SRC: ");
+	DlistForEach(DlistIteratorBegin(dlist_src), DlistIteratorEnd(dlist_src), 
+													PrintList, (void *)(long)x);
+		
+	printf("\n TAIL->PREVIOUS in DEST: %d\n", (int)(long)DlistGetData(DlistIteratorPrevious(DlistIteratorEnd(dlist_dest))));
+	printf("TAIL->PREVIOUS in SRC: %d\n", (int)(long)DlistGetData(DlistIteratorPrevious(DlistIteratorEnd(dlist_src))));												
+	DlistSplice(DlistIteratorPrevious(DlistIteratorEnd(dlist_dest)), DlistIteratorBegin(dlist_src), DlistIteratorEnd(dlist_src));
+}
+
