@@ -324,8 +324,10 @@ static void DlistMultiFindTest(dlist_ty *dlist, dlist_ty *dlist_output)
 /******************************************************************************/
 static void DlistSpliceTest(dlist_ty *dlist_dest, dlist_ty *dlist_src)
 {
+	boolean_ty is_working = TRUE;
+	void *popped_value = NULL;
+	
 	int num1 = 1, num2 = 2, num3 = 3, num4 = 4, num5 = 5, num6 = 6;
-	int x = -1;
 	
 	printf("Dlist Splice Test: ");
 	
@@ -340,45 +342,43 @@ static void DlistSpliceTest(dlist_ty *dlist_dest, dlist_ty *dlist_src)
 		DlistRemove(DlistIteratorBegin(dlist_src));
 	}
 	
+	/* fill up dest list */
 	DlistInsertBefore(DlistIteratorBegin(dlist_dest), (void *)(long)num1);
 	DlistInsertBefore(DlistIteratorBegin(dlist_dest), (void *)(long)num2);
 	DlistInsertBefore(DlistIteratorBegin(dlist_dest), (void *)(long)num3);
-	printf("\nPrinting List DEST: \n");
-	DlistForEach(DlistIteratorBegin(dlist_dest), DlistIteratorEnd(dlist_dest), 
-													PrintList, (void *)(long)x);
+
+	/* fill up src list */
 	DlistInsertBefore(DlistIteratorBegin(dlist_src), (void *)(long)num4);
 	DlistInsertBefore(DlistIteratorBegin(dlist_src), (void *)(long)num5);
 	DlistInsertBefore(DlistIteratorBegin(dlist_src), (void *)(long)num6);
-	printf("\nPrinting List SRC: \n");
-	DlistForEach(DlistIteratorBegin(dlist_src), DlistIteratorEnd(dlist_src), 
-													PrintList, (void *)(long)x);
 		
-	printf("\nTAIL->PREVIOUS in DEST: %d\n", (int)(long)DlistGetData(
-	DlistIteratorPrevious(DlistIteratorEnd(dlist_dest))));
-	printf("TAIL->PREVIOUS in SRC: %d\n", (int)(long)DlistGetData(
-	DlistIteratorPrevious(DlistIteratorEnd(dlist_src))));
-	
-	DlistPopFront(dlist_dest);
-	DlistPopFront(dlist_dest);
-	DlistPopFront(dlist_dest);						
-	/* TODO
-	SRC: 6 5 4
-	DEST:3 2 1 */
+	/* dest list: 3, 2, 1 && src list: 6, 5, 4 */
+
 	DlistSplice(
-	(DlistIteratorBegin(dlist_dest)), /* dest_iter */
-	(DlistIteratorBegin(dlist_src)), /* src_from */
-	DlistIteratorEnd(dlist_src)); /* src_to */
+	(DlistIteratorBegin(dlist_dest)), /* dest_iter: 3*/
+	(DlistIteratorBegin(dlist_src)), /* src_from: 6 */
+	DlistIteratorEnd(dlist_src)); /* src_to: dummy after 4 */
 	
-	printf("**AFTER SPLICE:**\n");
+	/* After Splice expected to be: 6, 5, 4, 3, 2, 1 */
 	
-	printf("\n TAIL->PREVIOUS in DEST: %d\n", (int)(long)DlistGetData(
-	DlistIteratorPrevious(DlistIteratorEnd(dlist_dest))));
-		printf("\nPrinting List SRC:\n ");
-/*	DlistForEach(DlistIteratorBegin(dlist_src), DlistIteratorEnd(dlist_src), */
-/*												PrintList, (void *)(long)x);*/
-				printf("\nPrinting List DEST:\n ");
-	DlistForEach(DlistIteratorBegin(dlist_dest), DlistIteratorEnd(dlist_dest), 
-													PrintList, (void *)(long)x);
-													printf("\n");										
+	popped_value = DlistPopBack(dlist_dest);
+	is_working *= IsMatch(popped_value, (void *)(long)num1);
+	
+	popped_value = DlistPopBack(dlist_dest);
+	is_working *= IsMatch(popped_value, (void *)(long)num2);
+	
+	popped_value = DlistPopBack(dlist_dest);
+	is_working *= IsMatch(popped_value, (void *)(long)num3);
+	
+	popped_value = DlistPopBack(dlist_dest);
+	is_working *= IsMatch(popped_value, (void *)(long)num4);
+	
+	popped_value = DlistPopBack(dlist_dest);
+	is_working *= IsMatch(popped_value, (void *)(long)num5);
+	
+	popped_value = DlistPopBack(dlist_dest);
+	is_working *= IsMatch(popped_value, (void *)(long)num6);
+													
+	is_working ? PRINT_SUCCESS : PRINT_FAILURE;										
 }
 
