@@ -2,7 +2,7 @@
 * File: dlist_test.c						 		  								
 * Author: Daniel Brodsky					  								
 * Date: 04/04/2021						   								
-* Version: 1.0 (Before Review)				   								
+* Version: 1.0 (After Review)				   								
 * Reviewer: Danel						   								
 * Description: Doubly Linked List API's Functions Testings.		 
 \******************************************************************************/

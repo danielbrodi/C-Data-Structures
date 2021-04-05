@@ -2,7 +2,7 @@
 * File: dlist.c						 		  								
 * Author: Daniel Brodsky					  								
 * Date: 05/04/2021							   								
-* Version: 1.5 (Before Review)				   								
+* Version: 1.5 (After Review)				   								
 * Reviewer: Danel						   								
 * Description: Doubly Linked List Functions Implementations.			 
 \******************************************************************************/
