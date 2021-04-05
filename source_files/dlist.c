@@ -31,9 +31,9 @@ struct dlist
 
 struct dlist_node
 {
-	void *data;
 	dlist_iter_ty previous;		/* points to the previous node in the list */
 	dlist_iter_ty next;			/* points to the next node in the list */
+	void *data;
 };
 
 /************************Functions Implementations*****************************/
@@ -57,12 +57,12 @@ dlist_ty *DlistCreate(void)
 	}
 	
 	/* tail node points to null because it's the last node in the list */
-	new_list->tail->data = new_list;
-	new_list->tail->previous = NULL;
+	new_list->tail->data = (void *)new_list;
 	new_list->tail->next = NULL;
 	
 	/* the first (and only) node of an empty list is the end dummy node */
 	new_list->head = new_list->tail;
+	new_list->head->previous = (dlist_node_ty *)new_list;
 	
 	return (new_list);
 }
@@ -158,11 +158,11 @@ dlist_iter_ty DlistInsertBefore(dlist_iter_ty iter, void *data)
 	new_node = (dlist_node_ty *)malloc(sizeof(dlist_node_ty));
 	if (NULL == new_node)
 	{
-		return (iter);
+		return (iter); /* allocation failed */
 	}
 	
-		
-	if (NULL == iter->previous) /* switch HEAD element, Insert After HEAD */
+	/* switch HEAD element, Insert After HEAD */
+	if (iter == iter->previous->previous) 
 	{
 		new_node->data = iter->data;
 		new_node->previous = iter;
@@ -170,14 +170,14 @@ dlist_iter_ty DlistInsertBefore(dlist_iter_ty iter, void *data)
 		
 		if (NULL != new_node->next)
 		{
-		new_node->next->previous = new_node;
+			new_node->next->previous = new_node;
 		}
 		
 		if (NULL == iter->next) /* if the list is empty update both tail and
 																head pointers */
 		{
-		((dlist_ty *)(ITER_TO_NODE_PTR(iter))->data)->tail = new_node;
-		((dlist_ty *)(ITER_TO_NODE_PTR(iter))->data)->head = iter;
+			((dlist_ty *)(ITER_TO_NODE_PTR(iter))->data)->tail = new_node;
+			((dlist_ty *)(ITER_TO_NODE_PTR(iter))->data)->head = iter;
 		}
 		
 		iter->next = new_node;
@@ -390,35 +390,36 @@ status_ty DlistForEach(dlist_iter_ty from_iter,
 dlist_iter_ty DlistSplice(dlist_iter_ty dest_iter, 
 								dlist_iter_ty src_from, dlist_iter_ty src_to)
 {
-	dlist_node_ty *nodes_runner = NULL;
+	dlist_node_ty *copy = NULL;
 	dlist_node_ty *temp = NULL;
 	
 	assert(dest_iter);
 	assert(src_from);
 	assert(src_to);
 	
-	nodes_runner = src_from;
+	temp = src_from->previous;
 	
-	/* if dest_iter is the HEAD elemenet in it's list */
-	if (NULL == dest_iter->previous)
+	if (dest_iter == dest_iter->previous->previous) /* if dest_iter is HEAD */
 	{
-		nodes_runner = src_to->previous;
-		while (nodes_runner != src_from->previous)
-		{
-			DlistInsertBefore(dest_iter, DlistGetData(nodes_runner));
-			temp = nodes_runner->previous;
-			DlistRemove(nodes_runner);
-			nodes_runner = temp;
-		}
+		dest_iter->previous->previous = src_from;
 	}
-	else
+	
+	if (src_from == src_from->previous->previous)
 	{
-		while (nodes_runner->next != src_to->next)
-		{
-			DlistInsertBefore(dest_iter, DlistGetData(nodes_runner));
-			nodes_runner = DlistRemove(nodes_runner);
-		}
+		src_from->previous->previous = src_to;
 	}
+
+	/* src_from */
+	src_from->previous->next = src_to;
+	src_from->previous = dest_iter->previous;
+	if (dest_iter != dest_iter->previous->previous)
+	dest_iter->previous->next = src_from;
+	
+	/* src_to */
+	if (src_from != src_from->previous->previous)
+	src_to->previous->next = dest_iter;
+	dest_iter->previous = src_to->previous;
+	src_to->previous = temp;
 	
 	return (src_from);
 }
