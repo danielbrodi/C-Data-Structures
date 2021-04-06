@@ -68,27 +68,23 @@ dlist_ty *DlistCreate(void)
 }
 /******************************************************************************/
 void DlistDestroy(dlist_ty *dlist)
-{
-	dlist_node_ty *runner = NULL;
-	
+{	
 	/* If the received dlist is NULL, no operation is performed */
-	if (NULL == dlist)
+	if (NULL != dlist)
 	{
-		return;
+		while (!DlistIsEmpty(dlist))
+		{
+			DlistRemove(DlistIteratorBegin(dlist));
+		}
+		
+		dlist->head = NULL;
+		
+		free(dlist->tail);
+		dlist->tail = NULL;
+		
+		free(dlist);
+		dlist = NULL;
 	}
-	
-	while (!DlistIsEmpty(dlist))
-	{
-		DlistRemove(DlistIteratorBegin(dlist));
-	}
-	
-	dlist->head = NULL;
-	
-	free(dlist->tail);
-	dlist->tail = NULL;
-	
-	free(dlist);
-	dlist = NULL;
 }
 /******************************************************************************/
 dlist_iter_ty DlistIteratorBegin(const dlist_ty *dlist)
@@ -117,7 +113,7 @@ dlist_iter_ty DlistIteratorPrevious(const dlist_iter_ty iter)
 {
 	assert(ITER_TO_NODE_PTR(iter));
 	/* checks if iter is the head element in its list */
-	assert(ITER_TO_NODE_PTR(iter)->previous);
+	assert(ITER_TO_NODE_PTR(iter)->previous->previous != ITER_TO_NODE_PTR(iter));
 	
 	return (NODE_PTR_TO_ITER((ITER_TO_NODE_PTR(iter)->previous)));
 }
@@ -160,77 +156,90 @@ dlist_iter_ty DlistInsertBefore(dlist_iter_ty iter, void *data)
 	new_node = (dlist_node_ty *)malloc(sizeof(dlist_node_ty));
 	if (NULL == new_node)
 	{
-		return (iter); /* allocation failed */
+		return (iter); /* memory allocation failed */
 	}
 	
-	/*	switch HEAD element: insert a copy node of the current head node after
-		the current head element, and insert the new data to the current
-		head element */
-	if (ITER_TO_NODE_PTR(iter) == ITER_TO_NODE_PTR(iter)->previous->previous) 
+	/*
+	The previous of the head element in a list points to the struct
+	handler of the list.
+	The previous of the previous of the head element which is:
+	"head->previous->previous" points to the element itself.
+	The reason for that is because the "head" struct member in a
+	list's structure is located at offset 0 in the memory.
+	
+	Also, the "previous" struct member in a node's structure is also located at
+	offset 0.
+	
+	Thus, if a pointer to a list is casted and called as a pointer to a 
+	node, a pointer to the "previous" member of it won't result in an error
+	although there is no "previous" member in a list's structure.
+	It will actually point to the "head" member of the list,
+	because both "previous" and "head" members are located at offset 0 of
+	their structures. So when the compiler will see a casted call to the list,
+	that seems to look like a call to a node, and to its first struct member,
+	it will access the member that is located in offset 0 of the struct,
+	which means the first member, which means the "head" member of the list.
+	
+	So the only reason for the previous of a previous of an element to be
+	the element itself, is if the element is the head node of its list.
+	*/	
+	if (ITER_TO_NODE_PTR(iter) == ITER_TO_NODE_PTR(iter)->previous->previous)
 	{
-		new_node->data = ITER_TO_NODE_PTR(iter)->data;
-		new_node->previous = ITER_TO_NODE_PTR(iter);
-		new_node->next = ITER_TO_NODE_PTR(iter)->next;
-		
-		if (NULL != new_node->next)
-		{
-			new_node->next->previous = new_node;
-		}
-		
-		/* if the list is empty update both tail and head pointers */						
-		if (NULL == ITER_TO_NODE_PTR(iter)->next)
-		{
-			((dlist_ty *)(ITER_TO_NODE_PTR(iter))->data)->tail = new_node;
-			((dlist_ty *)(ITER_TO_NODE_PTR(iter))->data)->head = iter;
-		}
-		
-		ITER_TO_NODE_PTR(iter)->next = new_node;
-		ITER_TO_NODE_PTR(iter)->data = data;
-		
-		return (iter);
+		/*	the head's previous must point to the list's data structure	*/
+		new_node->previous = (dlist_node_ty *)(iter->previous);
+		/* 
+		make the head pointer in the list structure to point to the new_node
+		as the new head element of the list.
+		*/
+		new_node->previous->previous = new_node;
 	}
-	/* no head element switching is required */
 	else
 	{
-		new_node->data = data;
-		new_node->previous = iter->previous;
-		new_node->next = iter;
-		
+		new_node->previous = ITER_TO_NODE_PTR(iter)->previous;
 		new_node->previous->next = new_node;
-		
-		ITER_TO_NODE_PTR(iter)->previous = new_node;
 	}
 	
-	return (new_node);
+	/* place the new node before the node that is pointed by iter */
+	new_node->data = data;
+	new_node->next = ITER_TO_NODE_PTR(iter);
+	
+	ITER_TO_NODE_PTR(iter)->previous = new_node;
+
+	return (NODE_PTR_TO_ITER(new_node));
 }
 /******************************************************************************/
 dlist_iter_ty DlistRemove(dlist_iter_ty iter)
 {
-	dlist_iter_ty new_node = NULL;
+	dlist_node_ty *ret_node = NULL;
 	
 	assert(iter);
-	assert(ITER_TO_NODE_PTR(iter)->next);
+	assert(ITER_TO_NODE_PTR(iter)->next);	/* check if iter is the end dummy */
 	
-	ITER_TO_NODE_PTR(iter)->data = ITER_TO_NODE_PTR(iter)->next->data;
-	
-	new_node = (ITER_TO_NODE_PTR(iter))->next->next;
-	
-	if (NULL == new_node)
+	/* 
+	if the received node is the head element of its list,
+	update the head element as the element that located right after the 
+	current head.
+	#	Look at line 163 for elaborated explanation.	#
+	*/
+	if (ITER_TO_NODE_PTR(iter)->previous->previous == ITER_TO_NODE_PTR(iter))
 	{
-		((dlist_ty *)(ITER_TO_NODE_PTR(iter))->data)->tail = 
-														ITER_TO_NODE_PTR(iter);
+		ITER_TO_NODE_PTR(iter)->next->previous = 
+							(dlist_node_ty *)(ITER_TO_NODE_PTR(iter)->previous);
+		ITER_TO_NODE_PTR(iter)->previous->previous = 
+												ITER_TO_NODE_PTR(iter)->next;
+	}
+	else
+	{
+	ITER_TO_NODE_PTR(iter)->previous->next = ITER_TO_NODE_PTR(iter)->next;
+	ITER_TO_NODE_PTR(iter)->next->previous = ITER_TO_NODE_PTR(iter)->previous;
 	}
 	
-	free((ITER_TO_NODE_PTR(iter))->next);
+	ret_node = ITER_TO_NODE_PTR(iter)->next;
 	
-	(ITER_TO_NODE_PTR(iter))->next = new_node;
+	free(iter);
+	iter = NULL;
 	
-	if (NULL != new_node)
-	{
-	(ITER_TO_NODE_PTR(new_node))->previous = ITER_TO_NODE_PTR(iter);
-	}
-	
-	return (iter);
+	return (NODE_PTR_TO_ITER(ret_node));
 }
 /******************************************************************************/
 dlist_iter_ty DlistPushFront(dlist_ty *dlist, void *data)
@@ -286,14 +295,14 @@ void *DlistPopBack(dlist_ty *dlist)
 /******************************************************************************/
 boolean_ty DlistIsEmpty(const dlist_ty *dlist)
 {
-	dlist_node_ty *head_node = NULL, *tail_node = NULL;
+	dlist_node_ty *head = NULL, *tail = NULL;
 	
 	assert(dlist);
 	
-	head_node = DlistIteratorBegin(dlist);
-	tail_node = DlistIteratorEnd(dlist);
+	head = ITER_TO_NODE_PTR(DlistIteratorBegin(dlist));
+	tail = ITER_TO_NODE_PTR(DlistIteratorEnd(dlist));
 	
-	return (DlistIteratorIsEqual(head_node, tail_node));
+	return (DlistIteratorIsEqual(NODE_PTR_TO_ITER(head), NODE_PTR_TO_ITER(tail)));
 }
 /******************************************************************************/
 size_t DlistSize(const dlist_ty *dlist)
@@ -309,7 +318,8 @@ size_t DlistSize(const dlist_ty *dlist)
 	
 	while (head_node != nodes_runner)
 	{
-		nodes_runner = DlistIteratorPrevious(nodes_runner);
+		nodes_runner = ITER_TO_NODE_PTR(
+						DlistIteratorPrevious(NODE_PTR_TO_ITER(nodes_runner)));
 		++counter;
 	}
 	
@@ -323,8 +333,8 @@ dlist_iter_ty DlistFind(const dlist_iter_ty from_iter,
 {
 	dlist_node_ty *runner = NULL;
 	
-	assert(from_iter);
-	assert(to_iter);
+	assert(ITER_TO_NODE_PTR(from_iter));
+	assert(ITER_TO_NODE_PTR(to_iter));
 	assert(param);
 
 	runner = ITER_TO_NODE_PTR(from_iter);
@@ -335,7 +345,7 @@ dlist_iter_ty DlistFind(const dlist_iter_ty from_iter,
 		{
 			return (NODE_PTR_TO_ITER(runner));
 		}
-		runner = DlistIteratorNext(runner);
+		runner = ITER_TO_NODE_PTR(DlistIteratorNext(NODE_PTR_TO_ITER(runner)));
 	}
 
 	return (to_iter);
@@ -349,8 +359,8 @@ size_t DlistMultiFind(const dlist_iter_ty from_iter,
 	dlist_node_ty *runner = NULL;
 	size_t matches_counter = 0;
 	
-	assert(from_iter);
-	assert(to_iter);
+	assert(ITER_TO_NODE_PTR(from_iter));
+	assert(ITER_TO_NODE_PTR(to_iter));
 	assert(dlist_output);
 	assert(param);
 	
@@ -363,7 +373,7 @@ size_t DlistMultiFind(const dlist_iter_ty from_iter,
 			DlistPushFront(dlist_output, runner->data);
 			++matches_counter;
 		}
-		runner = DlistIteratorNext(runner);
+		runner = ITER_TO_NODE_PTR(DlistIteratorNext(NODE_PTR_TO_ITER(runner)));
 	}
 
 	return (matches_counter);
@@ -375,8 +385,8 @@ status_ty DlistForEach(dlist_iter_ty from_iter,
 {
 	dlist_node_ty *runner = NULL;
 		
-	assert(from_iter);
-	assert(to_iter);
+	assert(ITER_TO_NODE_PTR(from_iter));
+	assert(ITER_TO_NODE_PTR(to_iter));
 	
 	runner = ITER_TO_NODE_PTR(from_iter);
 
@@ -387,7 +397,7 @@ status_ty DlistForEach(dlist_iter_ty from_iter,
 			return (FAILURE);
 		}
 		
-		runner = DlistIteratorNext(runner);
+		runner = ITER_TO_NODE_PTR(DlistIteratorNext(NODE_PTR_TO_ITER(runner)));
 	}
 	
 	return (SUCCESS);
