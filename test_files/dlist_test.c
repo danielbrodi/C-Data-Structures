@@ -1,4 +1,4 @@
-/**********************************FILE-HEADER*********************************\
+/*********************************FILE__HEADER*********************************\
 * File: dlist_test.c						 		  								
 * Author: Daniel Brodsky					  								
 * Date: 04/04/2021						   								
@@ -7,7 +7,7 @@
 * Description: Doubly Linked List API's Functions Testings.		 
 \******************************************************************************/
 
-/********************************** Inclusions ********************************/
+/********************************* Inclusions *********************************/
 #include <stddef.h>	/* size_t */
 #include <stdio.h>	/* printf, NULL */
 #include <stdlib.h> /* rand, srand */
@@ -26,7 +26,7 @@
 #define RANDOM_NUM (rand() % 100) + 1
 
 #define UNUSED(x) (void)(x)
-/****************************Forward Declarations******************************/
+/**************************** Forward Declarations ****************************/
 static void DlistCreateTest(dlist_ty *dlist);
 static void DlistDestroyTest(dlist_ty *dlist, dlist_ty *dlist_output);
 static void DlistIteratorBeginTest(dlist_ty *dlist);
@@ -46,7 +46,7 @@ static void DlistFindTest(dlist_ty *dlist);
 static void DlistMultiFindTest(dlist_ty *dlist, dlist_ty *dlist_output);
 static void DlistSpliceTest(dlist_ty *dlist_dest, dlist_ty *dlist_src);
 /******************************************************************************/
-/********************************Main Function*********************************/
+/******************************* Main__Function *******************************/
 int main()	
 {
 	/* Intializes two empty new doubly linked lists */

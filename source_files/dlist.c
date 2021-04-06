@@ -1,4 +1,4 @@
-/**********************************FILE-HEADER*********************************\
+/*********************************FILE__HEADER*********************************\
 * File: dlist.c						 		  								
 * Author: Daniel Brodsky					  								
 * Date: 05/04/2021							   								
@@ -7,7 +7,7 @@
 * Description: Doubly Linked List Functions Implementations.			 
 \******************************************************************************/
 
-/**************************** Inclusions **************************************/
+/********************************* Inclusions *********************************/
 #include <assert.h>		/* assert */
 #include <stddef.h>		/* size_t, NULL */
 #include <stdlib.h>		/* malloc, free */
@@ -15,12 +15,12 @@
 #include "utils.h"		/* status_ty, bolean_ty*/
 #include "dlist.h"
 
-/************************** Macros Definitions ********************************/
+/***************************** Macros Definitions *****************************/
 
 #define ITER_TO_NODE_PTR(iter) ((dlist_node_ty *)iter)
 #define NODE_PTR_TO_ITER(node) (dlist_iter_ty)(node)
 
-/************************ Global Definitions **********************************/
+/***************************** Global Definitions *****************************/
 struct dlist
 {
 	dlist_node_ty *head;		/* points to the first element in the list */
@@ -34,7 +34,7 @@ struct dlist_node
 	void *data;
 };
 /******************************************************************************/
-/************************Functions Implementations*****************************/
+/************************* Functions__Implementations *************************/
 /******************************************************************************/
 dlist_ty *DlistCreate(void)
 {
@@ -219,7 +219,7 @@ dlist_iter_ty DlistRemove(dlist_iter_ty iter)
 	if the received node is the head element of its list,
 	update the head element as the element that located right after the 
 	current head.
-	#	Look at line 163 for elaborated explanation.	#
+	#	Look at line 162 for elaborated explanation.	#
 	*/
 	if (ITER_TO_NODE_PTR(iter)->previous->previous == ITER_TO_NODE_PTR(iter))
 	{
