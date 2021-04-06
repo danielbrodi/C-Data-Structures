@@ -109,10 +109,9 @@ static void DlistInsertBeforeTest(dlist_ty *dlist)
 	
 	new_node = DlistInsertBefore(DlistIteratorBegin(dlist), "Messi");
 	
-	is_working *= DlistIteratorIsEqual(DlistIteratorBegin(dlist), new_node) ?
-	 											  			TRUE : FALSE;
+	is_working *= DlistIteratorIsEqual(DlistIteratorBegin(dlist), new_node);
 	
-	is_working *= strcmp(DlistGetData(new_node), "Messi") ? FALSE : TRUE;
+	is_working *= 0 == strcmp(DlistGetData(new_node), "Messi") ? TRUE : FALSE;
 	
 	is_working ? PRINT_SUCCESS : PRINT_FAILURE;
 }

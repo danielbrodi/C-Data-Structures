@@ -2,37 +2,38 @@
 * File: dlist.c						 		  								
 * Author: Daniel Brodsky					  								
 * Date: 05/04/2021							   								
-* Version: 1.5 (After Review)				   								
+* Version: 2.0 (Before Review)				   								
 * Reviewer: Danel						   								
 * Description: Doubly Linked List Functions Implementations.			 
 \******************************************************************************/
-
-/************************** Macros Definitions ********************************/
-
-#define ITER_TO_NODE_PTR(iter) ((dlist_node_ty *)iter)
-#define NODE_PTR_TO_ITER(iter) (dlist_iter_ty)(iter)
 
 /**************************** Inclusions **************************************/
 #include <assert.h>		/* assert */
 #include <stddef.h>		/* size_t, NULL */
 #include <stdlib.h>		/* malloc, free */
 
-#include "dlist.h"
 #include "utils.h"		/* status_ty, bolean_ty*/
+#include "dlist.h"
+
+/************************** Macros Definitions ********************************/
+
+#define ITER_TO_NODE_PTR(iter) ((dlist_node_ty *)iter)
+#define NODE_PTR_TO_ITER(node) (dlist_iter_ty)(node)
 
 /************************ Global Definitions **********************************/
 struct dlist
 {
-	dlist_iter_ty head;			/* points to the first element in the list */
-	dlist_iter_ty tail;			/* points to the end dummy of the list */
+	dlist_node_ty *head;		/* points to the first element in the list */
+	dlist_node_ty *tail;		/* points to the end dummy of the list */
 };
 
 struct dlist_node
 {
-	dlist_iter_ty previous;		/* points to the previous node in the list */
-	dlist_iter_ty next;			/* points to the next node in the list */
+	dlist_node_ty *previous;	/* points to the previous node in the list */
+	dlist_node_ty *next;		/* points to the next node in the list */
 	void *data;
 };
+/******************************************************************************/
 /************************Functions Implementations*****************************/
 /******************************************************************************/
 dlist_ty *DlistCreate(void)
@@ -53,14 +54,15 @@ dlist_ty *DlistCreate(void)
 		return (NULL);
 	}
 	
-	/* tail node points to null because it's the last node in the list */
-	new_list->tail->data = (void *)new_list;
+	/* tail node points to null because it's the last node in the list,
+		its previous points to the list struct handler */
+	new_list->tail->previous = (dlist_node_ty *)new_list;
 	new_list->tail->next = NULL;
-	
-	/* the first (and only) node of an empty list is the end dummy node
-		Its previous points to the current head element of the list */
+	new_list->tail->data = (void *)new_list;
+		
+	/* the first (and only) node of an empty list is the end dummy node,
+		so the head points to the tail */
 	new_list->head = new_list->tail;
-	new_list->head->previous = (dlist_node_ty *)new_list;
 	
 	return (new_list);
 }
@@ -77,10 +79,10 @@ void DlistDestroy(dlist_ty *dlist)
 	
 	while (!DlistIsEmpty(dlist))
 	{
-		runner = DlistIteratorBegin(dlist);
-		dlist->head = DlistIteratorNext(DlistIteratorBegin(dlist));
-		free(runner);
+		DlistRemove(DlistIteratorBegin(dlist));
 	}
+	
+	dlist->head = NULL;
 	
 	free(dlist->tail);
 	dlist->tail = NULL;
@@ -106,23 +108,24 @@ dlist_iter_ty DlistIteratorEnd(const dlist_ty *dlist)
 dlist_iter_ty DlistIteratorNext(const dlist_iter_ty iter)
 {
 	assert(ITER_TO_NODE_PTR(iter));
-	assert(ITER_TO_NODE_PTR(iter)->next);
+	assert(ITER_TO_NODE_PTR(iter)->next);	/* check if iter is the end dummy */
 	
-	return (ITER_TO_NODE_PTR(iter)->next);
+	return (NODE_PTR_TO_ITER((ITER_TO_NODE_PTR(iter)->next)));
 }
 /******************************************************************************/
 dlist_iter_ty DlistIteratorPrevious(const dlist_iter_ty iter)
 {
 	assert(ITER_TO_NODE_PTR(iter));
+	/* checks if iter is the head element in its list */
 	assert(ITER_TO_NODE_PTR(iter)->previous);
 	
-	return (ITER_TO_NODE_PTR(iter)->previous);
+	return (NODE_PTR_TO_ITER((ITER_TO_NODE_PTR(iter)->previous)));
 }
 /******************************************************************************/
 void *DlistGetData(const dlist_iter_ty iter)
 {
 	assert(ITER_TO_NODE_PTR(iter));
-	assert(ITER_TO_NODE_PTR(iter)->next);
+	assert(ITER_TO_NODE_PTR(iter)->next);	/* check if iter is the end dummy */
 	
 	return (ITER_TO_NODE_PTR(iter)->data);
 }
@@ -130,7 +133,7 @@ void *DlistGetData(const dlist_iter_ty iter)
 void DlistSetData(dlist_iter_ty iter, void *data)
 {
 	assert(ITER_TO_NODE_PTR(iter));
-	assert(ITER_TO_NODE_PTR(iter)->next);
+	assert(ITER_TO_NODE_PTR(iter)->next);	/* check if iter is the end dummy */
 	assert(data);
 	
 	(ITER_TO_NODE_PTR(iter))->data = data;
@@ -142,6 +145,8 @@ boolean_ty DlistIteratorIsEqual(const dlist_iter_ty iter_a,
 	assert(ITER_TO_NODE_PTR(iter_a));
 	assert(ITER_TO_NODE_PTR(iter_b));
 	
+	/* returns TRUE if both iterators point to the same element
+		otherwise returns FALSE */
 	return (ITER_TO_NODE_PTR(iter_a) == ITER_TO_NODE_PTR(iter_b));
 }
 /******************************************************************************/
