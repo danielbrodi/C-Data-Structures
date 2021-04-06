@@ -9,8 +9,8 @@
 
 #include <stddef.h>	/* size_t */
 
-#include "utils.h"  /* status_ty, bolean_ty */
 #include "dlist.h"
+#include "utils.h"  /* status_ty, bolean_ty */
 
 typedef struct sorted_list sorted_list_ty;
 
