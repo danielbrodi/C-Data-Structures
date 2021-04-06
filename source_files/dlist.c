@@ -16,7 +16,33 @@
 #include "dlist.h"
 
 /***************************** Macros Definitions *****************************/
-
+	/*
+	The previous of the head element in a list points to the struct
+	handler of the list.
+	The previous of the previous of the head element which is:
+	"head->previous->previous" points to the element itself.
+	The reason for that is because the "head" struct member in a
+	list's structure is located at offset 0 in the memory.
+	
+	Also, the "previous" struct member in a node's structure is also located at
+	offset 0.
+	
+	Thus, if a pointer to a list is casted and called as a pointer to a 
+	node, a pointer to the "previous" member of it won't result in an error
+	although there is no "previous" member in a list's structure.
+	It will actually point to the "head" member of the list,
+	because both "previous" and "head" members are located at offset 0 of
+	their structures. So when the compiler will see a casted call to the list,
+	that seems to look like a call to a node, and to its first struct member,
+	it will access the member that is located in offset 0 of the struct,
+	which means the first member, which means the "head" member of the list.
+	
+	So the only reason for the previous of a previous of an element to be
+	the element itself, is if the element is the head node of its list.
+	*/	
+#define IS_HEAD(iter) (ITER_TO_NODE_PTR(iter)->previous->previous ==\
+														 ITER_TO_NODE_PTR(iter))
+														 
 #define ITER_TO_NODE_PTR(iter) ((dlist_node_ty *)iter)
 #define NODE_PTR_TO_ITER(node) (dlist_iter_ty)(node)
 
@@ -112,8 +138,8 @@ dlist_iter_ty DlistIteratorNext(const dlist_iter_ty iter)
 dlist_iter_ty DlistIteratorPrevious(const dlist_iter_ty iter)
 {
 	assert(ITER_TO_NODE_PTR(iter));
-	/* checks if iter is the head element in its list */
-	assert(ITER_TO_NODE_PTR(iter)->previous->previous != ITER_TO_NODE_PTR(iter));
+	/* check if iter is the head element in its list */
+	assert(!IS_HEAD(iter));
 	
 	return (NODE_PTR_TO_ITER((ITER_TO_NODE_PTR(iter)->previous)));
 }
@@ -159,31 +185,8 @@ dlist_iter_ty DlistInsertBefore(dlist_iter_ty iter, void *data)
 		return (iter); /* memory allocation failed */
 	}
 	
-	/*
-	The previous of the head element in a list points to the struct
-	handler of the list.
-	The previous of the previous of the head element which is:
-	"head->previous->previous" points to the element itself.
-	The reason for that is because the "head" struct member in a
-	list's structure is located at offset 0 in the memory.
-	
-	Also, the "previous" struct member in a node's structure is also located at
-	offset 0.
-	
-	Thus, if a pointer to a list is casted and called as a pointer to a 
-	node, a pointer to the "previous" member of it won't result in an error
-	although there is no "previous" member in a list's structure.
-	It will actually point to the "head" member of the list,
-	because both "previous" and "head" members are located at offset 0 of
-	their structures. So when the compiler will see a casted call to the list,
-	that seems to look like a call to a node, and to its first struct member,
-	it will access the member that is located in offset 0 of the struct,
-	which means the first member, which means the "head" member of the list.
-	
-	So the only reason for the previous of a previous of an element to be
-	the element itself, is if the element is the head node of its list.
-	*/	
-	if (ITER_TO_NODE_PTR(iter) == ITER_TO_NODE_PTR(iter)->previous->previous)
+	/* if iter is the head of its list */
+	if (IS_HEAD(iter))
 	{
 		/*	the head's previous must point to the list's data structure	*/
 		new_node->previous = (dlist_node_ty *)(iter->previous);
@@ -219,9 +222,9 @@ dlist_iter_ty DlistRemove(dlist_iter_ty iter)
 	if the received node is the head element of its list,
 	update the head element as the element that located right after the 
 	current head.
-	#	Look at line 162 for elaborated explanation.	#
+	#	See line 21 for elaborated explanation.	#
 	*/
-	if (ITER_TO_NODE_PTR(iter)->previous->previous == ITER_TO_NODE_PTR(iter))
+	if (IS_HEAD(iter))
 	{
 		ITER_TO_NODE_PTR(iter)->next->previous = 
 							(dlist_node_ty *)(ITER_TO_NODE_PTR(iter)->previous);
@@ -416,8 +419,7 @@ dlist_iter_ty DlistSplice(dlist_iter_ty dest_iter,
 	temp = ITER_TO_NODE_PTR(src_from)->previous;
 	
 	/* check if dest_iter is the HEAD element in its list */
-	if (ITER_TO_NODE_PTR(dest_iter) == 
-								ITER_TO_NODE_PTR(dest_iter)->previous->previous)
+	if (IS_HEAD(dest_iter))
 	{
 		ITER_TO_NODE_PTR(dest_iter)->previous->previous = 
 													ITER_TO_NODE_PTR(src_from);
@@ -428,8 +430,7 @@ dlist_iter_ty DlistSplice(dlist_iter_ty dest_iter,
 	}
 	
 	/* check if src_from is the HEAD element in its list */
-	if (ITER_TO_NODE_PTR(src_from) == 
-								ITER_TO_NODE_PTR(src_from)->previous->previous)
+	if (IS_HEAD(src_from))
 	{
 		ITER_TO_NODE_PTR(src_from)->previous->previous = ITER_TO_NODE_PTR(src_to);
 	}
