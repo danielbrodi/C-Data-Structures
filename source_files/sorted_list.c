@@ -156,13 +156,12 @@ sorted_list_iter_ty SortedListInsert(sorted_list_ty *list, void *data)
 	sorted_list_iter_ty ret = NULL;
 	
 	assert(list);
-	assert(data);
 	
 	runner = SortedListIteratorBegin(list);
 	tail = SortedListIteratorEnd(list);
 	
-	while (tail != runner && 
-						list->compare_func(SortedListGetData(runner), data) > 0)
+	while (!SortedListIteratorIsEqual(tail, runner) && 
+					list->compare_func(SortedListGetData(runner), data) >= 0)
 	{
 		runner = SortedListIteratorNext(runner);
 	}
@@ -188,7 +187,6 @@ sorted_list_iter_ty SortedListFind(const sorted_list_ty *list,
 	assert(list);
 	assert(from_iter);
 	assert(to_iter);
-	assert(param);
 	
 	/* 
 	loop through the list till a matching element will be found

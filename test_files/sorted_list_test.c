@@ -24,7 +24,7 @@
 #define PRINT_FAILURE printf (ANSI_COLOR_RED "FAILURE\n" ANSI_COLOR_RESET)
 
 /* generates random number from 1 to 100 */
-#define RANDOM_NUM (rand() % 100) + 1
+#define RANDOM_NUM ((rand() % 100) + 1)
 
 #define UNUSED(x) (void)(x)
 /**************************** Forward Declarations ****************************/
@@ -35,8 +35,6 @@ static void SortedListIteratorBeginTest(sorted_list_ty *sorted_list);
 static void SortedListInsertTest(sorted_list_ty *sorted_list);
 static void SortedListRemoveTest(sorted_list_ty *sorted_list);
 static void SortedListIsEmptyTest(sorted_list_ty *sorted_list);
-static void SortedListPushFrontTest(sorted_list_ty *sorted_list);
-static void SortedListPushBackTest(sorted_list_ty *sorted_list);
 static void SortedListPopFrontTest(sorted_list_ty *sorted_list);
 static void SortedListPopBackTest(sorted_list_ty *sorted_list);
 static void SortedListSetDataTest(sorted_list_ty *sorted_list);
@@ -63,8 +61,6 @@ int main()
 	SortedListInsertTest(dest_list);
 	SortedListRemoveTest(dest_list);
 	SortedListIsEmptyTest(dest_list);
-/*	SortedListPushFrontTest(dest_list);*/
-/*	SortedListPushBackTest(dest_list);*/
 	SortedListPopFrontTest(dest_list);
 	SortedListPopBackTest(dest_list);
 /*	SortedListSetDataTest(dest_list);*/
@@ -94,41 +90,68 @@ static void SortedListDestroyTest(sorted_list_ty *list1, sorted_list_ty *list2)
 															ANSI_COLOR_RESET);
 }
 /******************************************************************************/
-
-/******************************************************************************/
 static void SortedListIteratorBeginTest(sorted_list_ty *sorted_list)
 {
 	printf("Iter To Begin/End/IsEqual Test: ");
-	SortedListIteratorIsEqual(SortedListIteratorBegin(sorted_list), SortedListIteratorEnd(sorted_list)) ?
-	 											  PRINT_SUCCESS : PRINT_FAILURE;
+	SortedListIteratorIsEqual(SortedListIteratorBegin(sorted_list),
+	 		SortedListIteratorEnd(sorted_list)) ? PRINT_SUCCESS : PRINT_FAILURE;
+	 											  
 }
 /******************************************************************************/
 static void SortedListInsertTest(sorted_list_ty *sorted_list)
 {	
+	boolean_ty is_working = TRUE;
 	sorted_list_iter_ty new_node = NULL;
-	size_t counter = 2;
-	int num1 = 5, num3 = 4;
+	sorted_list_iter_ty tail = SortedListIteratorEnd(sorted_list);
 	
-	new_node = SortedListInsert(sorted_list, (void *)(long)num1);
-	printf("\nInsert Test:\nInserting: %d->", (int)(long)SortedListGetData(new_node));
+	size_t num_of_inserts = 10, i = 0;
 	
-	new_node = SortedListInsert(sorted_list, (void *)(long)num3);
-	printf("%d->", (int)(long)SortedListGetData(new_node));
+	printf("Sorted List Insert+Next+GetData Test: ");
+	
+	for(i = 0; i < num_of_inserts; ++i)
+	{
+		new_node = SortedListInsert(sorted_list, (void *)(long)RANDOM_NUM);
+		/*
+		if the tail node is the return value of the insert function,
+		it indicates that the insertation has been failed.
+		*/
+		is_working *= !SortedListIteratorIsEqual(tail, new_node);
+	}
 	
 	new_node = SortedListIteratorBegin(sorted_list);
-	printf("Printing Sorted List: ");
-	while (counter > 0)
+	
+	/* check if the list is sorted as needed by the criteria */
+	while (num_of_inserts - 1 > 0 && CompareElements(
+					SortedListGetData(new_node),
+					SortedListGetData(SortedListIteratorNext(new_node))) >= 0)
 	{
-		printf("%d->", (int)(long)SortedListGetData(new_node));
 		new_node = SortedListIteratorNext(new_node);
-		--counter;
+		--num_of_inserts;
 	}
-	printf("\n\n");
+	
+	is_working *= SortedListIteratorIsEqual(
+										tail, SortedListIteratorNext(new_node));
+	
+	is_working ? PRINT_SUCCESS : PRINT_FAILURE;
+	 											
 }
 /******************************************************************************/
 static void SortedListRemoveTest(sorted_list_ty *sorted_list)
 {
-
+	boolean_ty is_working = TRUE;
+	size_t original_size = SortedListSize(sorted_list);
+	printf("%lu", original_size);
+	printf("Sorted List Remove Test: ");
+	
+	while(original_size > 0)
+	{
+		SortedListRemove(SortedListIteratorBegin(sorted_list));
+		is_working *= (original_size - 1) == SortedListSize(sorted_list);
+		--original_size;
+	}
+	
+	is_working ? PRINT_SUCCESS : PRINT_FAILURE;
+	
 }
 /******************************************************************************/
 static void SortedListIsEmptyTest(sorted_list_ty *sorted_list)
@@ -137,18 +160,8 @@ static void SortedListIsEmptyTest(sorted_list_ty *sorted_list)
 	TRUE == SortedListIsEmpty(sorted_list) ? PRINT_SUCCESS : PRINT_FAILURE;
 }
 /******************************************************************************/
-static void SortedListPushFrontTest(sorted_list_ty *sorted_list)
-{
-}
-/******************************************************************************/
-static void SortedListPushBackTest(sorted_list_ty *sorted_list)
-{
-
-}
-/******************************************************************************/
 static void SortedListPopFrontTest(sorted_list_ty *sorted_list)
-{
-	
+{	
 }
 /******************************************************************************/
 static void SortedListPopBackTest(sorted_list_ty *sorted_list)
