@@ -177,7 +177,6 @@ dlist_iter_ty DlistInsertBefore(dlist_iter_ty iter, void *data)
 	dlist_node_ty *new_node = NULL;
 	
 	assert(ITER_TO_NODE_PTR(iter));
-	assert(data);
 
 	new_node = (dlist_node_ty *)malloc(sizeof(dlist_node_ty));
 	if (NULL == new_node)
@@ -250,7 +249,6 @@ dlist_iter_ty DlistPushFront(dlist_ty *dlist, void *data)
 	dlist_iter_ty pushed_node = NULL;
 	
 	assert (dlist);
-	assert(data);
 	
 	pushed_node = DlistInsertBefore(DlistIteratorBegin(dlist), data);
 	
@@ -265,7 +263,6 @@ dlist_iter_ty DlistPushFront(dlist_ty *dlist, void *data)
 dlist_iter_ty DlistPushBack(dlist_ty *dlist, void *data)
 {
 	assert(dlist);
-	assert(data);
 
 	return (DlistInsertBefore(DlistIteratorEnd(dlist), data));
 }
@@ -338,7 +335,6 @@ dlist_iter_ty DlistFind(const dlist_iter_ty from_iter,
 	
 	assert(ITER_TO_NODE_PTR(from_iter));
 	assert(ITER_TO_NODE_PTR(to_iter));
-	assert(param);
 
 	runner = ITER_TO_NODE_PTR(from_iter);
 	
@@ -365,7 +361,6 @@ size_t DlistMultiFind(const dlist_iter_ty from_iter,
 	assert(ITER_TO_NODE_PTR(from_iter));
 	assert(ITER_TO_NODE_PTR(to_iter));
 	assert(dlist_output);
-	assert(param);
 	
 	runner = ITER_TO_NODE_PTR(from_iter);
 	

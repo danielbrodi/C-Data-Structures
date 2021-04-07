@@ -37,14 +37,13 @@ static void SortedListRemoveTest(sorted_list_ty *sorted_list);
 static void SortedListIsEmptyTest(sorted_list_ty *sorted_list);
 static void SortedListPopFrontTest(sorted_list_ty *sorted_list);
 static void SortedListPopBackTest(sorted_list_ty *sorted_list);
-static void SortedListSetDataTest(sorted_list_ty *sorted_list);
-/*static status_ty PrintList(void *data, void *param);*/
+static void SortedListFindTest(sorted_list_ty *sorted_list);
+static void SortedListFindIfTest(sorted_list_ty *sorted_list);
 static boolean_ty IsMatch(const void *data, void *param);
-/*static void InsertIntToList(sorted_list_ty *sorted_list);*/
-/*static void SortedListForEachTest(sorted_list_ty *sorted_list);*/
-/*static void SortedListFindTest(sorted_list_ty *sorted_list);*/
-/*static void SortedListMultiFindTest(sorted_list_ty *sorted_list, sorted_list_ty *src_list);*/
-/*static void SortedListSpliceTest(sorted_list_ty *sorted_list_dest, sorted_list_ty *sorted_list_src);*/
+static boolean_ty IsDividedBy(const void *data, const void *param);
+static void SortedListForEachTest(sorted_list_ty *sorted_list);
+static status_ty PrintList(void *data, const void *param);
+/*static void SortedListMergeTest(sorted_list_ty *sorted_list_dest, sorted_list_ty *sorted_list_src);*/
 /******************************************************************************/
 /******************************* Main__Function *******************************/
 int main()	
@@ -63,12 +62,10 @@ int main()
 	SortedListIsEmptyTest(dest_list);
 	SortedListPopFrontTest(dest_list);
 	SortedListPopBackTest(dest_list);
-/*	SortedListSetDataTest(dest_list);*/
-/*	InsertIntToList(dest_list);*/
-/*	SortedListForEachTest(dest_list);*/
-/*	SortedListFindTest(dest_list);*/
-/*	SortedListMultiFindTest(dest_list, src_list);*/
-/*	SortedListSpliceTest(dest_list, src_list);*/
+	SortedListFindTest(dest_list);
+	SortedListFindIfTest(dest_list);
+	SortedListForEachTest(dest_list);
+/*	SortedListMergeTest(dest_list, src_list);*/
 	SortedListDestroyTest(dest_list, src_list);
 	
 	return (0);
@@ -140,7 +137,6 @@ static void SortedListRemoveTest(sorted_list_ty *sorted_list)
 {
 	boolean_ty is_working = TRUE;
 	size_t original_size = SortedListSize(sorted_list);
-	printf("%lu", original_size);
 	printf("Sorted List Remove Test: ");
 	
 	while(original_size > 0)
@@ -161,29 +157,183 @@ static void SortedListIsEmptyTest(sorted_list_ty *sorted_list)
 }
 /******************************************************************************/
 static void SortedListPopFrontTest(sorted_list_ty *sorted_list)
-{	
+{
+	boolean_ty is_working = TRUE;
+	
+	void *popped_value = NULL;
+	
+	size_t original_size = 0;
+	
+	int num1 = 4, num2 = 0, num3 = 2;
+	
+	SortedListInsert(sorted_list, (void *)(long)num1);
+	SortedListInsert(sorted_list, (void *)(long)num2);
+	SortedListInsert(sorted_list, (void *)(long)num3);
+	
+	original_size = SortedListSize(sorted_list);
+	
+	printf("Sorted List PopFront Test: ");
+	
+	popped_value = SortedListPopFront(sorted_list);
+	is_working *= original_size - 1 == SortedListSize(sorted_list) ? TRUE : FALSE;
+	is_working *= IsMatch(popped_value, (void *)(long)num2);
+	
+	popped_value = SortedListPopFront(sorted_list);
+	is_working *= original_size - 2 == SortedListSize(sorted_list) ? TRUE : FALSE;
+	is_working *= IsMatch(popped_value, (void *)(long)num3);
+	
+	popped_value = SortedListPopFront(sorted_list);
+	is_working *= original_size - 3 == SortedListSize(sorted_list) ? TRUE : FALSE;
+	is_working *= IsMatch(popped_value, (void *)(long)num1);
+	
+	is_working ? PRINT_SUCCESS : PRINT_FAILURE;
 }
 /******************************************************************************/
 static void SortedListPopBackTest(sorted_list_ty *sorted_list)
 {
+	boolean_ty is_working = TRUE;
 	
+	void *popped_value = NULL;
+	
+	size_t original_size = 0;
+	
+	int num1 = 4, num2 = 0, num3 = 2;
+	
+	SortedListInsert(sorted_list, (void *)(long)num1);
+	SortedListInsert(sorted_list, (void *)(long)num2);
+	SortedListInsert(sorted_list, (void *)(long)num3);
+	
+	original_size = SortedListSize(sorted_list);
+	
+	printf("Sorted List PopBack Test: ");
+	
+	popped_value = SortedListPopBack(sorted_list);
+	is_working *= original_size - 1 == SortedListSize(sorted_list) ? TRUE : FALSE;
+	is_working *= IsMatch(popped_value, (void *)(long)num1);
+	
+	popped_value = SortedListPopBack(sorted_list);
+	is_working *= original_size - 2 == SortedListSize(sorted_list) ? TRUE : FALSE;
+	is_working *= IsMatch(popped_value, (void *)(long)num3);
+	
+	popped_value = SortedListPopBack(sorted_list);
+	is_working *= original_size - 3 == SortedListSize(sorted_list) ? TRUE : FALSE;
+	is_working *= IsMatch(popped_value, (void *)(long)num2);
+	
+	is_working ? PRINT_SUCCESS : PRINT_FAILURE;
 }
 /******************************************************************************/
-static void SortedListSetDataTest(sorted_list_ty *sorted_list)
+static void SortedListFindTest(sorted_list_ty *sorted_list)
 {
-
+	sorted_list_iter_ty head = SortedListIteratorBegin(sorted_list);
+	sorted_list_iter_ty tail = SortedListIteratorEnd(sorted_list);
+	sorted_list_iter_ty ret = NULL;
+	
+	int num1 = RANDOM_NUM, num2 = -10, num3 = RANDOM_NUM;
+	
+	printf("Sorted List Find Test: ");
+	
+	SortedListInsert(sorted_list, (void *)(long)num1);
+	SortedListInsert(sorted_list, (void *)(long)num2);
+	SortedListInsert(sorted_list, (void *)(long)num3);
+	
+	ret = SortedListFind(sorted_list, head, tail, (void *)(long)num2);
+	
+	if(SortedListIteratorIsEqual(ret, tail))
+	{
+		PRINT_FAILURE;
+	}
+	
+	if(IsMatch(SortedListGetData(ret), (void *)(long)num2))
+	{
+		PRINT_SUCCESS;
+	}
+	else
+	{
+		PRINT_FAILURE;
+	}
+	
+	SortedListPopFront(sorted_list);
+	SortedListPopFront(sorted_list);
+	SortedListPopFront(sorted_list);
+}
+/******************************************************************************/
+static void SortedListFindIfTest(sorted_list_ty *sorted_list)
+{
+	boolean_ty is_working = TRUE;
+	
+	sorted_list_iter_ty head = NULL;
+	sorted_list_iter_ty tail = SortedListIteratorEnd(sorted_list);
+	sorted_list_iter_ty ret_node = NULL;
+	
+	size_t num_of_inserts = 10, i = 0;
+	int num_to_divide_by = 2;
+	
+	printf("Sorted List FindIf Test: ");
+	
+	for(i = 0; i < num_of_inserts; ++i)
+	{
+		ret_node = SortedListInsert(sorted_list, (void *)(long)(RANDOM_NUM));
+		/*
+		if the tail node is the return value of the insert function,
+		it indicates that the insertation has been failed.
+		*/
+		is_working *= !SortedListIteratorIsEqual(tail, ret_node);
+	}
+	
+	head = SortedListIteratorBegin(sorted_list);
+	
+	ret_node = SortedListFindIf(head, tail, IsDividedBy,
+	 											(void *)(long)num_to_divide_by);
+	
+	is_working *= !SortedListIteratorIsEqual(ret_node, tail);
+	if (!is_working)
+	{	
+		PRINT_FAILURE;
+		return;
+	}
+	
+	is_working *= IsDividedBy(SortedListGetData(ret_node),
+	 											(void *)(long)num_to_divide_by);
+	
+	is_working ? PRINT_SUCCESS : PRINT_FAILURE;
+}
+/******************************************************************************/
+static void SortedListForEachTest(sorted_list_ty *sorted_list)
+{
+	int x = -1;
+	status_ty result = FAILURE;
+	printf("Printing List: *list");
+	result = SortedListForEach(SortedListIteratorBegin(sorted_list), SortedListIteratorEnd(sorted_list),
+													PrintList, (void *)(long)x);
+	printf(" <--> END_DUMMY -> NULL");
+	printf("\nForEach Test(PrintList): ");
+	(SUCCESS == result) ? PRINT_SUCCESS : PRINT_FAILURE;
 }
 /******************************************************************************/
 int CompareElements(const void *data1, const void *data2)
-{
-	assert(data1);
-	assert(data2);
-	
+{	
 	return ((int)(long)(data2) - (int)(long)(data1));
 }
 /******************************************************************************/
 static boolean_ty IsMatch(const void *data, void *param)
 {	
 	return (((int)(long)data == (int)(long)param));
+}
+/******************************************************************************/
+static boolean_ty IsDividedBy(const void *data, const void *param)
+{	
+	return (0 == ((int)(long)data % (int)(long)param));
+}
+/******************************************************************************/
+static status_ty PrintList(void *data, const void *param)
+{
+	UNUSED(param);
+	if (NULL == data || NULL == param)
+	{
+		return (FAILURE);
+	}
+	
+	printf(" <--> %d", (int)(long)data);
+	return (SUCCESS);
 }
 /******************************************************************************/

@@ -20,6 +20,7 @@
 
 #define D_ITER_TO_S_ITER(iter) (sorted_list_iter_ty)(iter)
 #define S_ITER_TO_D_ITER(iter) (dlist_iter_ty)(iter)
+#define UNUSED(x) (void)(x)
 
 /***************************** Global Definitions *****************************/
 struct sorted_list
@@ -129,6 +130,7 @@ boolean_ty SortedListIsEmpty(const sorted_list_ty *sorted_list)
 /******************************************************************************/
 status_ty IsValidElem(void *data, const void *param)
 {
+	UNUSED(data);
 	++(*(int *)param);
 	return (SUCCESS);
 }
@@ -188,6 +190,8 @@ sorted_list_iter_ty SortedListFind(const sorted_list_ty *list,
 	assert(from_iter);
 	assert(to_iter);
 	
+	runner = SortedListIteratorBegin(list);
+	
 	/* 
 	loop through the list till a matching element will be found
 	or until the runner will reach elements that should be located after
@@ -211,17 +215,47 @@ sorted_list_iter_ty SortedListFindIf(const sorted_list_iter_ty from_iter,
 								const sorted_list_iter_ty to_iter, 
 					Is_Match_Func_ty match_func, void *param)
 {
-	return (D_ITER_TO_S_ITER(
-	DlistFind(S_ITER_TO_D_ITER(from_iter), S_ITER_TO_D_ITER(to_iter),
-										(IsMatch_Func_ty)match_func, param)));
+	sorted_list_iter_ty runner = NULL;
+
+	assert(from_iter);
+	assert(to_iter);
+
+	runner = from_iter;
+
+	while (!SortedListIteratorIsEqual(runner, to_iter))
+	{
+		if (TRUE == match_func(SortedListGetData(runner), param))
+		{
+			return (runner);
+		}
+		runner = SortedListIteratorNext(runner);
+	}
+
+	return (to_iter);
 }
 /******************************************************************************/
 status_ty SortedListForEach(sorted_list_iter_ty from_iter,
 			const sorted_list_iter_ty to_iter, Action_Function_ty action_func,
 													 void *param)
 {
-	return (DlistForEach(S_ITER_TO_D_ITER(from_iter), S_ITER_TO_D_ITER(to_iter),
-										(Action_Func_ty)action_func, param));
+	sorted_list_iter_ty runner = NULL;
+
+	assert(from_iter);
+	assert(to_iter);
+
+	runner = from_iter;
+
+	while (!SortedListIteratorIsEqual(runner, to_iter))
+	{
+		if (SUCCESS != action_func(SortedListGetData(runner), param))
+		{
+		return (FAILURE);
+		}
+
+		runner = SortedListIteratorNext(runner);
+	}
+
+	return (SUCCESS);
 }				 
 /******************************************************************************/
 void SortedListMerge(sorted_list_ty *dest_list, 
