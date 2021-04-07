@@ -275,7 +275,8 @@ void SortedListMerge(sorted_list_ty *dest_list,
 	dest_tail = SortedListIteratorEnd(dest_list);
 	src_tail = SortedListIteratorEnd(src_list);
 	
-	while (dest_runner != dest_tail && src_runner != src_tail)
+	while (!SortedListIteratorIsEqual(dest_runner, 
+			SortedListIteratorEnd(dest_list)) && !SortedListIsEmpty(src_list))
 	{
 		while ((dest_list->compare_func(
 			SortedListGetData(dest_runner), SortedListGetData(src_runner)) < 0)
@@ -284,11 +285,22 @@ void SortedListMerge(sorted_list_ty *dest_list,
 			src_runner = SortedListIteratorNext(src_runner);
 		}
 		
-		DlistSplice(S_ITER_TO_D_ITER(dest_runner),
+		if (!SortedListIteratorIsEqual(src_runner,
+											 SortedListIteratorBegin(src_list)))
+		{
+			DlistSplice(S_ITER_TO_D_ITER(dest_runner),
 			SortedListIteratorBegin(src_list), S_ITER_TO_D_ITER(src_runner));
+			
+			src_runner = SortedListIteratorBegin(src_list);
+		}
 		
-		src_runner = SortedListIteratorBegin(src_list);
 		dest_runner = SortedListIteratorNext(dest_runner);
-	}	
+	}
+	
+	if (!SortedListIsEmpty(src_list))
+	{
+		DlistSplice(S_ITER_TO_D_ITER(SortedListIteratorEnd(dest_list)),
+			SortedListIteratorBegin(src_list), src_tail);
+	}
 }
 /******************************************************************************/

@@ -344,9 +344,11 @@ static void SortedListMergeTest(sorted_list_ty *dest_list,
 	boolean_ty is_working = TRUE;
 	void *popped_value = NULL;
 	
-	int num1 = 1, num2 = 2, num3 = 3, num4 = 4, num5 = 5, num6 = 6;
-	
-	printf("SortedList Merge Test: ");
+	int num1 = 1, num2 = 4, num3 = 5, num4 = 9, num5 = 10,
+		num6= 2, num7 = 3 , num8 = 6 , num9 = 7, num10 = 8, num11= 11;
+		
+	printf(ANSI_COLOR_CYAN "\n\n--**--SortedList Merge Test:--**--\n"
+															ANSI_COLOR_RESET);
 	
 	/** Empty both lists **/
 	while(!SortedListIsEmpty(dest_list))
@@ -363,14 +365,26 @@ static void SortedListMergeTest(sorted_list_ty *dest_list,
 	SortedListInsert(dest_list, (void *)(long)num1);
 	SortedListInsert(dest_list, (void *)(long)num2);
 	SortedListInsert(dest_list, (void *)(long)num3);
+	SortedListInsert(dest_list, (void *)(long)num4);
+	SortedListInsert(dest_list, (void *)(long)num5);
+	
 
 	/* fill up src list */
-	SortedListInsert(src_list, (void *)(long)num4);
-	SortedListInsert(src_list, (void *)(long)num5);
 	SortedListInsert(src_list, (void *)(long)num6);
+	SortedListInsert(src_list, (void *)(long)num7);
+	SortedListInsert(src_list, (void *)(long)num8);
+	SortedListInsert(src_list, (void *)(long)num9);
+	SortedListInsert(src_list, (void *)(long)num10);
+	SortedListInsert(src_list, (void *)(long)num11);
 	
 	
-	printf("\nPRINTING DEST:\n");
+	/*
+	Expected lists:
+	dest list: 1,4,5,9,10
+	src list: 2,3,6,7,8,11
+	 */
+	
+	printf("\nPrinting Dest:\n");
 	SortedListForEach(SortedListIteratorBegin(dest_list), 
 				SortedListIteratorEnd(dest_list), PrintList, (void *)(long)1);
 	
@@ -378,12 +392,8 @@ static void SortedListMergeTest(sorted_list_ty *dest_list,
 	SortedListForEach(SortedListIteratorBegin(src_list), 
 				SortedListIteratorEnd(src_list), PrintList, (void *)(long)1);
 	
-	printf("\nSIZE OF DEST: \n%lu\n", SortedListSize(src_list));
+	printf("\nSIZE OF DEST: \n%lu\n", SortedListSize(dest_list));
 	printf("\nSIZE OF SRC: \n%lu\n", SortedListSize(src_list));
-	
-	
-	
-	/* dest list: 1,2,3 && src list: 4,5,6 */
 
 	SortedListMerge(dest_list, src_list);
 	
@@ -394,8 +404,13 @@ static void SortedListMergeTest(sorted_list_ty *dest_list,
 	printf("\nPRINTING DEST:\n");
 	SortedListForEach(SortedListIteratorBegin(dest_list), 
 				SortedListIteratorEnd(dest_list), PrintList, (void *)(long)1);
+				
+				printf("\nPRINTING SRC:\n");
+	SortedListForEach(SortedListIteratorBegin(src_list), 
+				SortedListIteratorEnd(src_list), PrintList, (void *)(long)1);
+				
 	popped_value = SortedListPopBack(dest_list);
-	is_working *= IsMatch(popped_value, (void *)(long)num6);
+	is_working *= IsMatch(popped_value, (void *)(long)num11);
 	
 	popped_value = SortedListPopBack(dest_list);
 	is_working *= IsMatch(popped_value, (void *)(long)num5);
@@ -404,13 +419,13 @@ static void SortedListMergeTest(sorted_list_ty *dest_list,
 	is_working *= IsMatch(popped_value, (void *)(long)num4);
 	
 	popped_value = SortedListPopBack(dest_list);
-	is_working *= IsMatch(popped_value, (void *)(long)num3);
+	is_working *= IsMatch(popped_value, (void *)(long)num10);
 	
 	popped_value = SortedListPopBack(dest_list);
-	is_working *= IsMatch(popped_value, (void *)(long)num2);
+	is_working *= IsMatch(popped_value, (void *)(long)num9);
 	
 	popped_value = SortedListPopBack(dest_list);
-	is_working *= IsMatch(popped_value, (void *)(long)num1);
+	is_working *= IsMatch(popped_value, (void *)(long)num8);
 	
 	printf("\nPRINTING DEST:\n");
 	SortedListForEach(SortedListIteratorBegin(dest_list), 
