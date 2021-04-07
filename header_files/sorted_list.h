@@ -1,34 +1,22 @@
 /***********************************************
 * File: sorted_list.h						 	*
-* Date: 04/04/2021							    *
-* Version: 2.1 								    *
+* Date: 05/04/2021							    *
+* Version: 2.4								    *
 * Description: Sorted List API  		        * 
 ************************************************/
 #ifndef	__SORTEDLIST_H__
 #define	__SORTEDLIST_H__
 
-#include <stddef.h>	/* size_t */
+#include <stddef.h>	/* size_t	*/
 
+#include "utils.h"	/* status_ty, bolean_ty	*/
 #include "dlist.h"
-#include "utils.h"  /* status_ty, bolean_ty */
 
 typedef struct sorted_list sorted_list_ty;
 
-#ifdef NDEBUG
-
 typedef dlist_iter_ty sorted_list_iter_ty;
 
-#else
-
-typedef struct sorted_list_iter
-{
-    dlist_iter_ty iter;
-    sorted_list_ty *list;   
-}sorted_list_iter_ty;
-
-#endif /* NDEBUG */
-
-typedef boolean_ty (*Is_Match_Funct_ty)(const void *data, const void *param);
+typedef boolean_ty (*Is_Match_Func_ty)(const void *data, const void *param);
 
 typedef status_ty (*Action_Function_ty)(void *data, const void *param);
 
@@ -136,7 +124,7 @@ sorted_list_iter_ty SortedListFindIf(const sorted_list_iter_ty from_iter,
 /* Note: the action function may ruin the sorted nature of the list */
 /* Complexity: O(n) */
 status_ty SortedListForEach(sorted_list_iter_ty from_iter,
-			const sorted_list_iter_ty to_iter, Action_Funcion_ty action_func,
+			const sorted_list_iter_ty to_iter, Action_Function_ty action_func,
 													 void *param);
 
 /* Merges two sorted lists */
