@@ -302,10 +302,10 @@ static void SortedListForEachTest(sorted_list_ty *sorted_list)
 {
 	int x = -1;
 	status_ty result = FAILURE;
-	printf("Printing List: *list");
-	result = SortedListForEach(SortedListIteratorBegin(sorted_list), SortedListIteratorEnd(sorted_list),
-													PrintList, (void *)(long)x);
-	printf(" <--> END_DUMMY -> NULL");
+	printf("Printing List:" ANSI_COLOR_CYAN " *list");
+	result = SortedListForEach(SortedListIteratorBegin(sorted_list), 
+				SortedListIteratorEnd(sorted_list), PrintList, (void *)(long)x);
+	printf(" <--> END_DUMMY -> NULL" ANSI_COLOR_RESET);
 	printf("\nForEach Test(PrintList): ");
 	(SUCCESS == result) ? PRINT_SUCCESS : PRINT_FAILURE;
 }
