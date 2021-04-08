@@ -1,5 +1,5 @@
 /***********************************************
-* File: Pqueue.h							 	*
+* File: pqueue.h							 	*
 * Date: 08/04/2021							    *
 * Version: 1.1 								    *
 * Description: Priority Queue API  		        * 
@@ -7,9 +7,9 @@
 #ifndef	__PQUEUE_H__
 #define	__PQUEUE_H__
 
-#include <stddef.h>	/* size_t					*/
+#include <stddef.h>	/* size_t */
 
-#include "utils.h"	/* status_ty, bolean_ty		*/
+#include "utils.h"  /* status_ty, bolean_ty */
 
 typedef struct p_queue p_queue_ty;                                                  
                                                           
@@ -27,6 +27,7 @@ typedef int (*Cmp_Func_ty)(const void *data1, const void *data2);
 p_queue_ty *PqueueCreate(Cmp_Func_ty cmp_func);
 
 /* Frees entire p_queue */
+/* No operations will be performed if pointer is NULL */
 /* Complexity: O(n) */
 void PqueueDestroy(p_queue_ty *p_queue);
 
