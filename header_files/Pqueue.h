@@ -7,9 +7,9 @@
 #ifndef	__PQUEUE_H__
 #define	__PQUEUE_H__
 
-#include <stddef.h>	/* size_t */
+#include <stddef.h>	/* size_t					*/
 
-#include "utils.h"  /* status_ty, bolean_ty */
+#include "utils.h"	/* status_ty, bolean_ty		*/
 
 typedef struct p_queue p_queue_ty;                                                  
                                                           

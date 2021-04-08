@@ -8,11 +8,14 @@ CC = gcc
 CFLAGS = -ansi -pedantic-errors -Wall -Wextra -g -I$(IDIR)
 RM = rm -rf
 
-TARGETS := vector slist slist_ex queue cbuffer dlist
+TARGETS := vector slist slist_ex queue cbuffer dlist uid
 
 .PHONY = all clean
 
 all: $(TARGETS)
+
+pqueue: $(IDIR)pqueue.h pqueue.c $(TDIR)pqueue_test.c $(IDIR)$(DEPS) $(IDIR)sorted_list.h sorted_list.c
+	$(CC) $(CFLAGS) -o $@ $^
 
 sorted_list: $(IDIR)sorted_list.h sorted_list.c $(TDIR)sorted_list_test.c $(IDIR)$(DEPS) $(IDIR)dlist.h dlist.c
 	$(CC) $(CFLAGS) -o a.out $^
