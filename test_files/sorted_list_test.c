@@ -231,8 +231,8 @@ static void SortedListPopBackTest(sorted_list_ty *sorted_list)
 /******************************************************************************/
 static void SortedListFindTest(sorted_list_ty *sorted_list)
 {
-	sorted_list_iter_ty head = SortedListIteratorBegin(sorted_list);
-	sorted_list_iter_ty tail = SortedListIteratorEnd(sorted_list);
+	sorted_list_iter_ty head = NULL;
+	sorted_list_iter_ty tail = NULL;
 	sorted_list_iter_ty ret = NULL;
 	
 	int num1 = RANDOM_NUM, num2 = -10, num3 = RANDOM_NUM;
@@ -243,6 +243,8 @@ static void SortedListFindTest(sorted_list_ty *sorted_list)
 	SortedListInsert(sorted_list, (void *)(long)num2);
 	SortedListInsert(sorted_list, (void *)(long)num3);
 	
+	head = SortedListIteratorBegin(sorted_list);
+	tail = SortedListIteratorEnd(sorted_list);
 	ret = SortedListFind(sorted_list, head, tail, (void *)(long)num2);
 	
 	if(SortedListIteratorIsEqual(ret, tail))

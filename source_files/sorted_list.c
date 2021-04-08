@@ -1,8 +1,8 @@
 /*********************************FILE__HEADER*********************************\
 * File: sorted_list.c						 		  								
-* Author: Daniel Brodsky					  								
+* Author: Daniel Brodsky	S				  								
 * Date: 07/04/2021							   								
-* Version: 1.0 (Before Review)				   								
+* Version: 1.1 (Before Review)				   								
 * Reviewer: Ariel						   								
 * Description: Sorted Linked List Functions Implementations.			 
 \******************************************************************************/
@@ -20,6 +20,8 @@
 
 #define D_ITER_TO_S_ITER(iter) (sorted_list_iter_ty)(iter)
 #define S_ITER_TO_D_ITER(iter) (dlist_iter_ty)(iter)
+#define S_ITER_TO_NODE_PTR(iter)	((dlist_node_ty *)S_ITER_TO_D_ITER(iter))
+
 #define UNUSED(x) (void)(x)
 
 /***************************** Global Definitions *****************************/
@@ -36,7 +38,7 @@ sorted_list_ty *SortedListCreate(Compare_Func_ty compare_func)
 	sorted_list_ty *new_list = (sorted_list_ty *)malloc(sizeof(sorted_list_ty));
 	if (NULL == new_list)
 	{
-		return(NULL);
+		return (NULL);
 	}
 	
 	new_list->list = DlistCreate();
@@ -45,24 +47,24 @@ sorted_list_ty *SortedListCreate(Compare_Func_ty compare_func)
 		free(new_list);
 		new_list = NULL;
 		
-		return(NULL);
+		return (NULL);
 	}
 	
 	new_list->compare_func = compare_func;
 	
-	return(new_list);
+	return (new_list);
 }
 /******************************************************************************/
 void SortedListDestroy(sorted_list_ty *sorted_list)
 {
-	assert(sorted_list);
-	assert(sorted_list->list);
-	
-	DlistDestroy(sorted_list->list);
-	sorted_list->list = NULL;
-	
-	free(sorted_list);
-	sorted_list = NULL;
+	if (NULL != sorted_list)
+	{
+		DlistDestroy(sorted_list->list);
+		sorted_list->list = NULL;
+		
+		free(sorted_list);
+		sorted_list = NULL;
+	}
 }
 /******************************************************************************/
 sorted_list_iter_ty SortedListIteratorBegin(const sorted_list_ty *sorted_list)
@@ -80,30 +82,37 @@ sorted_list_iter_ty SortedListIteratorEnd(const sorted_list_ty *sorted_list)
 }
 /******************************************************************************/
 sorted_list_iter_ty SortedListIteratorNext(const sorted_list_iter_ty iter)
-{	
+{
+	assert(S_ITER_TO_NODE_PTR(iter));
+		
 	return D_ITER_TO_S_ITER(DlistIteratorNext(S_ITER_TO_D_ITER(iter)));
 }
 /******************************************************************************/
 sorted_list_iter_ty SortedListIteratorPrevious(const sorted_list_iter_ty iter)
 {
+	assert(S_ITER_TO_NODE_PTR(iter));
+	
 	return D_ITER_TO_S_ITER(DlistIteratorPrevious(S_ITER_TO_D_ITER(iter)));
 }
 /******************************************************************************/
 boolean_ty SortedListIteratorIsEqual(const sorted_list_iter_ty iter_a, 
 const sorted_list_iter_ty iter_b)
-{
+{	
 	return (DlistIteratorIsEqual(
-							S_ITER_TO_D_ITER(iter_a), S_ITER_TO_D_ITER(iter_b)));
+						S_ITER_TO_D_ITER(iter_a), S_ITER_TO_D_ITER(iter_b)));
 }
 /******************************************************************************/
 void *SortedListGetData(const sorted_list_iter_ty iter)
 {
+	assert(S_ITER_TO_NODE_PTR(iter));
+	
 	return DlistGetData(S_ITER_TO_D_ITER(iter));
 }
 /******************************************************************************/
 sorted_list_iter_ty SortedListRemove(sorted_list_iter_ty iter)
 {
-
+	assert(S_ITER_TO_NODE_PTR(iter));
+	
 	return (D_ITER_TO_S_ITER(DlistRemove(S_ITER_TO_D_ITER(iter))));
 }
 /******************************************************************************/
@@ -146,7 +155,7 @@ size_t SortedListSize(const sorted_list_ty *sorted_list)
 	head = SortedListIteratorBegin(sorted_list);
 	tail = SortedListIteratorEnd(sorted_list);
 	
-	SortedListForEach(head, tail, IsValidElem, (void *)&counter);
+	SortedListForEach(head, tail, IsValidElem, &counter);
 		 									 
 	return (counter);
 }
@@ -187,10 +196,10 @@ sorted_list_iter_ty SortedListFind(const sorted_list_ty *list,
 	int status = 1;	/*	for a positive indication	*/
 	
 	assert(list);
-	assert(from_iter);
-	assert(to_iter);
+	assert(S_ITER_TO_NODE_PTR(from_iter));
+	assert(S_ITER_TO_NODE_PTR(to_iter));
 	
-	runner = SortedListIteratorBegin(list);
+	runner = from_iter;
 	
 	/* 
 	loop through the list till a matching element will be found
@@ -208,7 +217,7 @@ sorted_list_iter_ty SortedListFind(const sorted_list_ty *list,
 		return (SortedListIteratorPrevious(runner));	/*	data found	*/
 	}
 	
-	return (to_iter);	/* no matching data is found in the list	*/
+	return (runner);	/* no matching data is found in the list	*/
 }
 /******************************************************************************/
 sorted_list_iter_ty SortedListFindIf(const sorted_list_iter_ty from_iter, 
@@ -217,8 +226,9 @@ sorted_list_iter_ty SortedListFindIf(const sorted_list_iter_ty from_iter,
 {
 	sorted_list_iter_ty runner = NULL;
 
-	assert(from_iter);
-	assert(to_iter);
+	assert(S_ITER_TO_NODE_PTR(from_iter));
+	assert(S_ITER_TO_NODE_PTR(to_iter));
+	assert(match_func);
 
 	runner = from_iter;
 
@@ -240,8 +250,9 @@ status_ty SortedListForEach(sorted_list_iter_ty from_iter,
 {
 	sorted_list_iter_ty runner = NULL;
 
-	assert(from_iter);
-	assert(to_iter);
+	assert(S_ITER_TO_NODE_PTR(from_iter));
+	assert(S_ITER_TO_NODE_PTR(to_iter));
+	assert(action_func);
 
 	runner = from_iter;
 
