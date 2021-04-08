@@ -217,7 +217,7 @@ sorted_list_iter_ty SortedListFind(const sorted_list_ty *list,
 		return (SortedListIteratorPrevious(runner));	/*	data found	*/
 	}
 	
-	return (runner);	/* no matching data is found in the list	*/
+	return (to_iter);	/* no matching data is found in the list	*/
 }
 /******************************************************************************/
 sorted_list_iter_ty SortedListFindIf(const sorted_list_iter_ty from_iter, 
