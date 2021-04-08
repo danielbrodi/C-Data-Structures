@@ -1,6 +1,6 @@
 /*********************************FILE__HEADER*********************************\
 * File: sorted_list.c						 		  								
-* Author: Daniel Brodsky	S				  								
+* Author: Daniel Brodsky				  								
 * Date: 07/04/2021							   								
 * Version: 1.1 (Before Review)				   								
 * Reviewer: Ariel						   								
