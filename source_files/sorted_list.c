@@ -2,7 +2,7 @@
 * File: sorted_list.c						 		  								
 * Author: Daniel Brodsky				  								
 * Date: 07/04/2021							   								
-* Version: 1.1 (Before Review)				   								
+* Version: 1.1 (Reviewed)				   								
 * Reviewer: Ariel						   								
 * Description: Sorted Linked List Functions Implementations.			 
 \******************************************************************************/
@@ -206,7 +206,7 @@ sorted_list_iter_ty SortedListFind(const sorted_list_ty *list,
 	or until the runner will reach elements that should be located after
 	the given data, which means they will never match it.
 	*/
-	while (runner != to_iter && status > 0)
+	while (!SortedListIteratorIsEqual(runner, to_iter) && status > 0)
 	{
 		status = list->compare_func(SortedListGetData(runner), param);
 		runner = SortedListIteratorNext(runner);

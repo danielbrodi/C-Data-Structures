@@ -2,7 +2,7 @@
 * File: sorted_list_test.c						 		  								
 * Author: Daniel Brodsky					  								
 * Date: 07/04/2021						   								
-* Version: 1.0 (Before Review)				   								
+* Version: 1.0 (Reviewed)				   								
 * Reviewer: Ariel						   								
 * Description: Sorted Linked List API's Functions Testings.		 
 \******************************************************************************/

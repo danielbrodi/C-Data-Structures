@@ -164,8 +164,6 @@ void DlistSetData(dlist_iter_ty iter, void *data)
 boolean_ty DlistIteratorIsEqual(const dlist_iter_ty iter_a, 
 											const dlist_iter_ty iter_b)
 {
-	assert(ITER_TO_NODE_PTR(iter_a));
-	assert(ITER_TO_NODE_PTR(iter_b));
 	
 	/* returns TRUE if both iterators point to the same element
 		otherwise returns FALSE */
