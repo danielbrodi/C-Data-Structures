@@ -8,14 +8,12 @@
 \******************************************************************************/
 
 /********************************* Inclusions *********************************/
-#include <assert.h>	/*	assert	*/
-#include <stddef.h>	/*	size_t	*/
-#include <stdio.h>	/* printf, NULL */
-#include <stdlib.h> /* rand, srand */
-#include <string.h> /* strcmp */
-#include <time.h>	/* time */
+#include <stddef.h>	/*	size_t			*/
+#include <stdio.h>	/*	printf, NULL	*/
+#include <stdlib.h>	/*	rand, srand		*/
+#include <time.h>	/*	time			*/
 
-#include "utils.h" /* status_ty, boolean_ty, ANSI_COLOR_*/
+#include "utils.h"	/*	status_ty, boolean_ty, ANSI_COLOR_	*/
 #include "pqueue.h"
 
 /***************************** Macros Definitions *****************************/
@@ -26,7 +24,6 @@
 /* generates random number from 1 to 100 */
 #define RANDOM_NUM ((rand() % 100) + 1)
 
-#define UNUSED(x) (void)(x)
 #define INT_TO_VOID_PTR(int_x) (void *)(long)(int_x)
 #define VOID_PTR_TO_INT(void_ptr) (int)(long)(void_ptr)
 /**************************** Forward Declarations ****************************/
@@ -34,9 +31,9 @@ int SortElements(const void *data1, const void *data2);
 static void PqueueCreateTest(p_queue_ty *p_queue);
 static void PqueueDestroyTest(p_queue_ty *p_queue);
 static void PqueueSortingTest(p_queue_ty *p_queue);
-static void PqueueClearTest(p_queue_ty *p_queue);
 static void PqueueEraseTest(p_queue_ty *p_queue);
 static boolean_ty IsMatch(const void *data, const void *param);
+static void PqueueClearTest(p_queue_ty *p_queue);
 static void PrintQueue(p_queue_ty *p_queue);
 /******************************************************************************/
 /******************************* Main__Function *******************************/
@@ -133,6 +130,7 @@ static void PqueueEraseTest(p_queue_ty *p_queue)
 	
 	size_t num_of_inserts = 10, i = 0;
 	int nums_to_cmp[10] = {0};
+	int *num_to_cmp = nums_to_cmp;
 	
 	printf("Priority Queue Erase Test: ");
 	
@@ -143,14 +141,16 @@ static void PqueueEraseTest(p_queue_ty *p_queue)
 											INT_TO_VOID_PTR(nums_to_cmp[i])));
 	}
 	
-	while(!PqueueIsEmpty(p_queue))
+	while(!PqueueIsEmpty(p_queue) && TRUE ==is_working)
 	{
 		is_working *= IsMatch(
-								INT_TO_VOID_PTR(*nums_to_cmp),
+								 INT_TO_VOID_PTR(*num_to_cmp),
 					 			PqueueErase(p_queue, IsMatch,
-					 						 INT_TO_VOID_PTR(*nums_to_cmp)));
-		++nums_to_cmp;
+					 						 INT_TO_VOID_PTR(*num_to_cmp)));
+		++num_to_cmp;
 	}
+	
+	is_working *= PqueueIsEmpty(p_queue);
 	
 	is_working ? PRINT_SUCCESS : PRINT_FAILURE;
 }
