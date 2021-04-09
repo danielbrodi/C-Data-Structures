@@ -1,10 +1,7 @@
 /****************************** File Header ***********************************\
 * File Name: utils.h
 * Author: Daniel Brodsky
-* Description: Utilities for Singly Linked List API.
-* Date: 22/03/2021
-* Version: 1.0
-* Reviewer: Olga
+* Description: Utilities for different API's.
 \******************************************************************************/
 #ifndef	__UTILS_H__
 #define	__UTILS_H__
