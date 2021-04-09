@@ -141,7 +141,7 @@ static void PqueueEraseTest(p_queue_ty *p_queue)
 											INT_TO_VOID_PTR(nums_to_cmp[i])));
 	}
 	
-	while(!PqueueIsEmpty(p_queue) && TRUE ==is_working)
+	while(!PqueueIsEmpty(p_queue) && is_working)
 	{
 		is_working *= IsMatch(
 								 INT_TO_VOID_PTR(*num_to_cmp),
