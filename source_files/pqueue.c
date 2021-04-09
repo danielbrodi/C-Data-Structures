@@ -27,9 +27,11 @@ struct p_queue
 /******************************************************************************/
 p_queue_ty *PqueueCreate(Cmp_Func_ty cmp_func)
 {
+	p_queue_ty *new_p_queue = NULL;
+	
 	assert(cmp_func);
 	
-	p_queue_ty *new_p_queue = (p_queue_ty *)malloc(sizeof(p_queue_ty));
+	new_p_queue = (p_queue_ty *)malloc(sizeof(p_queue_ty));
 	if (NULL == new_p_queue)
 	{
 		return (NULL);
@@ -53,7 +55,7 @@ void PqueueDestroy(p_queue_ty *p_queue)
 	
 	if(p_queue) 
 	{
-		SortedListDestory(p_queue->list);
+		SortedListDestroy(p_queue->list);
 		p_queue->list = NULL;
 
 		free(p_queue);
@@ -82,7 +84,7 @@ status_ty PqueueEnqueue(p_queue_ty *p_queue, void *data)
 void *PqueueDequeue(p_queue_ty *p_queue)
 {
 	assert(p_queue);
-	assert(!PqueueIsEmpty);
+	assert(!PqueueIsEmpty(p_queue));
 	
 	return (SortedListPopFront(p_queue->list));
 }
@@ -104,7 +106,7 @@ size_t PqueueSize(const p_queue_ty *p_queue)
 void *PqueuePeek(const p_queue_ty *p_queue)
 {
 	assert(p_queue);
-	assert(!PqueueIsEmpty);
+	assert(!PqueueIsEmpty(p_queue));
 	
 	return (SortedListGetData(SortedListIteratorBegin(p_queue->list)));
 }
@@ -112,9 +114,9 @@ void *PqueuePeek(const p_queue_ty *p_queue)
 void PqueueClear(p_queue_ty *p_queue)
 {
 	assert(p_queue);
-	assert(!PqueueIsEmpty);
+	assert(!PqueueIsEmpty(p_queue));
 	
-	while(!PqueueIsEmpty(p_queue->list))
+	while(!PqueueIsEmpty(p_queue))
 	{
 		PqueueDequeue(p_queue);
 	}
@@ -125,22 +127,22 @@ void *PqueueErase(p_queue_ty *p_queue, Match_Function_ty match_func, void *param
 	void *ret_data = NULL;	/*	stores the data that will be returned	*/
 	sorted_list_iter_ty element = NULL;
 	sorted_list_iter_ty head = NULL;
-	sorted_list_iter_ty tail = NULL
+	sorted_list_iter_ty tail = NULL;
 	
 	assert(p_queue);
 	assert(match_func);
 
-	head = SortedListIteratorBegin(pqueue->list);
-	tail = SortedListIteratorEnd(pqueue->list);
+	head = SortedListIteratorBegin(p_queue->list);
+	tail = SortedListIteratorEnd(p_queue->list);
 
 	element = SortedListFindIf(head, tail, match_func, param);
 
-	if(!IsEqual(element, tail))
+	if(!SortedListIteratorIsEqual(element, tail))
 	{
 		ret_data = SortedListGetData(element);
 		SortedListRemove(element);
 	}
 
-	return(ret_data)
+	return(ret_data);
 }
 /******************************************************************************/
