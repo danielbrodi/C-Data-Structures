@@ -28,39 +28,30 @@
 
 #define UNUSED(x) (void)(x)
 #define INT_TO_VOID_PTR(int_x) (void *)(long)(int_x)
+#define VOID_PTR_TO_INT(void_ptr) (int)(long)(void_ptr)
 /**************************** Forward Declarations ****************************/
 int SortElements(const void *data1, const void *data2);
 static void PqueueCreateTest(p_queue_ty *p_queue);
 static void PqueueDestroyTest(p_queue_ty *p_queue);
-/*static void PqueueEnqueueTest(p_queue_ty *p_queue);*/
-/*static void PqueueDequeueTest(p_queue_ty *p_queue);*/
-/*static void PqueueIsEmptyTest(p_queue_ty *p_queue);*/
-/*static void PqueuePeekTest(p_queue_ty *p_queue);*/
-/*static void PqueueSizeTest(p_queue_ty *p_queue);*/
-/*static void PqueueClearTest(p_queue_ty *p_queue);*/
-/*static void PqueueEraseTest(p_queue_ty *p_queue);*/
-/*static boolean_ty IsMatch(const void *data, void *param);*/
-/*static boolean_ty IsDividedBy(const void *data, const void *param);*/
+static void PqueueSortingTest(p_queue_ty *p_queue);
+static void PqueueClearTest(p_queue_ty *p_queue);
+static void PqueueEraseTest(p_queue_ty *p_queue);
+static boolean_ty IsMatch(const void *data, const void *param);
+static void PrintQueue(p_queue_ty *p_queue);
 /******************************************************************************/
 /******************************* Main__Function *******************************/
 int main()	
 {
-	/* Intializes two empty new sorted lists */
+	/*	Intializes a new empty priority queue	*/
 	p_queue_ty *new_p_queue = PqueueCreate(SortElements);
 	
-	/* Intializes random number generator */
+	/*	Intializes a random number generator	*/
 	srand(time(0));
+	
 	PqueueCreateTest(new_p_queue);
-/*	PqueueIteratorBeginTest(new_p_queue);*/
-/*	PqueueInsertTest(new_p_queue);*/
-/*	PqueueRemoveTest(new_p_queue);*/
-/*	PqueueIsEmptyTest(new_p_queue);*/
-/*	PqueuePopFrontTest(new_p_queue);*/
-/*	PqueuePopBackTest(new_p_queue);*/
-/*	PqueueFindTest(new_p_queue);*/
-/*	PqueueFindIfTest(new_p_queue);*/
-/*	PqueueForEachTest(new_p_queue);*/
-/*	PqueueMergeTest(new_p_queue, src_list);*/
+	PqueueSortingTest(new_p_queue);
+	PqueueClearTest(new_p_queue);
+	PqueueEraseTest(new_p_queue);
 	PqueueDestroyTest(new_p_queue);
 	
 	return (0);
@@ -82,29 +73,104 @@ static void PqueueDestroyTest(p_queue_ty *p_queue)
 															ANSI_COLOR_RESET);
 }
 /******************************************************************************/
-int SortElements(const void *data1, const void *data2)
-{	
-	return ((int)(long)(data2) - (int)(long)(data1));
-}
-/******************************************************************************/
-static void PqueueEnqueueTest(p_queue_ty *p_queue)
+static void PqueueSortingTest(p_queue_ty *p_queue)
 {
 	boolean_ty is_working = TRUE;
+	size_t num_of_inserts = 10, i = 0;
+	void *data1 = NULL, *data2 = NULL;
 	
 	size_t original_size = PqueueSize(p_queue);
-	int num1 = RANDOM_NUM, num2 = 3, num3 = RANDOM_NUM;
 	
-	printf("Enqueue & Size Test: ");
+	printf("Enqueue & Dequeue & Peek & Size Tests: ");
 	
-	is_working *= !PqueueEnqueue(p_queue, INT_TO_VOID_PTR(num1));
-	is_working *= (PqueueSize(p_queue) == original_size + 1);
-	
-	is_working *= !PqueueEnqueue(p_queue, INT_TO_VOID_PTR(num2));
-	is_working *= (PqueueSize(p_queue) == original_size + 2);
-	
-	is_working *= !PqueueEnqueue(p_queue, INT_TO_VOID_PTR(num3));
-	is_working *= (PqueueSize(p_queue) == original_size + 3);
+	for(i = 0; i < num_of_inserts; ++i)
+	{
+		is_working *= !(PqueueEnqueue(p_queue, INT_TO_VOID_PTR(RANDOM_NUM)));
+		is_working *= (PqueueSize(p_queue) == original_size + 1 + i);
+	}
+
+	/* check if the list is sorted as needed by its criteria */
+	while (PqueueSize(p_queue) != 1 && TRUE == is_working)
+	{
+		data1 = PqueueDequeue(p_queue);
+		data2 = PqueuePeek(p_queue);
+		
+		is_working *= (SortElements(data1, data2) >= 0);
+	}
 	
 	is_working ? PRINT_SUCCESS : PRINT_FAILURE;
 }
 /******************************************************************************/
+static void PqueueClearTest(p_queue_ty *p_queue)
+{
+	boolean_ty is_working = TRUE;
+	size_t num_of_inserts = 10, i = 0;
+	
+	printf("Priority Queue Clear & IsEmpty Tests: ");
+	
+	if(!PqueueIsEmpty(p_queue))
+	{
+		PqueueClear(p_queue);
+	}
+	
+	is_working *= PqueueIsEmpty(p_queue);
+	
+	for(i = 0; i < num_of_inserts; ++i)
+	{
+		is_working *= !(PqueueEnqueue(p_queue, INT_TO_VOID_PTR(RANDOM_NUM)));
+	}
+	
+	PqueueClear(p_queue);
+	
+	is_working *= PqueueIsEmpty(p_queue);
+	
+	is_working ? PRINT_SUCCESS : PRINT_FAILURE;
+}
+/******************************************************************************/
+static void PqueueEraseTest(p_queue_ty *p_queue)
+{
+	boolean_ty is_working = TRUE;
+	
+	size_t num_of_inserts = 10, i = 0;
+	int nums_to_cmp[10] = {0};
+	
+	printf("Priority Queue Erase Test: ");
+	
+	for(i = 0; i < num_of_inserts; ++i)
+	{
+		nums_to_cmp[i] = RANDOM_NUM;
+		is_working *= !(PqueueEnqueue(p_queue, 
+											INT_TO_VOID_PTR(nums_to_cmp[i])));
+	}
+	
+	while(!PqueueIsEmpty(p_queue))
+	{
+		is_working *= IsMatch(
+								INT_TO_VOID_PTR(*nums_to_cmp),
+					 			PqueueErase(p_queue, IsMatch,
+					 						 INT_TO_VOID_PTR(*nums_to_cmp)));
+		++nums_to_cmp;
+	}
+	
+	is_working ? PRINT_SUCCESS : PRINT_FAILURE;
+}
+/******************************************************************************/
+
+static void PrintQueue(p_queue_ty *p_queue)
+{
+	printf("Printing Queue Elements:");
+	while(!PqueueIsEmpty(p_queue))
+	{
+		printf("%d->",VOID_PTR_TO_INT(PqueueDequeue(p_queue)));
+	}
+}
+/******************************************************************************/
+static boolean_ty IsMatch(const void *data, const void *param)
+{	
+	return (VOID_PTR_TO_INT(data) == VOID_PTR_TO_INT(param));
+}
+/******************************************************************************/
+int SortElements(const void *data1, const void *data2)
+{	
+	return (VOID_PTR_TO_INT(data2) - VOID_PTR_TO_INT(data1));
+}

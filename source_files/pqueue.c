@@ -68,17 +68,13 @@ status_ty PqueueEnqueue(p_queue_ty *p_queue, void *data)
 	assert(p_queue);
 	
 	/*
-	Insert function returns the end dummy if it failed.
+	Insert function returns the end dummy to indicate on a failure.
 	IsEqual will check if the return value of Insert is the end dummy.
-	IsEqual returns a boolean value TRUE or FALSE which stands for 1 or 0.
-	PqueueEnqueue returns SUCCESS or FAILURE which stands for 0 or 1.
-	SUCCESS stands for 0 while TRUE stands for 1, and same goes for
-	FAILURE and FALSE. Thus, the use of the `NOT` operator.
+	If it will match, PqueueEnqueue will return FAILURE.
 	*/
-	return (!(
-			SortedListIteratorIsEqual(
+	return (SortedListIteratorIsEqual(
 			SortedListInsert(p_queue->list, data),
-			SortedListIteratorEnd(p_queue->list))));
+			SortedListIteratorEnd(p_queue->list)));
 }
 /******************************************************************************/
 void *PqueueDequeue(p_queue_ty *p_queue)

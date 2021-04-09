@@ -78,11 +78,13 @@ void QueueEnqueueTest(queue_ty *queue)
 	
 	printf("Enqueue & Size Test: ");
 	
-	Enqueue(queue, (void *)(long)num1);
-	Enqueue(queue, (void *)(long)num2);
+	PqueueEnqueue(queue, (void *)(long)num1);
+	PqueueEnqueue(queue, (void *)(long)num2);
 	Enqueue(queue, (void *)(long)num3);
 	
 	QueueSize(queue) == (original_size + 3) ? PRINT_SUCCESS : PRINT_FAILURE;
+	
+	
 }
 /******************************************************************************/
 void QueuePeekTest(queue_ty *queue)
