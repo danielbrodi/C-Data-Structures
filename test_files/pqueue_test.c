@@ -155,14 +155,9 @@ static void PqueueEraseTest(p_queue_ty *p_queue)
 	is_working ? PRINT_SUCCESS : PRINT_FAILURE;
 }
 /******************************************************************************/
-
-static void PrintQueue(p_queue_ty *p_queue)
-{
-	printf("Printing Queue Elements:");
-	while(!PqueueIsEmpty(p_queue))
-	{
-		printf("%d->",VOID_PTR_TO_INT(PqueueDequeue(p_queue)));
-	}
+int SortElements(const void *data1, const void *data2)
+{	
+	return (VOID_PTR_TO_INT(data2) - VOID_PTR_TO_INT(data1));
 }
 /******************************************************************************/
 static boolean_ty IsMatch(const void *data, const void *param)
@@ -170,7 +165,3 @@ static boolean_ty IsMatch(const void *data, const void *param)
 	return (VOID_PTR_TO_INT(data) == VOID_PTR_TO_INT(param));
 }
 /******************************************************************************/
-int SortElements(const void *data1, const void *data2)
-{	
-	return (VOID_PTR_TO_INT(data2) - VOID_PTR_TO_INT(data1));
-}
