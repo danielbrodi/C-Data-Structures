@@ -20,7 +20,7 @@
 struct p_queue
 {
 	sorted_list_ty *list;		/*	stores a list of elements which are sorted
-									by their priorities	*/
+									by their priorities.	*/
 };
 /******************************************************************************/
 /************************* Functions__Implementations *************************/
@@ -70,7 +70,7 @@ status_ty PqueueEnqueue(p_queue_ty *p_queue, void *data)
 	/*
 	Insert function returns the end dummy to indicate on a failure.
 	IsEqual will check if the return value of Insert is the end dummy.
-	If it will match, PqueueEnqueue will return FAILURE
+	If it will match, PqueueEnqueue will return FAILURE.
 	*/
 	return (SortedListIteratorIsEqual(
 			SortedListInsert(p_queue->list, data),
@@ -120,7 +120,7 @@ void PqueueClear(p_queue_ty *p_queue)
 /******************************************************************************/
 void *PqueueErase(p_queue_ty *p_queue, Match_Function_ty match_func, void *param)
 {
-	void *ret_data = NULL;	/*	stores the data that will be returned	*/
+	void *ret_data = NULL;	/*	stores the data that will be returned.	*/
 	sorted_list_iter_ty element = NULL;
 	sorted_list_iter_ty head = NULL;
 	sorted_list_iter_ty tail = NULL;
