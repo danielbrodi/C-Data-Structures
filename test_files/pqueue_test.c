@@ -27,22 +27,20 @@
 #define RANDOM_NUM ((rand() % 100) + 1)
 
 #define UNUSED(x) (void)(x)
+#define INT_TO_VOID_PTR(int_x) (void *)(long)(int_x)
 /**************************** Forward Declarations ****************************/
 int SortElements(const void *data1, const void *data2);
 static void PqueueCreateTest(p_queue_ty *p_queue);
 static void PqueueDestroyTest(p_queue_ty *p_queue);
-/*static void PqueueIteratorBeginTest(p_queue_ty *p_queue);*/
-/*static void PqueueInsertTest(p_queue_ty *p_queue);*/
-/*static void PqueueRemoveTest(p_queue_ty *p_queue);*/
+/*static void PqueueEnqueueTest(p_queue_ty *p_queue);*/
+/*static void PqueueDequeueTest(p_queue_ty *p_queue);*/
 /*static void PqueueIsEmptyTest(p_queue_ty *p_queue);*/
-/*static void PqueuePopFrontTest(p_queue_ty *p_queue);*/
-/*static void PqueuePopBackTest(p_queue_ty *p_queue);*/
-/*static void PqueueFindTest(p_queue_ty *p_queue);*/
-/*static void PqueueFindIfTest(p_queue_ty *p_queue);*/
+/*static void PqueuePeekTest(p_queue_ty *p_queue);*/
+/*static void PqueueSizeTest(p_queue_ty *p_queue);*/
+/*static void PqueueClearTest(p_queue_ty *p_queue);*/
+/*static void PqueueEraseTest(p_queue_ty *p_queue);*/
 /*static boolean_ty IsMatch(const void *data, void *param);*/
 /*static boolean_ty IsDividedBy(const void *data, const void *param);*/
-/*static void PqueueForEachTest(p_queue_ty *p_queue);*/
-/*static status_ty PrintList(void *data, const void *param);*/
 /******************************************************************************/
 /******************************* Main__Function *******************************/
 int main()	
@@ -73,7 +71,7 @@ int main()
 static void PqueueCreateTest(p_queue_ty *p_queue)
 {
 	
-	printf("\nSorted List Creation Test: ");
+	printf("\nPriority Queue Creation Test: ");
 	NULL == p_queue ? PRINT_FAILURE : PRINT_SUCCESS;
 }
 /******************************************************************************/
@@ -87,5 +85,26 @@ static void PqueueDestroyTest(p_queue_ty *p_queue)
 int SortElements(const void *data1, const void *data2)
 {	
 	return ((int)(long)(data2) - (int)(long)(data1));
+}
+/******************************************************************************/
+static void PqueueEnqueueTest(p_queue_ty *p_queue)
+{
+	boolean_ty is_working = TRUE;
+	
+	size_t original_size = PqueueSize(p_queue);
+	int num1 = RANDOM_NUM, num2 = 3, num3 = RANDOM_NUM;
+	
+	printf("Enqueue & Size Test: ");
+	
+	is_working *= !PqueueEnqueue(p_queue, INT_TO_VOID_PTR(num1));
+	is_working *= (PqueueSize(p_queue) == original_size + 1);
+	
+	is_working *= !PqueueEnqueue(p_queue, INT_TO_VOID_PTR(num2));
+	is_working *= (PqueueSize(p_queue) == original_size + 2);
+	
+	is_working *= !PqueueEnqueue(p_queue, INT_TO_VOID_PTR(num3));
+	is_working *= (PqueueSize(p_queue) == original_size + 3);
+	
+	is_working ? PRINT_SUCCESS : PRINT_FAILURE;
 }
 /******************************************************************************/
