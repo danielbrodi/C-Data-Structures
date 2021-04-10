@@ -2,7 +2,7 @@
 * File:	pqueue.c						 		  								
 * Author:	Daniel Brodsky					  								
 * Date:	08/04/2021							   								
-* Version:	1.0	(Pre Review)						
+* Version:	1.0	(Reviewed)						
 * Reviewer:	Eran						   								
 * Description:	Priority Queue implementation wrapped by Sorted List's API.			 
 \******************************************************************************/
@@ -51,8 +51,6 @@ p_queue_ty *PqueueCreate(Cmp_Func_ty cmp_func)
 /******************************************************************************/
 void PqueueDestroy(p_queue_ty *p_queue)
 {
-	assert(p_queue);
-	
 	if(p_queue) 
 	{
 		SortedListDestroy(p_queue->list);
@@ -121,7 +119,7 @@ void PqueueClear(p_queue_ty *p_queue)
 void *PqueueErase(p_queue_ty *p_queue, Match_Function_ty match_func, void *param)
 {
 	void *ret_data = NULL;	/*	stores the data that will be returned.	*/
-	sorted_list_iter_ty element = NULL;
+	sorted_list_iter_ty element_to_erase = NULL;
 	sorted_list_iter_ty head = NULL;
 	sorted_list_iter_ty tail = NULL;
 	
@@ -131,12 +129,12 @@ void *PqueueErase(p_queue_ty *p_queue, Match_Function_ty match_func, void *param
 	head = SortedListIteratorBegin(p_queue->list);
 	tail = SortedListIteratorEnd(p_queue->list);
 
-	element = SortedListFindIf(head, tail, match_func, param);
+	element_to_erase = SortedListFindIf(head, tail, match_func, param);
 
-	if(!SortedListIteratorIsEqual(element, tail))
+	if(!SortedListIteratorIsEqual(element_to_erase, tail))
 	{
-		ret_data = SortedListGetData(element);
-		SortedListRemove(element);
+		ret_data = SortedListGetData(element_to_erase);
+		SortedListRemove(element_to_erase);
 	}
 
 	return(ret_data);
