@@ -156,7 +156,7 @@ static void PqueueEraseTest(p_queue_ty *p_queue)
 /******************************************************************************/
 int SortElements(const void *data1, const void *data2)
 {	
-	return (VOID_PTR_TO_INT(data2) - VOID_PTR_TO_INT(data1));
+	return (VOID_PTR_TO_INT(data1) - VOID_PTR_TO_INT(data2));
 }
 /******************************************************************************/
 static boolean_ty IsMatch(const void *data, const void *param)
