@@ -16,7 +16,7 @@
 #include "sorted_list.h"		/*	sorted list API wrapper	*/
 #include "pqueue.h"
 
-/***************************** Global Definitions *****************************/
+/**************************** General__Definitions ****************************/
 struct p_queue
 {
 	sorted_list_ty *list;		/*	stores a list of elements which are sorted
@@ -131,8 +131,14 @@ void *PqueueErase(p_queue_ty *p_queue, Match_Function_ty match_func, void *param
 	head = SortedListIteratorBegin(p_queue->list);
 	tail = SortedListIteratorEnd(p_queue->list);
 
+	/*	Look for the elemenet through the whole queue	*/
 	element_to_erase = SortedListFindIf(head, tail, match_func, param);
 
+	/* 
+	If the element has been found, remove it and return its data.
+	If not, the runner will reach the end of the queue, and no data
+	will be returned.
+	*/
 	if(!SortedListIteratorIsEqual(element_to_erase, tail))
 	{
 		ret_data = SortedListGetData(element_to_erase);
