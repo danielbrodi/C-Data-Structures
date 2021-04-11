@@ -29,7 +29,8 @@ p_queue_ty *PqueueCreate(Cmp_Func_ty cmp_func)
 {
 	p_queue_ty *new_p_queue = NULL;
 	
-	assert(cmp_func);
+	assert(cmp_func);	/*	Initializing a p_queue without a sorting function
+							is meaningless and will cause errors	*/
 	
 	new_p_queue = (p_queue_ty *)malloc(sizeof(p_queue_ty));
 	if (NULL == new_p_queue)
@@ -119,9 +120,10 @@ void PqueueClear(p_queue_ty *p_queue)
 void *PqueueErase(p_queue_ty *p_queue, Match_Function_ty match_func, void *param)
 {
 	void *ret_data = NULL;	/*	stores the data that will be returned.	*/
-	sorted_list_iter_ty element_to_erase = NULL;
-	sorted_list_iter_ty head = NULL;
-	sorted_list_iter_ty tail = NULL;
+	
+	sorted_list_iter_ty element_to_erase;
+	sorted_list_iter_ty head;
+	sorted_list_iter_ty tail;
 	
 	assert(p_queue);
 	assert(match_func);
