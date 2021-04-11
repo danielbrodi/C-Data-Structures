@@ -7,18 +7,18 @@
 #ifndef	__PQUEUE_H__
 #define	__PQUEUE_H__
 
-#include <stddef.h>	/* size_t */
+#include <stddef.h>	/*	size_t	*/
 
-#include "utils.h"  /* status_ty, bolean_ty */
+#include "utils.h"	/*	status_ty, bolean_ty	*/
 
 typedef struct p_queue p_queue_ty;                                                  
                                                           
 typedef boolean_ty (*Match_Function_ty)(const void *data, const void *param);
 
-/* Compare Func returns positive if data2 belongs somewhere after */
-/* data1 in the list */
-/* Returns 0 if the data are equal */
-/* Returns negative otherwise */
+/* Compare Func returns positive if data2 has a lower priority than/
+/ data1 in the list /
+/ Returns 0 if the data are equal /
+/ Returns negative otherwise */
 typedef int (*Cmp_Func_ty)(const void *data1, const void *data2);
 
 /* Creates an empty p_queue and returns pointer to handler struct */
@@ -62,6 +62,7 @@ void *PqueuePeek(const p_queue_ty *p_queue);
 void PqueueClear(p_queue_ty *p_queue);
 
 /* Erases the first element that found based on given criteria */
+/* Returns the removed data    */
 /* Returns NULL if data not found  */
 /* Complexity: O(n) */
 void *PqueueErase(p_queue_ty *p_queue, Match_Function_ty match_func, void *param);
