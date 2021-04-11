@@ -34,7 +34,6 @@ static void PqueueSortingTest(p_queue_ty *p_queue);
 static void PqueueEraseTest(p_queue_ty *p_queue);
 static boolean_ty IsMatch(const void *data, const void *param);
 static void PqueueClearTest(p_queue_ty *p_queue);
-static void PrintQueue(p_queue_ty *p_queue);
 /******************************************************************************/
 /******************************* Main__Function *******************************/
 int main()	

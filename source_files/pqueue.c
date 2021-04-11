@@ -10,7 +10,7 @@
 /********************************* Inclusions *********************************/
 #include <assert.h>				/*	assert			*/
 #include <stddef.h>				/*	size_t, NULL	*/
-#include <stdlib.h>				/*	free			*/
+#include <stdlib.h>				/*	malloc, free	*/
 
 #include "utils.h"				/*	status_ty, boolean_ty	*/
 #include "sorted_list.h"		/*	sorted list API wrapper	*/
