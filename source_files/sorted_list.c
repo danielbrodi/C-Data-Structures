@@ -62,6 +62,8 @@ void SortedListDestroy(sorted_list_ty *sorted_list)
 		DlistDestroy(sorted_list->list);
 		sorted_list->list = NULL;
 		
+		sorted_list->compare_func = NULL;
+		
 		free(sorted_list);
 		sorted_list = NULL;
 	}
