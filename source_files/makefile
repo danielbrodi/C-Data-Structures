@@ -14,6 +14,9 @@ TARGETS := vector slist slist_ex queue cbuffer dlist uid
 
 all: $(TARGETS)
 
+scheduler: $(IDIR)scheduler.h scheduler.c $(TDIR)scheduler_test.c $(IDIR)task.h task.c $(IDIR)$(DEPS) $(IDIR)pqueue.h pqueue.c $(IDIR)UID.h UID.c $(IDIR)sorted_list.h sorted_list.c $(IDIR)dlist.h dlist.c
+	$(CC) $(CFLAGS) -o a.out $^
+
 pqueue: $(IDIR)pqueue.h pqueue.c $(TDIR)pqueue_test.c $(IDIR)$(DEPS) $(IDIR)sorted_list.h sorted_list.c $(IDIR)dlist.h dlist.c
 	$(CC) $(CFLAGS) -o a.out $^
 
