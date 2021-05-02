@@ -6,7 +6,7 @@ int main(int argc, char **arv, char **envp)
 	int i = 8;
 	int j = 16;
 	int k = 32;
-	int *p = &j;
+	int *p = NULL;
 	
 	FILE *fp;
 	
@@ -16,7 +16,7 @@ int main(int argc, char **arv, char **envp)
 		return -1;
 	}	
 	
-	fprintf(fp, "%p\n", &p);
+	fscanf(fp, "%p\n", &p);
 	
 	if(fclose(fp))
 	{

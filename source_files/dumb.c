@@ -24,8 +24,6 @@ int main(int argc, char **arv, char **envp)
 		return -1;
 	}
 	
-	sleep(300);
-	
 	return 0;
 	
 }
