@@ -2,7 +2,7 @@
 * File: 	mem_map.c						 		  								
 * Author: 	Daniel Brodsky					  								
 * Date: 	02/05/2021						   								
-* Version:	21.0 (After Review)				   											   								
+* Version:	1.0			   											   								
 * Purpose:	Draw a memory map of different types, print their addresses to
 			define in which memory segments they are located.				 
 \******************************************************************************/
