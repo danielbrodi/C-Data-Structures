@@ -55,6 +55,7 @@ int main()
 void PrintMemAddress(char *string, void *address)
 {
 	assert(string);
+	assert(address);
 	
 	printf ("The memory address of an " GREEN "%s " RESET "is: " CYAN "%p\n" RESET,
 	 														string, address);
