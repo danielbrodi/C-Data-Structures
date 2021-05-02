@@ -41,20 +41,20 @@ int main()
 	
 	printf("\n");
 	
-	PrintMemAddress("initialized global", (void*) &global_init);
-	PrintMemAddress("uninitialized global", (void*) &global_not_init);
+	PrintMemAddress("initialized global variable", (void*) &global_init);
+	PrintMemAddress("uninitialized global variable", (void*) &global_not_init);
 	printf("\n");
 	
-	PrintMemAddress("initialized global static", (void*) &global_static_init);
-	PrintMemAddress("uninitialized global static", (void*) &global_static_not_init);
+	PrintMemAddress("initialized global static variable", (void*) &global_static_init);
+	PrintMemAddress("uninitialized global static variable", (void*) &global_static_not_init);
 	printf("\n");
 	
-	PrintMemAddress("initialized local static", (void*) &local_static_init);
-	PrintMemAddress("uninitialized local static", (void*) &local_static_not_init);
+	PrintMemAddress("initialized local static variable", (void*) &local_static_init);
+	PrintMemAddress("uninitialized local static variable", (void*) &local_static_not_init);
 	printf("\n");
 	
-	PrintMemAddress("initialized local", (void*) &local_init);
-	PrintMemAddress("uninitialized local", (void*) &local_not_init);
+	PrintMemAddress("initialized local variable", (void*) &local_init);
+	PrintMemAddress("uninitialized local variable", (void*) &local_not_init);
 	printf("\n");
 	
 	return (0);
@@ -66,7 +66,7 @@ void PrintMemAddress(char *string, void *address)
 	assert(string);
 	assert(address);
 	
-	printf ("The memory address of an " GREEN "%s variable " RESET
+	printf ("The memory address of an " GREEN "%s " RESET
 	 								"is: " CYAN "%p\n" RESET, string, address);
 }
 /******************************************************************************/
