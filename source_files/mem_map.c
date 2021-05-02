@@ -28,7 +28,7 @@ int main()
 	static char local_static_not_init;
 	
 	int local_init = 3;
-	int local_not_init = 3;
+	int local_not_init;
 	
 	printf("\n");
 	
