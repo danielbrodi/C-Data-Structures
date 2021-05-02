@@ -35,9 +35,12 @@ int main()
 {
 	static long local_static_init = 200;
 	static char local_static_not_init;
+	
 	char *string = "Daniel";
+	
 	int local_init = 3;
 	int local_not_init;
+	
 	void (*func_ptr)(char, void *);
     func_ptr = PrintMemAddress;
 	
