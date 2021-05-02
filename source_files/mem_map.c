@@ -22,9 +22,9 @@
 /******************************************************************************/
 
 int global_init = 100;
-int global_not_init;
+long global_not_init;
 
-void PrintMemAddress(char *string, void *address);
+static void PrintMemAddress(char *string, void *address);
 
 static char global_static_init = 100;
 static int global_static_not_init;
@@ -35,9 +35,14 @@ int main()
 {
 	static long local_static_init = 200;
 	static char local_static_not_init;
-	
+	char *string = "Daniel";
 	int local_init = 3;
 	int local_not_init;
+	void (*func_ptr)(char, void *);
+    func_ptr = PrintMemAddress;
+	
+	
+	
 	
 	printf("\n");
 	
@@ -56,6 +61,11 @@ int main()
 	PrintMemAddress("initialized local variable", (void*) &local_init);
 	PrintMemAddress("uninitialized local variable", (void*) &local_not_init);
 	printf("\n");
+	
+	PrintMemAddress("strings literal", (void*) string);
+	
+	printf ("The memory address of an " GREEN "static function " RESET
+	 								"is: " CYAN "%p\n\n" RESET, func_ptr);
 	
 	return (0);
 }
