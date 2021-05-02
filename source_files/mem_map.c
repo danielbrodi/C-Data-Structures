@@ -1,3 +1,12 @@
+/*********************************FILE__HEADER*********************************\
+* File: 	mem_map.c						 		  								
+* Author: 	Daniel Brodsky					  								
+* Date: 	02/05/2021						   								
+* Version:	21.0 (After Review)				   											   								
+* Purpose:	Draw a memory map of different types, print their addresses to
+			define in which memory segments they are located.				 
+\******************************************************************************/
+
 /******************************** HEADER_FILES ********************************/
 
 #include <assert.h>	/*	assert									*/
