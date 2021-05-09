@@ -9,13 +9,14 @@
 
 /********************************* Inclusions *********************************/
 #include <stdio.h>		/*	fprintf, printf, null	*/		
-#include <stdlib.h>		/*	exit					*/	
+#include <stdlib.h>		/*	abort					*/	
 
 /***************************** Macros Definitions *****************************/
-#define ASSERT(expr) \
-    if (!(expr)){ \
-        fprintf(stderr, "%s:%d: Assertion `%s` failed.\n" \
-        		,__FILE__, __LINE__, #expr); exit(1); }
+#define ASSERT(expr)                                                        \
+    ((expr) ?                                                               \
+        (void) 0 :                                                          \
+        (void) (fprintf(stderr, "%s:%d: Assertion `%s` failed.\n",      	\
+                        __FILE__, __LINE__, #expr), abort()))
 
 /******************************************************************************/
 int main()
