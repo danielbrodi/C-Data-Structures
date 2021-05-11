@@ -26,7 +26,8 @@ TSTOBJS=$(TESTS:.c=.o)
 
 .PHONY: all clean
 
-all: ${TARGET_LIB} $(TARGETS)
+all: ${TARGET_LIB}
+test: $(TARGETS)
 
 #CREATE EXECUTABLES
 $(TARGETS): $(TSTOBJS)
