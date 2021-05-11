@@ -77,7 +77,7 @@ void Pop(stack_ty *stack)
 	assert(stack);
 	assert(!IsEmpty(stack));
 	
-	stack->items[--(stack->top)];
+	--(stack->top);
 }
 
 /*******************************************************************************
