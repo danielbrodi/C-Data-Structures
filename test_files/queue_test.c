@@ -76,10 +76,10 @@ void QueueEnqueueTest(queue_ty *queue)
 	size_t original_size = QueueSize(queue);
 	int num1 = RANDOM_NUM, num2 = 3, num3 = RANDOM_NUM;
 	
-	printf("Enqueue & Size Test: ");
+	printf("Enqueue & Size Test:");
 	
-	PqueueEnqueue(queue, (void *)(long)num1);
-	PqueueEnqueue(queue, (void *)(long)num2);
+	Enqueue(queue, (void *)(long)num1);
+	Enqueue(queue, (void *)(long)num2);
 	Enqueue(queue, (void *)(long)num3);
 	
 	QueueSize(queue) == (original_size + 3) ? PRINT_SUCCESS : PRINT_FAILURE;

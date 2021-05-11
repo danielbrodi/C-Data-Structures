@@ -17,12 +17,17 @@ TARGET_LIB = libds.so  # target lib
 TESTS=$(wildcard ./test/*.c)
 CFILESWP=$(patsubst %_test.c,%.c,$(TESTS))
 SRCS=$(notdir $(CFILESWP))
+TARGETS=$(patsubst %.c,%,$(SRCS))
 OBJS=$(SRCS:.c=.o)
 
 
 .PHONY: all
 
-all: ${TARGET_LIB}
+all: ${TARGET_LIB} $(TARGETS)
+
+#CREATE EXECUTABLES
+$(TARGETS): $(TESTS:.c=.o)
+	$(CC) $(CFLAGS) -L. -lds $(TSTDIR)$@_test.o -o $@
 
 $(SRCS:.c=.d):%.d:%.c
 	$(CC) $(CFLAGS) -MM $< >$@
