@@ -22,7 +22,6 @@ OBJS=$(SRCS:.c=.o)
 
 
 .PHONY: all
-
 all: ${TARGET_LIB} $(TARGETS)
 
 #CREATE EXECUTABLES
@@ -34,7 +33,7 @@ $(SRCS:.c=.d):%.d:%.c
 	
 #CREATE A SHARED LIBRARY
 $(TARGET_LIB): $(OBJS)
-	$(CC) ${LDFLAGS} -o $@ $^
+	$(CC) $(LDFLAGS) -o $@ $^
 	
 include $(SRCS:.c=.d)
 
