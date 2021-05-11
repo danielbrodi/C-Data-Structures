@@ -11,32 +11,39 @@ vpath %.o ./obj/
 #COMPILER
 CC=gcc
 CFLAGS=-ansi -pedantic-errors -Wall -Wextra -fpic -g -I$(HDRDIR) # C flags
-LDFLAGS=-shared # linking flags
+LDFLAGS=-L./ -Wl,-rpath=./ # linking flags
 TARGET_LIB = libds.so  # target lib
+LDLIBS=-lds
 #FILES
-TESTS=$(wildcard ./test/*.c)
+TESTS=dlist_test.c
 CFILESWP=$(patsubst %_test.c,%.c,$(TESTS))
 SRCS=$(notdir $(CFILESWP))
 TARGETS=$(patsubst %.c,%,$(SRCS))
-OBJS=$(SRCS:.c=.o)
+SRCOBJS=$(SRCS:.c=.o)
+TSTOBJS=$(TESTS:.c=.o)
 
 
-.PHONY: all
+
+.PHONY: all clean
+
 all: ${TARGET_LIB} $(TARGETS)
 
 #CREATE EXECUTABLES
-$(TARGETS): $(TESTS:.c=.o)
-	$(CC) $(CFLAGS) -L. -lds $(TSTDIR)$@_test.o -o $@
+$(TARGETS): dlist_test.o
+	$(CC) $(CFLAGS) $(LDFLAGS) dlist_test.o -o $@ $(LDLIBS)
+	
+#CREATE A SHARED LIBRARY
+$(TARGET_LIB): $(SRCOBJS)
+	$(CC) -shared -o $@ $^
 
 $(SRCS:.c=.d):%.d:%.c
 	$(CC) $(CFLAGS) -MM $< >$@
 	
-#CREATE A SHARED LIBRARY
-$(TARGET_LIB): $(OBJS)
-	$(CC) $(LDFLAGS) -o $@ $^
+$(TESTS:.c=.d):%.d:%.c
+	$(CC) $(CFLAGS) -MM $< >$@
 	
 include $(SRCS:.c=.d)
 
 #CLEAN
 clean:
-	rm -f ${TARGET_LIB} ${OBJS} $(SRCS:.c=.d)
+	rm -f ${TARGET_LIB} ${SRCOBJS} ${TSTOBJS} $(SRCS:.c=.d) $(TESTS:.c=.d)
