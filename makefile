@@ -42,7 +42,7 @@ $(SRCS:.c=.d):%.d:%.c
 $(TESTS:.c=.d):%.d:%.c
 	$(CC) $(CFLAGS) -MM $< >$@
 	
-include $(SRCS:.c=.d)
+-include $(SRCS:.c=.d)
 
 #CLEAN
 clean:
