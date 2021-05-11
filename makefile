@@ -15,7 +15,7 @@ LDFLAGS=-L./ -Wl,-rpath=./ # linking flags
 TARGET_LIB = libds.so  # target lib
 LDLIBS=-lds
 #FILES
-TESTS=dlist_test.c
+TESTS=$(wildcard ./test/*.c)
 CFILESWP=$(patsubst %_test.c,%.c,$(TESTS))
 SRCS=$(notdir $(CFILESWP))
 TARGETS=$(patsubst %.c,%,$(SRCS))
@@ -29,8 +29,8 @@ TSTOBJS=$(TESTS:.c=.o)
 all: ${TARGET_LIB} $(TARGETS)
 
 #CREATE EXECUTABLES
-$(TARGETS): dlist_test.o
-	$(CC) $(CFLAGS) $(LDFLAGS) dlist_test.o -o $@ $(LDLIBS)
+$(TARGETS): $(TSTOBJS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(TSTDIR)$@_test.o -o $@ $(LDLIBS)
 	
 #CREATE A SHARED LIBRARY
 $(TARGET_LIB): $(SRCOBJS)
@@ -41,6 +41,9 @@ $(SRCS:.c=.d):%.d:%.c
 	
 $(TESTS:.c=.d):%.d:%.c
 	$(CC) $(CFLAGS) -MM $< >$@
+	
+#%.d:%.c
+#	$(CC) $(CFLAGS) -MM $< >$@
 	
 -include $(SRCS:.c=.d)
 
