@@ -53,9 +53,10 @@ bst_ty *BSTCreate(Cmp_Func_ty sorting_func, const void *param)
 		create an empty node that will be the end dummy node of the tree,
 		check for any memory allocation errors and abort the bst creation
 		if any.
-		initialize its data, next and previous struct members as NULL.
+		initialize its data, right and left struct members as NULL.
 		
-		assign the dummy node to the begin and end pointers of the created bst.
+		assign the dummy node to the end and root pointer of the created bst.
+		
 		set the received `sorting_func` as the sorting func of the tree.
 		
 		return a pointer to the created bst.
@@ -90,7 +91,7 @@ size_t BSTSize(const bst_ty *bst)
 		
 		initialize a size_t counter.
 		
-		get to the "bst->begin" node of the tree, and loop through all the nodes
+		get to the "BSTIterBegin" node of the tree, and loop through all the nodes
 		using BSTIterNext and count them till it reaches the `bst->end` node.
 		
 		return the count.
@@ -104,7 +105,7 @@ int BSTIsEmpty(const bst_ty *bst)
 	/*
 		assert bst.
 		
-		return value of (bst->begin == bst->end).
+		return value of (bst->root == bst->end).
 	*/
 }
 /******************************************************************************/
@@ -136,46 +137,43 @@ bst_iter_ty BSTInsert(bst_ty *bst, void *data)
 		
 		bst_node_ty *new_node = CreateNode(data);
 		
-		if (NULL != CreateNode(data)):
-		
-			if (1 == BSTIsEmpty) : 
-				set bst-> begin & bst->root & bst->begin as new_node.
-				set new_node->right & left as NULL.
-				return new_node.
-				
-			else if (data < (bst->begin)->data) : 
-				set bst->begin as new_node.
-				
-			Loop through the tree nodes from bst->root using a runner:
+		if (NULL == new_node):
+			return bst->end;
 			
-				runner = bst->root;
-				is_inserted = 0;
-				
-				while (!is_inserted):
-					if (bst->sorting_func(data, runner->data) > 0)
+		if (BSTIsEmpty) : 
+			set bst->root as new_node
+			return new_node.
+			
+		Loop through the tree nodes from bst->root using a runner:
+		
+			runner = bst->root;
+			is_inserted = 0;
+			
+			while (!is_inserted):
+				if (bst->sorting_func(data, runner->data) > 0)
+				{
+					if (NULL = runner->right)
 					{
-						if (NULL = runner->right)
-						{
-							new_node = runner->right;
-							is_inserted = 1;
-						}
-						else
-						{
-							runner = runner->right;
-						}
-					}		
+						new_node = runner->right;
+						is_inserted = 1;
+					}
 					else
 					{
-						if (NULL = runner->left)
-						{
-							new_node = runner->left;
-							is_inserted = 1;
-						}
-						else
-						{
-							runner = runner->left;
-						}
+						runner = runner->right;
 					}
+				}		
+				else
+				{
+					if (NULL = runner->left)
+					{
+						new_node = runner->left;
+						is_inserted = 1;
+					}
+					else
+					{
+						runner = runner->left;
+					}
+				}
 	
 		return (new_node);
 	*/
