@@ -262,7 +262,7 @@ status_ty SortedListForEach(sorted_list_iter_ty from_iter,
 	{
 		if (SUCCESS != action_func(SortedListGetData(runner), param))
 		{
-		return (FAILURE);
+			return (FAILURE);
 		}
 
 		runner = SortedListIteratorNext(runner);
