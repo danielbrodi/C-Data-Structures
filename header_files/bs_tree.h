@@ -1,91 +1,99 @@
 /*********************************FILE__HEADER*********************************\
-* File:				bs_tree.c						 		  								
-* Author:			Daniel Brodsky					  								
+* File:				bs_tree.h				 		  												  								
 * Date:				13/05/2021							   								
-* Version:			1.0	(After Review)							   								
+* Version:			1.0						   								
 * Description:		Binary Search Tree implementation API 
 \******************************************************************************/
 
-#ifndef	__BS_TREE_H__
-#define	__BS_TREE_H__
+#ifndef __BS_TREE_H__
+#define __BS_TREE_H__
 
-#include <stddef.h>		/* size_t					*/
+#include <stddef.h>		/*	size_t							*/
 
-#include "utils.h"		/* status_ty, boolean_ty	*/
+typedef struct bst bst_ty;
 
-typedef struct BST BST_ty;
+typedef struct bst_iter bst_iter_ty;
 
-typedef struct BST_node BST_node_ty;
+/*	Compare Func returns:
+ *	0 if data1 equals to data2
+ *	Positive value if data1 belongs somewhere after data2
+ *	Negative value if data2 belongs somewhere after data1	*/
+typedef int (*Cmp_Func_ty)(const void *data1, const void *data2, 
+															const void *param);
 
-typedef BST_node_ty *BST_iter_ty;
+/* 	Returns 0 on success 									*/
+/* 	Should not change the key of the data 					*/
+typedef int (*Action_Func_ty)(void *data, void *param);
 
-/* Creates an empty binary tree list and returns pointer to handler struct */
-/* returns NULL on failure*/
-/* Complexity: O(1) */
-dlist_ty *BSTCreate(void);
+/* 	Complexity O(1) 										*/
+bst_ty *BSTCreate(Cmp_Func_ty sorting_func, const void *param);
 
-/* Frees entire tree */
-/* Immitates Free() if BST is NULL */
-/* Complexity: O(n) */
-void BSTDestroy(dlist_ty *BST);
+/* 	Complexity O(n) - n is tree size 						*/
+void BSTDestroy(bst_ty *bst);
 
-/* Returns iterator to root of the tree, the smallest key */
-/* If BST is empty returns BST_END */
-/* Complexity: O(1) */
-BST_iter_ty BSTBegin(const BST_ty *BST);
+/* 	Complexity O(n) - n is tree size 						*/
+size_t BSTSize(const bst_ty *bst);
 
-/* Returns iterator to the end of the tree */
-/* Complexity: O(1) */
-BST_iter_ty BSTEnd(const BST_ty *BST);
+/* 	Complexity O(1) 										*/
+int BSTIsEmpty(const bst_ty *bst);
 
-/* Returns iterator to the next node in the tree */
-/* Returns BST_END on the last element in the list */
-/* Undefined if iter is BST_END */
-/* Complexity: O(1) */
-BST_iter_ty BSTNext(const BST_iter_ty iter);
+/* 	Returns iterator to the new element 					*/
+/* 	On memory allocation failure, returns iterator END 		*/
+/*	IMPORTANT: 	Undefined behavior if data with the
+ *				same key is already in the tree 			*/
+ 				
+/* 	Complexity O(log (n)) - n is tree size 					*/
+bst_iter_ty BSTInsert(bst_ty *bst, void *data);
 
-/* Returns iterator to the previous node in the tree */
-/* Undefined if iter is BST_BEGIN */
-/* Complexity: O(1) */
-BST_iter_ty BSTPrev(const BST_iter_ty iter);
+/* 	Complexity O(log (n)) - n is tree size 					*/
+/* PHASE II */
+void BSTRemove(bst_ty *bst, void *data);
 
-/* Returns TRUE if both are iterators of the same node, FALSE otherwise */
-/* Complexity: O(1) */
-boolean_ty BSTIterIsEqual(const BST_iter_ty iter_a, 
-													const BST_iter_ty iter_b);
+/* 	Returns iterator to next element 						*/
+/* 	Undefined behavior if to_remove is iterator END 		*/
+/* 	Complexity O(log (n)) - n is tree size 					*/
+/* 	PHASE II 												*/
+bst_iter_ty BSTRemoveIter(bst_iter_ty to_remove);
 
-/* Returns the data of the node that is pointed by the iterator */
-/* Undefined behaviour if iter is BST_END */
-/* Complexity: O(1) */
-void *BSTGetData(const BST_iter_ty iter);
+/* 	Complexity O(log (n)) - n is tree size 					*/
+bst_iter_ty BSTIterBegin(const bst_ty *bst);
 
-/* Inserts the data as a new node in the tree	*/
-/* Returns an iterator to the node 				*/
-/* On failure returns NULL 						*/
-/* Complexity: O(n) 							*/
-BST_iter_ty BSTInsert(void *data);
+/* 	Complexity O(1) 										*/
+bst_iter_ty BSTIterEnd(const bst_ty *bst);
 
-/* Removes the node that points by iter from the tree. 	*/
-/* Returns SUCCESS or FAILURE.							*/
-/* Undefined behaviour if iter is BST_END 				*/
-/* Complexity: O(1) */
-status_ty BSTRemove(BST_iter_ty iter);
+/* 	Undefined behavior if iter is BEGIN 					*/
+/* 	Complexity O(log (n)) - n is tree size 					*/
+bst_iter_ty BSTIterPrev(bst_iter_ty iter);
 
-/* Returns TRUE if the tree is empty or FALSE otherwise */
-/* Complexity: O(1) */
-boolean_ty BSTIsEmpty(const BST_ty *BST);
+/* 	Undefined behavior if iter is End 						*/
+/* 	Complexity O(log (n)) - n is tree size  				*/
+bst_iter_ty BSTIterNext(bst_iter_ty iter);
 
+/* 	Complexity O(1) 										*/
+int BSTIterIsEqual(bst_iter_ty iter1, bst_iter_ty iter2);
 
-size_t BSTSize(const BST_ty *BST);
+/* 	Undefined behavior if iter is End 						*/
+/* 	Complexity O(1) 										*/
+void *BSTGetData(bst_iter_ty iter);
 
+/* 	Returns End if not found 								*/
+/* 	Complexity O(log (n)) - n is tree size 					*/
+bst_iter_ty BSTFind(bst_ty *bst, void *to_find);
 
-BST_iter_ty BSTFind(const BST_iter_ty from_iter, 
-								const BST_iter_ty to_iter, 
-										IsMatch_Func_ty match_func,
-												void *param);
+/*	action_func is applied to elements in range [from_iter, to_iter) 	
+ *	Stops if action_func fails, and returns its failure status 			
+ *	Undefined behavior if action_func changes the keys 		*/				
+/*	Complexity O(n*log(n)) - n is tree size 				*/
+int BSTForEach(bst_iter_ty from_iter, bst_iter_ty to_iter, 
+									Action_Func_ty action_func, void *param);
 
-			
-status_ty BSTForEach
-								
-							 
+/*	BST's iterator definition								*/
+typedef struct bst_node bst_node_ty;
+
+typedef struct bst_iter
+{
+	bst_node_ty *node;
+	DEBUG_ONLY(size_t version;)
+} bst_iter_ty;
+
 #endif	/* __BS_TREE_H__ */
