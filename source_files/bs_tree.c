@@ -68,6 +68,18 @@ bst_ty *BSTCreate(Cmp_Func_ty sorting_func, const void *param)
 	*/
 }
 /******************************************************************************/
+bst_node_ty *GetToBottomNode(bst_node_ty *node)
+{
+	/*
+		while (node->left || node->right)
+				{
+					if node->left:
+						go left.
+					else if node->right:
+						go right.
+				}
+	*/
+}
 
 void BSTDestroy(bst_ty *bst)
 {
@@ -75,15 +87,11 @@ void BSTDestroy(bst_ty *bst)
 		if received bst pointer is null - do nothing.
 		otherwise:
 		
+		node = bst->stub->left; // include assrt
+		
 		while node != bst->stub:
 		
-			while (!node->left && !node->right)
-			{
-				if node->left:
-					go left.
-				else if node->right:
-					go right.
-			}
+			node = GetToBottomNode(node);
 			
 			next_node_to_free = node->up;
 			
