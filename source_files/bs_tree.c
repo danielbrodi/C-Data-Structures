@@ -1,10 +1,10 @@
 /*********************************FILE__HEADER*********************************\
 * File:				bs_tree.c
 * Author:			Daniel Brodsky				 		  												  								
-* Date:				13/05/2021
+* Date:				15/05/2021
 * Code Reviewer:	Rostik						   								
-* Version:			1.0						   								
-* Description:		Binary Search Tree implementation Pseudocode. 
+* Version:			1.5				   								
+* Description:		Binary Search Tree iterative implementation Pseudocode. 
 \******************************************************************************/
 
 /********************************* Inclusions *********************************/
@@ -15,21 +15,25 @@
 
 
 /***************************** Structs Definition *****************************/
-/*	handler struct of a binary search tree									*/
+/*	handler struct of a binary search tree								*/
 struct bst
 {
-	Cmp_Func_ty sorting_func;	/*	will sort the nodes by its criteria		*/
-	bst_node_ty *root;			/*	the root node of the tree				*/
-	bst_node_ty *end;			/*	the end dummy node of the tree			*/
+	Cmp_Func_ty sorting_func;	/*	sorts the nodes by its criteria		*/
+	
+	bst_node_ty stub;			/*	end dummy node of the tree:
+								 *	its left child node is the
+								 *	root of the tree					*/
+								 
+	void *param;				/*	param which is given by the user	*/
 };
 
-/*	handler struct of each node in a binary search tree						*/
+/*	handler struct of each node in a binary search tree					*/
 struct bst_node
 {
-/*	bst_node_ty *up;		/* 	the parent node - do I need it? Maybe for BSTIterPrev?	*/*/
-	bst_node_ty *right;		/*	the right child node						*/
-	bst_node_ty *left;		/*	the left child node 						*/
-	void *data;				/*	the data that is stored in the node			*/
+	bst_node_ty *up;			/*	parent node							*/
+	bst_node_ty *right;			/*	right child node					*/
+	bst_node_ty *left;			/*	left child node 					*/
+	void *data;					/*	data which is stored in the node	*/
 };
 
 /**************************** Forward Declarations ****************************/
@@ -37,7 +41,7 @@ struct bst_node
 static bst_node_ty *CreateNode(void *data);
 /*	returns the node that has the lowest key in the sub tree that
 	starts at the given node					*/
-static bst_node_ty *GetMinValue(bst_node_ty *node);
+static bst_node_ty *GetMinKeyNode(bst_node_ty *node);
 
 /*************************** Functions  Pseudocodes ***************************/
 
@@ -53,9 +57,9 @@ bst_ty *BSTCreate(Cmp_Func_ty sorting_func, const void *param)
 		create an empty node that will be the end dummy node of the tree,
 		check for any memory allocation errors and abort the bst creation
 		if any.
-		initialize its data, right and left struct members as NULL.
+		Initialize its data, right and left struct members as NULL.
 		
-		assign the dummy node to the end and root pointer of the created bst.
+		assign the created node to the stub member of the bst struct handler.
 		
 		set the received `sorting_func` as the sorting func of the tree.
 		
@@ -71,14 +75,34 @@ void BSTDestroy(bst_ty *bst)
 		if received bst pointer is null - do nothing.
 		otherwise:
 		
-		loop through the tree from begin to end using BSTIterNext and free each
-		node.
-		free the end dummy node.
+		while node != bst->stub:
 		
-		assign null to bst's struct handler members (cmp_func, begin, end).
+			while (!node->left && !node->right)
+			{
+				if node->left:
+					go left.
+				else if node->right:
+					go right.
+			}
+			
+			next_node_to_free = node->up;
+			
+			if node->data > next_node_to_free->data: // means its the right child
+				next_node_to_free->right = NULL;
+				
+			else // means its the left child
+				next_node_to_free->left = NULL;
+			
+			free(node);
+			
+			node = next_node_to_free;
+			
+		free(bst->stub);
+		
+		assign null to bst's struct handler members (cmp_func, param, stub).
 		
 		free bst.
-		assign null to bst ptr to avoid a dangling pointer.
+		bst = null;
 	*/
 }
 /******************************************************************************/
@@ -114,16 +138,10 @@ int BSTIsEmpty(const bst_ty *bst)
 bst_node_ty *CreateNode(void *data)
 {
 /*
-    bst_node_ty *new_node = (bst_node_ty *)malloc(sizeof(bst_node_ty));
-    if (NULL == new_node)
-    {
-    	return (NULL);
-    }
-    
-    new_node->data = data;
-    new_node->left = new_node->right = NULL;
-
-    return new_node;
+    /*	creates a new node with the received data		*/
+    /* 	allocates memory, checks for allocation errors	*/
+    /*	set data as data, right and left ptrs as null	*/
+    /*	return created node								*/
 */
 }
 
@@ -135,7 +153,7 @@ bst_iter_ty BSTInsert(bst_ty *bst, void *data)
 		assert both bst and data (NULL data isn't accepted in this BST).
 		assert (bts->end == BSTFind(bst, data));
 		
-		bst_node_ty *new_node = CreateNode(data);
+		new_node = CreateNode(data);
 		
 		if (NULL == new_node):
 			return bst->end;
@@ -150,29 +168,13 @@ bst_iter_ty BSTInsert(bst_ty *bst, void *data)
 			is_inserted = 0;
 			
 			while (!is_inserted):
-				if (bst->sorting_func(data, runner->data) > 0)
-				{
-					if (NULL = runner->right)
-					{
-						new_node = runner->right;
-						is_inserted = 1;
-					}
-					else
-					{
-						runner = runner->right;
-					}
-				}		
-				else
-				{
-					if (NULL = runner->left)
-					{
-						new_node = runner->left;
-						is_inserted = 1;
-					}
-					else
-					{
-						runner = runner->left;
-					}
+				if data > runner->data:
+					if runner has right child, move to it.
+					else: set created node as its right child & update is_inserted to 1.
+					
+				if data < runner->data:
+					if runner has left child, move to it.
+					else: set created node as its left child & update is_inserted to 1.
 				}
 	
 		return (new_node);
@@ -182,7 +184,7 @@ bst_iter_ty BSTInsert(bst_ty *bst, void *data)
 bst_node_ty *GetMinValue(bst_node_ty *node)
 {
 /*
-    bst_node_ty *nodes_runner = node;
+    nodes_runner = node;
     
     if (NULL != nodes_runner)
     {
@@ -239,7 +241,7 @@ bst_iter_ty BSTIterNext(bst_iter_ty iter)
 {
 	/*
 		assert(iter->node);
-		assert(NULL != iter->node->right && NULL != iter->node->left); //BST END
+		assert(NULL != iter->node->right && NULL != iter->node->left); //CHECK THIS IS NOT BST END
 		
 		return (bst_iter_ty *(GetMinValue(iter->right)));
 	*/
@@ -273,26 +275,18 @@ bst_iter_ty BSTFind(bst_ty *bst, void *to_find)
 		
 		assert !BSTIsEmpty
 		
-		bst_node_ty *curr_node = bst->root;
+		curr_node = bst->root;
 		
-		while (curr_node && 0 != bst->sorting_func(to_find, curr_node->data))
+		while curr_node is not NULL && sorting_func(to_find, curr_node->data) != 0 (indicates data is equal)
 		{
-			if (bst->sorted_list(to_find, curr_node->data) > 0)
-			{
-				curr_node = curr_node->right;
-			}
-			else
-			{
-				curr_node = curr_node->left;
-			}
+			if to_find > curr_node->data: move right
+			if to find < curr_node->data: move left
 		}
 	
-		if (!curr_node) // data not found in tree
-		{
-			curr_node = bst->end;
-		}
+		check if the loop is over because curr_node is NULL or because data is equal.
+		if curr_node is NULL : return BST END.
 		
-		return (bst_iter_ty *(curr_node));
+		return curr_node.
 	
 	*/
 }
@@ -303,11 +297,6 @@ int BSTForEach(bst_iter_ty from_iter, bst_iter_ty to_iter,
 									Action_Func_ty action_func, void *param)
 {
 	/*
-	
-		bst_iter_ty runner;
-		
-		void *data_check = NULL;	// check that action_func didnt change
-										the keys of the nodes.
 		
 		assert : from_iter->node, to_iter->node, action_func;
 
@@ -315,21 +304,9 @@ int BSTForEach(bst_iter_ty from_iter, bst_iter_ty to_iter,
 		
 		while (!BSTIterIsEqual(runner, to_iter))
 		{
-			data_check = BSTGetData(runner);
-			
-			if (0 != action_func(BSTGetData(runner), param))
-			{
-				return (1); //action_func returned an error.
-			}
-			
-			else if (data_check != BSTGetData(runner))
-			{
-				abort.
-				//????// how can I check if the data remained the same?
-				can't compare void ptrs.
-			}
-			
-			runner = BSTIterNext(runner);
+			execute action_func on each node with the given param.
+			if action_func return failure: abort.
+			else: move to next node using BSTIterNext.
 		}
 
 		return (0); // SUCCESS			
