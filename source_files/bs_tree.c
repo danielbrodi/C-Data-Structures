@@ -84,27 +84,28 @@ bst_node_ty *GetToBottomNode(bst_node_ty *node)
 void BSTDestroy(bst_ty *bst)
 {
 	/*
-		if received bst pointer is null - do nothing.
-		otherwise:
+		assert bst
 		
-		node = bst->stub->left; // include assrt
+		assert if not empty
+		
+		node = bst->stub->left; //start from the root of the tree
 		
 		while node != bst->stub:
-		
+		{
 			node = GetToBottomNode(node);
 			
 			next_node_to_free = node->up;
 			
-			if node->data > next_node_to_free->data: // means its the right child
-				next_node_to_free->right = NULL;
-				
-			else // means its the left child
+			if (IsLeftChild(node, next_node_to_free)):
 				next_node_to_free->left = NULL;
+			else:
+				next_node_to_free->right = NULL;
 			
 			free(node);
 			
 			node = next_node_to_free;
-			
+		}	
+		
 		free(bst->stub);
 		
 		assign null to bst's struct handler members (cmp_func, param, stub).
