@@ -41,7 +41,7 @@ struct bst_node
 static bst_node_ty *CreateNode(void *data);
 /*	returns the node that has the lowest key in the sub tree that
 	starts at the given node					*/
-static bst_node_ty *GetMinKeyNode(bst_node_ty *node);
+static bst_node_ty *GetMinValue(bst_node_ty *node);
 
 /*************************** Functions  Pseudocodes ***************************/
 
@@ -72,12 +72,12 @@ bst_node_ty *GetToBottomNode(bst_node_ty *node)
 {
 	/*
 		while (node->left || node->right)
-				{
-					if node->left:
-						go left.
-					else if node->right:
-						go right.
-				}
+		{
+			if node->left:
+				go left.
+			else if node->right:
+				go right.
+		}
 	*/
 }
 
@@ -86,48 +86,44 @@ void BSTDestroy(bst_ty *bst)
 	/*
 		assert bst
 		
-		assert if not empty
+		next_node = null;
+		node = bst->stub->left; // start from the root
 		
-		node = bst->stub->left; //start from the root of the tree
+		if not empty:
+			while node != bst->stub:
+			{
+				next_node = BSTIterNext(node);
+				BSTRemove(node);
+				node = next_node;
+			}
 		
-		while node != bst->stub:
-		{
-			node = GetToBottomNode(node);
-			
-			next_node_to_free = node->up;
-			
-			if (IsLeftChild(node, next_node_to_free)):
-				next_node_to_free->left = NULL;
-			else:
-				next_node_to_free->right = NULL;
-			
-			free(node);
-			
-			node = next_node_to_free;
-		}	
-		
-		free(bst->stub);
-		
-		assign null to bst's struct handler members (cmp_func, param, stub).
-		
+		bst->stub = bst->param = bst->sorting_func = null;
 		free bst.
 		bst = null;
 	*/
 }
 /******************************************************************************/
-
+static int NodesCounter(void *counter, void *param)
+{
+/*	assert*/
+/*	unused param;*/
+/*	*(size_t*)counter += 1;*/
+	
+/*	return 0;*/
+}
 
 size_t BSTSize(const bst_ty *bst)
 {
 	/*
 		assert bst.
 		
-		initialize a size_t counter.
+		size_t counter;
 		
-		get to the "BSTIterBegin" node of the tree, and loop through all the nodes
-		using BSTIterNext and count them till it reaches the `bst->end` node.
+		if 0 = BSTForEach(root, bst->stub, NodesCounter, &counter);
+		return counter.
 		
-		return the count.
+		else
+			return 0.
 	*/
 }
 /******************************************************************************/
@@ -138,11 +134,17 @@ int BSTIsEmpty(const bst_ty *bst)
 	/*
 		assert bst.
 		
-		return value of (bst->root == bst->end).
+		return value of (bst->stub->left == NULL). //root doesn't exist.
 	*/
 }
 /******************************************************************************/
+int IsLeftChild(bst, bst_node_ty parent, bst_node_ty child)
+{
+/*	assert*/
 
+/*	return ((bst->cmp_func(parent->data, child->data) > 0);*/
+	
+}
 
 bst_node_ty *CreateNode(void *data)
 {
@@ -160,51 +162,56 @@ bst_iter_ty BSTInsert(bst_ty *bst, void *data)
 {
 	/*
 		assert both bst and data (NULL data isn't accepted in this BST).
-		assert (bts->end == BSTFind(bst, data));
 		
 		new_node = CreateNode(data);
 		
 		if (NULL == new_node):
-			return bst->end;
+			return bst->stub;
 			
 		if (BSTIsEmpty) : 
-			set bst->root as new_node
+			set bst->stub->left as new_node
 			return new_node.
 			
-		Loop through the tree nodes from bst->root using a runner:
+		location = BSTSearchLocation(bst, data);
 		
-			runner = bst->root;
-			is_inserted = 0;
-			
-			while (!is_inserted):
-				if data > runner->data:
-					if runner has right child, move to it.
-					else: set created node as its right child & update is_inserted to 1.
-					
-				if data < runner->data:
-					if runner has left child, move to it.
-					else: set created node as its left child & update is_inserted to 1.
-				}
+		if (location->data equals data)
+		{
+			abort(1)
+		}
+		
+		else
+		{
+			if (IsLeftChild(location, new_node))
+				location->left = new_node;
+			else
+				location->right = new_node;
+		}
 	
 		return (new_node);
 	*/
 }
 /******************************************************************************/
-bst_node_ty *GetMinValue(bst_node_ty *node)
+/*	loop down to find the leftmost leaf	*/
+bst_node_ty *GetMinKey(bst_node_ty *node)
 {
-/*
-    nodes_runner = node;
-    
-    if (NULL != nodes_runner)
-    {
-	 	/*	loop down to find the leftmost leaf	/*
-		while (NULL != nodes_runner->left)
-		{
-		    nodes_runner = nodes_runner->left;
-		}
-    }
-    
-    return nodes_runner;
+	/*  
+    if node isn't null:
+    	while node->left exists:
+    		go node->left.
+    		
+    return node.
+    */
+}
+
+/*	loop down to find the rightmost leaf	*/
+bst_node_ty *GetMaxKey(bst_node_ty *node)
+{
+	/*  
+    if node isn't null:
+    	while node->right exists:
+    		go node->right.
+    		
+    return node.
     */
 }
 
@@ -214,10 +221,10 @@ bst_iter_ty BSTIterBegin(const bst_ty *bst)
 		assert bst
 		assert !BSTIsEmpty
 		
-		loop from bst->root only on the left sub-tree to find the minimum value
+		loop from bst->stub->left only on the left sub-tree to find the minimum value
 		in the tree.
 		
-		return (GetMinValue->bst->root);
+		return (GetMinValue(bst->stub->left));
 	*/
 }
 /******************************************************************************/
@@ -227,7 +234,7 @@ bst_iter_ty BSTIterEnd(const bst_ty *bst)
 {
 	/*
 		assert bst
-		return bst->end;
+		return bst->stub;
 	*/
 }
 /******************************************************************************/
@@ -236,11 +243,36 @@ bst_iter_ty BSTIterEnd(const bst_ty *bst)
 bst_iter_ty BSTIterPrev(bst_iter_ty iter)
 {
 	/*
-		
-		Needs the `parent` member? or assign `*bst_ty BST to bst->end node as data? 
-		Needs the use of the root of the tree?
-		*TODO*
+		assert iter->node
+		assert to check if its iter == BSTIterBegin (???) TODO
 	
+		prev = null;
+		
+		if node->left isnt null:
+			//	the predecessor is the rightmost child of left subtree or
+			 	left child itself. //
+			 	
+			prev = GetMaxKey(node->left);
+			
+		else: 
+		
+			// 	no left child is available. thus - we need
+				to climb up each time and verify that we come from the left.
+				In the moment that we will come from the right, it means the parent
+				is smaller, which means its the first key that is smaller than the 
+				received node. //
+				
+			parent = node->up	
+			
+			while parent && node == parent->left
+			{
+				node = parent
+				parent = parent->up
+			}
+			prev = parent;
+			
+			
+		return prev;	
 	*/
 }
 /******************************************************************************/
@@ -250,9 +282,36 @@ bst_iter_ty BSTIterNext(bst_iter_ty iter)
 {
 	/*
 		assert(iter->node);
-		assert(NULL != iter->node->right && NULL != iter->node->left); //CHECK THIS IS NOT BST END
+		assert(deadbeef != iter->node->right) // check if iter != BST_END
 		
-		return (bst_iter_ty *(GetMinValue(iter->right)));
+		next = null;
+		
+		if (node->right != null):
+		
+			// the successor is the leftmost child of right subtree
+			or the right child itself. //
+			
+			next = GetMinKey(node->right);
+			
+		else: 
+		
+			// 	no right child is available. thus - we need
+				to climb up each time and verify that we come from the right.
+				In the moment that we will come from the left, it means the parent
+				is bigger, which means its the first key that is bigger than the 
+				received node. //
+				
+			parent = node->up	
+			
+			while parent && node == parent->right
+			{
+				node = parent
+				parent = parent->up
+			}
+			next = parent;
+			
+		return next;
+			
 	*/
 }
 /******************************************************************************/
@@ -275,28 +334,48 @@ void *BSTGetData(bst_iter_ty iter)
 	*/
 }
 /******************************************************************************/
+bst_iter_ty *BSTSearchLocation(bst_ty *bst, void *data)
+{
+	/*
+	Loop through the tree nodes from the root (bst->stub->left) using a runner:
+		
+		runner = bst->stub->left;
+		is_found = 0;
 
+		while (!is_found):
+
+			#option1:
+			if data > runner->data: // check using bst->sorting_func > 0:
+
+				if runner has right child, move to it and loop again.
+
+				else: break
+
+			#option2:
+			else if data < runner->data:	
+				
+					if: runner has left child, move to it and loop again.
+
+					else: break;
+					
+			#option3:	
+			else: is_found = 1;
+			
+		return iter to runner;
+	*/
+}
 
 bst_iter_ty BSTFind(bst_ty *bst, void *to_find)
 {
 	/*
-		assert bst and to_find (null data isn't accepted in this bst).
+		assert
 		
-		assert !BSTIsEmpty
+		ret_node = BSTSearchLocation(bst, to_find);
 		
-		curr_node = bst->root;
-		
-		while curr_node is not NULL && sorting_func(to_find, curr_node->data) != 0 (indicates data is equal)
-		{
-			if to_find > curr_node->data: move right
-			if to find < curr_node->data: move left
-		}
-	
-		check if the loop is over because curr_node is NULL or because data is equal.
-		if curr_node is NULL : return BST END.
-		
-		return curr_node.
-	
+		if (ret_node->data !equals to_find)
+			ret_node = bst->stub;
+			
+		return ret_node;
 	*/
 }
 /******************************************************************************/
