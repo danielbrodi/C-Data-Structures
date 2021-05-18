@@ -3,7 +3,7 @@
 * Author:			Daniel Brodsky				 		  												  								
 * Date:				15/05/2021
 * Code Reviewer:	Rostik						   								
-* Version:			1.6			   								
+* Version:			1.7			   								
 * Description:		Binary Search Tree iterative implementation Pseudocode. 
 \******************************************************************************/
 
@@ -87,18 +87,10 @@ void BSTDestroy(bst_ty *bst)
 	/*
 		assert bst
 		
-		next_node = null;
-		node = bst->stub->left; // start from the root
+		while node != BST END:
+			node = Remove(node);
 		
-		if not empty:
-			while node != bst->stub:
-			{
-				node = BSTRemove(node);
-			}
-		
-		bst->stub = bst->param = bst->sorting_func = null;
-		free bst.
-		bst = null;
+		free bst end & bst
 	*/
 }
 /******************************************************************************/
@@ -118,9 +110,9 @@ size_t BSTSize(const bst_ty *bst)
 		
 		size_t counter;
 		
-		BSTForEach(root, bst->stub, NodesCounter, &counter);
+		use BSTForEach and loop all over the tree with the counter.
 		
-		return counter.
+		return count.
 	*/
 }
 /******************************************************************************/
@@ -137,9 +129,10 @@ int BSTIsEmpty(const bst_ty *bst)
 /******************************************************************************/
 static int IsLeftChild(bst, bst_node_ty parent, bst_node_ty child)
 {
+
 /*	assert*/
 
-/*	return ((bst->cmp_func(parent->data, child->data) > 0);*/
+/*	return (parent data > child data)	*/
 	
 }
 
@@ -162,23 +155,21 @@ bst_iter_ty BSTInsert(bst_ty *bst, void *data)
 		
 		new_node = CreateNode(data);
 		
-		if (NULL == new_node):
-			return bst->stub;
+		case 1: if error while creating node:
+			return BST END
 			
-		if (BSTIsEmpty) : 
-			set bst->stub->left as new_node
+		case 2: if bst is empty: 
+			set root as new_node
 			return new_node.
 			
-		location = BSTSearchLocation(bst, data);
+		case 3:	
+		FoundParent = BSTSearchLocation(bst, data); //find potential parent
 		
-		assert (location->data equals data);
+		assert (FoundParent->data equals data);
 		
-		if (IsLeftChild(location, new_node))
-			location->left = new_node;
-		else
-			location->right = new_node;
-		
-	
+		IsLeftChild(FoundParent, new_node) ? location->left = new_node : 
+													location->right = new_node;
+													
 		return (new_node);
 	*/
 }
@@ -190,24 +181,19 @@ bst_iter_ty BSTRemoveIter(bst_iter_ty to_remove)
 		assert iter
 		assert to_remove->data != deadbeef
 		
-		#case1: if to_remove is a leaf:
-					if (IsLeftChild(to_remove, parent))
-						parent->left = null;
-					else
-						parent->right = null;
+		#case1: if to_remove is a leaf (no subtrees):
+					unlink to_remove from its parent.
+					free(to_remove)
 		
-		#case2: if only one child !to_remove->right || !to_remove->left:
-					if(to_remove->right):
-						to_remove->data = to_remove->right->data
-						to_remove->right = null
-						free(to_remove->right);
-					else
-						to_remove->data = to_remove->left->data
-						to_remove->left = null
-						free(to_remove->left);
+		#case2: if only one child:
+					link to_remove parent to to_remove subtree.
+					free (to_remove)
 						
-		case3: else
-						
+		#case3: to_remove has 2 subtrees:
+					Find successor of to_remove
+					Copy successor's data to to_remove->data
+					make successor's parent to point to successor's right subtree.
+					
 	*/
 }
 /******************************************************************************/
@@ -245,7 +231,7 @@ bst_iter_ty BSTIterBegin(const bst_ty *bst)
 		assert bst
 		assert !BSTIsEmpty
 		
-		//loop from bst->stub->left only on the left sub-tree to find the minimum value
+		//loop from the root only on the left sub-tree to find the minimum value
 		in the tree.
 		
 		return (GetMinValue(bst->stub->left));
