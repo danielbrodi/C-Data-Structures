@@ -3,7 +3,7 @@
 * Author:			Daniel Brodsky				 		  												  								
 * Date:				15/05/2021
 * Code Reviewer:	Rostik						   								
-* Version:			1.5				   								
+* Version:			1.6			   								
 * Description:		Binary Search Tree iterative implementation Pseudocode. 
 \******************************************************************************/
 
@@ -17,7 +17,8 @@
 /*	handler struct of a binary search tree								*/
 struct bst
 {
-	Cmp_Func_ty sorting_func;	/*	sorts the nodes by its criteria		*/
+	Cmp_Func_ty compare_func;	/*	helps to sort the nodes by
+								 *	comparing them by its criteria		*/
 	
 	bst_node_ty stub;			/*	end dummy node of the tree:
 								 *	its left child node is the
@@ -47,10 +48,6 @@ static bst_node_ty *GetMinKey(bst_node_ty *node);
  *	starts at the given node					*/
 static bst_node_ty *GetMaxKey(bst_node_ty *node);
 
-/* 	returns the node that located at the bottom of the tree which
- *	starts at the given node.					*/
-static bst_node_ty *GetToBottomNode(bst_node_ty *node);
-
 /* 	returns 1 if a given child is the left child
  *	of a given parent, 0 otherwise.				*/
 static int IsLeftChild(bst, bst_node_ty parent, bst_node_ty child);
@@ -74,30 +71,17 @@ bst_ty *BSTCreate(Cmp_Func_ty sorting_func, const void *param)
 		create an empty node that will be the end dummy node of the tree,
 		check for any memory allocation errors and abort the bst creation
 		if any.
-		Initialize its data, right and left struct members as NULL.
+		Initialize its data, right and left struct members as DEAD_MEM.
 		
 		assign the created node to the stub member of the bst struct handler.
 		
-		set the received `sorting_func` as the sorting func of the tree.
+		set the received `compare_func` as the comparing func of the tree.
 		
 		return a pointer to the created bst.
 	
 	*/
 }
 /******************************************************************************/
-static bst_node_ty *GetToBottomNode(bst_node_ty *node)
-{
-	/*
-		while (node->left || node->right)
-		{
-			if node->left:
-				go left.
-			else if node->right:
-				go right.
-		}
-	*/
-}
-
 void BSTDestroy(bst_ty *bst)
 {
 	/*
@@ -109,9 +93,7 @@ void BSTDestroy(bst_ty *bst)
 		if not empty:
 			while node != bst->stub:
 			{
-				next_node = BSTIterNext(node);
-				BSTRemove(node);
-				node = next_node;
+				node = BSTRemove(node);
 			}
 		
 		bst->stub = bst->param = bst->sorting_func = null;
@@ -120,11 +102,11 @@ void BSTDestroy(bst_ty *bst)
 	*/
 }
 /******************************************************************************/
-static int NodesCounter(void *counter, void *param)
+static int NodesCounter(void *data, void *counter)
 {
-/*	assert*/
-/*	unused param;*/
-/*	*(size_t*)counter += 1;*/
+/*	assert						*/
+/* unused data					*/
+/*	*(size_t*)counter += 1;		*/
 	
 /*	return 0;*/
 }
@@ -136,11 +118,9 @@ size_t BSTSize(const bst_ty *bst)
 		
 		size_t counter;
 		
-		if 0 = BSTForEach(root, bst->stub, NodesCounter, &counter);
-		return counter.
+		BSTForEach(root, bst->stub, NodesCounter, &counter);
 		
-		else
-			return 0.
+		return counter.
 	*/
 }
 /******************************************************************************/
@@ -191,20 +171,43 @@ bst_iter_ty BSTInsert(bst_ty *bst, void *data)
 			
 		location = BSTSearchLocation(bst, data);
 		
-		if (location->data equals data)
-		{
-			abort(1)
-		}
+		assert (location->data equals data);
 		
+		if (IsLeftChild(location, new_node))
+			location->left = new_node;
 		else
-		{
-			if (IsLeftChild(location, new_node))
-				location->left = new_node;
-			else
-				location->right = new_node;
-		}
+			location->right = new_node;
+		
 	
 		return (new_node);
+	*/
+}
+/******************************************************************************/
+
+bst_iter_ty BSTRemoveIter(bst_iter_ty to_remove)
+{
+	/*
+		assert iter
+		assert to_remove->data != deadbeef
+		
+		#case1: if to_remove is a leaf:
+					if (IsLeftChild(to_remove, parent))
+						parent->left = null;
+					else
+						parent->right = null;
+		
+		#case2: if only one child !to_remove->right || !to_remove->left:
+					if(to_remove->right):
+						to_remove->data = to_remove->right->data
+						to_remove->right = null
+						free(to_remove->right);
+					else
+						to_remove->data = to_remove->left->data
+						to_remove->left = null
+						free(to_remove->left);
+						
+		case3: else
+						
 	*/
 }
 /******************************************************************************/
@@ -212,6 +215,8 @@ bst_iter_ty BSTInsert(bst_ty *bst, void *data)
 static bst_node_ty *GetMinKey(bst_node_ty *node)
 {
 	/*  
+	assert
+	
     if node isn't null:
     	while node->left exists:
     		go node->left.
@@ -224,6 +229,8 @@ static bst_node_ty *GetMinKey(bst_node_ty *node)
 static bst_node_ty *GetMaxKey(bst_node_ty *node)
 {
 	/*  
+	assert
+	
     if node isn't null:
     	while node->right exists:
     		go node->right.
@@ -238,7 +245,7 @@ bst_iter_ty BSTIterBegin(const bst_ty *bst)
 		assert bst
 		assert !BSTIsEmpty
 		
-		loop from bst->stub->left only on the left sub-tree to find the minimum value
+		//loop from bst->stub->left only on the left sub-tree to find the minimum value
 		in the tree.
 		
 		return (GetMinValue(bst->stub->left));
@@ -255,13 +262,10 @@ bst_iter_ty BSTIterEnd(const bst_ty *bst)
 	*/
 }
 /******************************************************************************/
-
-
 bst_iter_ty BSTIterPrev(bst_iter_ty iter)
 {
 	/*
 		assert iter->node
-		assert to check if its iter == BSTIterBegin (???) TODO
 	
 		prev = null;
 		
@@ -281,7 +285,7 @@ bst_iter_ty BSTIterPrev(bst_iter_ty iter)
 				
 			parent = node->up	
 			
-			while parent && node == parent->left
+			while parent != DEAD_MEM && node == parent->left
 			{
 				node = parent
 				parent = parent->up
@@ -320,7 +324,7 @@ bst_iter_ty BSTIterNext(bst_iter_ty iter)
 				
 			parent = node->up	
 			
-			while parent && node == parent->right
+			while parent != DEAD_MEM && node == parent->right
 			{
 				node = parent
 				parent = parent->up
@@ -404,27 +408,17 @@ int BSTForEach(bst_iter_ty from_iter, bst_iter_ty to_iter,
 	/*
 		
 		assert : from_iter->node, to_iter->node, action_func;
-
-		runner = from_iter;
 		
-		while (!BSTIterIsEqual(runner, to_iter))
+		status = 1
+		
+		while (!BSTIterIsEqual(from_iter, to_iter) && status)
 		{
 			execute action_func on each node with the given param.
-			if action_func return failure: abort.
-			else: move to next node using BSTIterNext.
+			move to next node using BSTIterNext.
 		}
 
-		return (0); // SUCCESS			
+		return (status); // SUCCESS			
 	
 	*/
 }
 /******************************************************************************/
-
-/*	BST's iterator definition								*/
-typedef struct bst_node bst_node_ty;
-
-typedef struct bst_iter
-{
-	bst_node_ty *node;
-	DEBUG_ONLY(size_t version;)
-} bst_iter_ty;
