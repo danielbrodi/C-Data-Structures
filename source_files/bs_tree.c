@@ -13,7 +13,6 @@
 
 #include "bs_tree.h"
 
-
 /***************************** Structs Definition *****************************/
 /*	handler struct of a binary search tree								*/
 struct bst
@@ -39,10 +38,28 @@ struct bst_node
 /**************************** Forward Declarations ****************************/
 /*	creates a new node with the received data	*/
 static bst_node_ty *CreateNode(void *data);
-/*	returns the node that has the lowest key in the sub tree that
-	starts at the given node					*/
-static bst_node_ty *GetMinValue(bst_node_ty *node);
 
+/*	returns the node that has the lowest key in the sub tree that
+ *	starts at the given node					*/
+static bst_node_ty *GetMinKey(bst_node_ty *node);
+
+/*	returns the node that has the largest key in the sub tree that
+ *	starts at the given node					*/
+static bst_node_ty *GetMaxKey(bst_node_ty *node);
+
+/* 	returns the node that located at the bottom of the tree which
+ *	starts at the given node.					*/
+static bst_node_ty *GetToBottomNode(bst_node_ty *node);
+
+/* 	returns 1 if a given child is the left child
+ *	of a given parent, 0 otherwise.				*/
+static int IsLeftChild(bst, bst_node_ty parent, bst_node_ty child);
+
+/* 	searches for the right location for a node with a key
+	that equals to a given data. 				*/
+static bst_node_ty *BSTSearchLocation(bst_ty *bst, void *data);
+
+static int NodesCounter(void *counter, void *param);
 /*************************** Functions  Pseudocodes ***************************/
 
 bst_ty *BSTCreate(Cmp_Func_ty sorting_func, const void *param)
@@ -68,7 +85,7 @@ bst_ty *BSTCreate(Cmp_Func_ty sorting_func, const void *param)
 	*/
 }
 /******************************************************************************/
-bst_node_ty *GetToBottomNode(bst_node_ty *node)
+static bst_node_ty *GetToBottomNode(bst_node_ty *node)
 {
 	/*
 		while (node->left || node->right)
@@ -138,7 +155,7 @@ int BSTIsEmpty(const bst_ty *bst)
 	*/
 }
 /******************************************************************************/
-int IsLeftChild(bst, bst_node_ty parent, bst_node_ty child)
+static int IsLeftChild(bst, bst_node_ty parent, bst_node_ty child)
 {
 /*	assert*/
 
@@ -146,7 +163,7 @@ int IsLeftChild(bst, bst_node_ty parent, bst_node_ty child)
 	
 }
 
-bst_node_ty *CreateNode(void *data)
+static bst_node_ty *CreateNode(void *data)
 {
 /*
     /*	creates a new node with the received data		*/
@@ -192,7 +209,7 @@ bst_iter_ty BSTInsert(bst_ty *bst, void *data)
 }
 /******************************************************************************/
 /*	loop down to find the leftmost leaf	*/
-bst_node_ty *GetMinKey(bst_node_ty *node)
+static bst_node_ty *GetMinKey(bst_node_ty *node)
 {
 	/*  
     if node isn't null:
@@ -204,7 +221,7 @@ bst_node_ty *GetMinKey(bst_node_ty *node)
 }
 
 /*	loop down to find the rightmost leaf	*/
-bst_node_ty *GetMaxKey(bst_node_ty *node)
+static bst_node_ty *GetMaxKey(bst_node_ty *node)
 {
 	/*  
     if node isn't null:
@@ -334,7 +351,7 @@ void *BSTGetData(bst_iter_ty iter)
 	*/
 }
 /******************************************************************************/
-bst_iter_ty *BSTSearchLocation(bst_ty *bst, void *data)
+static bst_iter_ty *BSTSearchLocation(bst_ty *bst, void *data)
 {
 	/*
 	Loop through the tree nodes from the root (bst->stub->left) using a runner:
