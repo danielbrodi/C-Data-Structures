@@ -2,7 +2,8 @@
 * File:				bs_tree.c
 * Author:			Daniel Brodsky				 		  												  								
 * Date:				15/05/2021
-* Code Reviewer:	Rostik						   								
+* Code Reviewer:	Rostik
+* Pseudo Reviewer: 	Eran					   								
 * Version:			2.0		   								
 * Description:		Binary Search Tree iterative implementation Pseudocode. 
 \******************************************************************************/
@@ -17,7 +18,7 @@
 #define DEAD_MEM(type) ((type)0xdeadbeef)
 
 /*	from which direction the child node connected to its parent node	*/
-enum side
+enum sides
 {
 	LEFT = 0,
 	RIGHT = 1
@@ -41,7 +42,8 @@ struct bst
 struct bst_node
 {
 	bst_node_ty *parent;		/*	parent node							*/
-	bst_node_ty children[0,1];	/*	left and right child nodes			*/
+	bst_node_ty children[2];	/*	left and right child nodes	
+								 *	left = 0, right = 1					*/
 	void *data;					/*	data which is stored in the node	*/
 };
 
@@ -54,18 +56,18 @@ typedef struct bst_location
 } bst_location_ty;
 
 /**************************** Forward Declarations ****************************/
-/*	creates a new node with the received data	*/
+/*	creates a new node with the received data							*/
 static bst_node_ty *CreateNodeIMP(void *data);
 
-/*	loop down from a node to find the leftmost or the rightmost leaf	*/
-static bst_node_ty *GetMaxMinIMP(bst_node_ty *node, int side)
+/*	loop down from a node to find the leftmost or the rightmost node	*/
+static bst_node_ty *GetSideMostIMP(bst_node_ty *node, int side)
 
 
 static bst_iter_ty PrevNextImp(bst_iter_ty iter, int side);
 
 /* 	searches for the right location for a node with a key
-	that equals to a given data. 				*/
-static bst_location_ty *BSTSearchLocationIMP(bst_ty *bst, void *data);
+	that equals to a given data. 										*/
+static bst_location_ty BSTSearchLocationIMP(bst_ty *bst, void *data);
 
 static int NodesCounterIMP(void *counter, void *param);
 /*************************** Functions  Pseudocodes ***************************/
@@ -83,6 +85,8 @@ bst_ty *BSTCreate(Cmp_Func_ty sorting_func, const void *param)
 		Initialize stub's left child as null.
 		
 		set the received `sorting_func` as the comparing func of the tree.
+		
+		set the received `param` as the param of the tree.
 		
 		return a pointer to the created bst.
 	
@@ -128,17 +132,17 @@ int BSTIsEmpty(const bst_ty *bst)
 	/*
 		assert bst.
 		
-		return value of (bst->stub->left == NULL). //root doesn't exist.
+		return value of (bst->stub->left == NULL). //does root exist?
 	*/
 }
 /******************************************************************************/
 static bst_node_ty *CreateNodeIMP(void *data)
 {
 /*
-    /*	creates a new node with the received data		*/
-    /* 	allocates memory, checks for allocation errors	*/
-    /*	set data as data, right and left ptrs as null	*/
-    /*	return created node								*/
+    /*	creates a new node with the received data				*/
+    /* 	allocates memory, checks for allocation errors			*/
+    /*	set data as data, right, left and parent ptrs as null	*/
+    /*	return created node										*/
 */
 }
 
@@ -152,18 +156,14 @@ bst_iter_ty BSTInsert(bst_ty *bst, void *data)
 		case 1: if error while creating node:
 			return BST END
 			
-		case 2: if bst is empty: 
-			set new_node's parent as the stub
-			set stub left child as new_node
-			return new_node.
-			
-		case 3:	
+		case 2:	
 		found_location = BSTSearchLocationIMP(bst, data); //find potential parent
 		
-		assert (found_location data is equal to received data); 
+		assert (found_location data is not equal to received data); 
 		
 		get to the found_location by the recevied data and assign new_node.
 		assign new_node's parent as found_location->parent.
+		assign found_location->parent child by the received direction as new_node.
 													
 		return (new_node);
 	*/
@@ -176,31 +176,36 @@ bst_iter_ty BSTRemoveIter(bst_iter_ty to_remove)
 		assert iter
 		assert to_remove->data != deadbeef
 		
+		ret = next of to_remove;
+		
 		#case1: if to_remove is a leaf (no subtrees):
-					unlink to_remove from its parent.
-					free(to_remove)
+					set to_remove's parent child as null.
+					free to_remove		
 		
 		#case2: if only one child:
 					link to_remove parent to to_remove subtree.
-					free (to_remove)
+					free to_remove		
 						
 		#case3: to_remove has 2 subtrees:
 					Find successor of to_remove
 					Copy successor's data to to_remove->data
 					make successor's parent to point to successor's right subtree.
 					
-					if successor has right child - change its parent to the parent of the successor.		
-					
+					if successor has a right child - change its parent to the parent of the successor.		
+					ret = to_remove;
+					free successor
+
+				
+		return ret;			
 	*/
 }
 /******************************************************************************/
 /*	loop down from a node to find the leftmost or the rightmost leaf	*/
-static bst_node_ty *GetMaxMinIMP(bst_node_ty *node, int side)
+static bst_node_ty *GetSideMostIMP(bst_node_ty *node, int side)
 {
 	/*  
 	assert
 	
-    if node isn't null:
     	while node's child on the received side exists:
     		go to that child.
     		
@@ -212,12 +217,11 @@ bst_iter_ty BSTIterBegin(const bst_ty *bst)
 {
 	/*
 		assert bst
-		assert !BSTIsEmpty
 		
 		//loop from the root only on the left sub-tree to find the minimum value
 		in the tree.
 		
-		return (GetMaxMinIMP(tree root, LEFT));
+		return (GetSideMostIMP(tree stub, LEFT));
 	*/
 }
 /******************************************************************************/
@@ -238,25 +242,23 @@ static bst_iter_ty PrevNextImp(bst_iter_ty iter, int side)
 		
 		if node's child on the received side exists:
 		
-			//	the predecessor is the rightmost child of left subtree or
-			 	left child itself.
+			//	the predecessor is the rightmost child of left subtree.//
 			 	
-			 	the successor is the leftmost child of right subtree
-				or the right child itself. //
+			 	the successor is the leftmost child of right subtree.//
 			
-			ret = GetMaxMinIMP(node->child[side], !side);
+			ret = GetSideMostIMP(node->child[side], !side);
 			
 		else:
 			
 			// 	no left or right (based on needed key) child is available. 
 			Thus - we need to climb up each time and verify that we come from
-			the right subtree.
+			the correct subtree.
 			At the moment that we will come from the other direction, it will 
 			mean that the parent is smaller or bigger, 
 			which means its the first key that is smaller or bigger 
 			than the received node. //
 			
-			while parent->right != DEAD_MEM && node == parent->child[side]
+			while parent's right child != DEAD_MEM && node == parent->child[side]
 			{
 				node = parent
 				parent = parent->parent
@@ -265,11 +267,12 @@ static bst_iter_ty PrevNextImp(bst_iter_ty iter, int side)
 			return parent
 	*/
 }
-
+/******************************************************************************/
 bst_iter_ty BSTIterPrev(bst_iter_ty iter)
 {
 	/*
 		assert iter->node
+		TODO assert its not begin
 	
 		return PrevNextImp(node, LEFT);
 	*/
@@ -293,6 +296,8 @@ bst_iter_ty BSTIterNext(bst_iter_ty iter)
 int BSTIterIsEqual(bst_iter_ty iter1, bst_iter_ty iter2)
 {
 	/*
+		assert
+		
 		return iter1->node == iter2->node;
 	*/
 }
@@ -310,22 +315,22 @@ void *BSTGetData(bst_iter_ty iter)
 static bst_location_ty *BSTSearchLocationIMP(bst_ty *bst, void *data)
 {
 	/*
-	Loop through the tree nodes from the root (bst->stub->left) using a runner:
+	Loop through the tree nodes from the (bst->stub) using a runner:
 		
-		runner = bst->stub->left;
-
+		runner = bst->stub;
+	
 		bst_location_ty found_location;
 		
-		while runner and runner's data isn't equal:
-
-			parent = runner
+		dir = LEFT		
+				
+		while runner->child[dir] isn't null and child[dir]->data isn't equal to param data:
+					
+			runner = runner->child[dir]
 			
-			runner = move left or right based on runner's data compared with the received data.
+			dir = the direction we will move, based on cmp_func result.
 			
-			dir = the direction we moved.
-			
-		assign last saved parent to found_location->parent
-		assign last saved dir to found_location->direction
+		assign runner to found_location->parent
+		assign dir to found_location->direction
 		
 		return found_location.
 	*/
@@ -338,10 +343,10 @@ bst_iter_ty BSTFind(bst_ty *bst, void *to_find)
 		
 		found_location = BSTSearchLocationIMP(bst, to_find);
 		
-		if (found_location data is equal to 'to_find'):
+		if (found_location's child data is null):
 			set found_location as BST END;
 		
-		return found_location;
+		return found_location's child;
 	*/
 }
 /******************************************************************************/
@@ -354,11 +359,11 @@ int BSTForEach(bst_iter_ty from_iter, bst_iter_ty to_iter,
 		
 		assert : from_iter->node, to_iter->node, action_func;
 		
-		status = 1
+		status = 0
 		
-		while (!BSTIterIsEqual(from_iter, to_iter) && status)
+		while (!BSTIterIsEqual(from_iter, to_iter) && !status)
 		{
-			execute action_func on each node with the given param.
+			status = execute action_func on each node with the given param.
 			move to next node using BSTIterNext.
 		}
 

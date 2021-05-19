@@ -45,14 +45,9 @@ int BSTIsEmpty(const bst_ty *bst);
 /* 	Complexity O(log (n)) - n is tree size 					*/
 bst_iter_ty BSTInsert(bst_ty *bst, void *data);
 
-/* 	Complexity O(log (n)) - n is tree size 					*/
-/* PHASE II */
-void BSTRemove(bst_ty *bst, void *data);
-
 /* 	Returns iterator to next element 						*/
 /* 	Undefined behavior if to_remove is iterator END 		*/
 /* 	Complexity O(log (n)) - n is tree size 					*/
-/* 	PHASE II 												*/
 bst_iter_ty BSTRemoveIter(bst_iter_ty to_remove);
 
 /* 	Complexity O(log (n)) - n is tree size 					*/
