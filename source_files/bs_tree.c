@@ -155,20 +155,19 @@ size_t BSTSize(const bst_ty *bst)
 	BSTForEach(minimum_key, end_of_tree, NodesCounterIMP, &counter);
 		 									 
 	return (counter);
-	
 }
 /******************************************************************************/
 int BSTIsEmpty(const bst_ty *bst)
 {
 	assert(bst);
-		
-	return (bst->stub->left == NULL);
 	
+	return (NULL == bst->stub->left); /* checks if the root node exists	*/
 }
 /******************************************************************************/
 static bst_node_ty *CreateNodeIMP(void *data)
 {
-/*
+	assert(data); /*	NULL data isn't accepted in this BST	*/
+	
     /*	creates a new node with the received data				*/
     /* 	allocates memory, checks for allocation errors			*/
     /*	set data as data, right, left and parent ptrs as null	*/
