@@ -373,10 +373,7 @@ bst_iter_ty BSTFind(bst_ty *bst, void *to_find)
 	/*
 		assert
 		
-		ret_node = BSTSearchLocation(bst, to_find);
-		
-		if (ret node is null which means not match)
-			ret_node = bst->stub;
+		received_location = BSTSearchLocation(bst, to_find);
 			
 		return ret_node;
 	*/
