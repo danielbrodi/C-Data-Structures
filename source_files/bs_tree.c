@@ -36,6 +36,15 @@ struct bst_node
 	void *data;					/*	data which is stored in the node	*/
 };
 
+/*	return type for potential location of a node						*/
+typedef struct bst_location
+{
+	bst_node_ty *parent;		/*	parent node of the found location	*/
+	int direction;				/*	-1 if this is a right child,
+								 *	1 if this is a right child,
+								 *	0 if equals to a given data.		*/
+} bst_location_ty;
+
 /**************************** Forward Declarations ****************************/
 /*	creates a new node with the received data	*/
 static bst_node_ty *CreateNode(void *data);
@@ -67,13 +76,9 @@ bst_ty *BSTCreate(Cmp_Func_ty sorting_func, const void *param)
 		
 		allocate memory for bst's handler struct and return null if any
 		allocation errors.
-		
-		create an empty node that will be the end dummy node of the tree,
-		check for any memory allocation errors and abort the bst creation
-		if any.
-		Initialize its data, right and left struct members as DEAD_MEM.
-		
-		assign the created node to the stub member of the bst struct handler.
+	
+		Initialize stub's data, right and up struct members as DEAD_MEM.
+		Initialize stub's left child as null.
 		
 		set the received `compare_func` as the comparing func of the tree.
 		
@@ -194,6 +199,8 @@ bst_iter_ty BSTRemoveIter(bst_iter_ty to_remove)
 					Copy successor's data to to_remove->data
 					make successor's parent to point to successor's right subtree.
 					
+					if successor has right child - change its parent to the parent of the successor.		
+					
 	*/
 }
 /******************************************************************************/
@@ -271,7 +278,7 @@ bst_iter_ty BSTIterPrev(bst_iter_ty iter)
 				
 			parent = node->up	
 			
-			while parent != DEAD_MEM && node == parent->left
+			while parent->right != DEAD_MEM && node == parent->left
 			{
 				node = parent
 				parent = parent->up
@@ -310,7 +317,7 @@ bst_iter_ty BSTIterNext(bst_iter_ty iter)
 				
 			parent = node->up	
 			
-			while parent != DEAD_MEM && node == parent->right
+			while parent->right != DEAD_MEM && node == parent->right
 			{
 				node = parent
 				parent = parent->up
@@ -341,34 +348,23 @@ void *BSTGetData(bst_iter_ty iter)
 	*/
 }
 /******************************************************************************/
-static bst_iter_ty *BSTSearchLocation(bst_ty *bst, void *data)
+static bst_location_ty *BSTSearchLocation(bst_ty *bst, void *data)
 {
 	/*
 	Loop through the tree nodes from the root (bst->stub->left) using a runner:
 		
 		runner = bst->stub->left;
-		is_found = 0;
 
-		while (!is_found):
+		bst_location_ty found_location;
+		
+		while (runner != null && runner->data not equal to data):
 
-			#option1:
-			if data > runner->data: // check using bst->sorting_func > 0:
-
-				if runner has right child, move to it and loop again.
-
-				else: break
-
-			#option2:
-			else if data < runner->data:	
-				
-					if: runner has left child, move to it and loop again.
-
-					else: break;
-					
-			#option3:	
-			else: is_found = 1;
+			parent = runner->up;
 			
-		return iter to runner;
+			runner = IsLeftChild(runner->data, data) ? move left : move right;
+			
+		found_location->parent = parent;
+		found_location->direction = cmp_func(parent->data, data);
 	*/
 }
 
@@ -379,7 +375,7 @@ bst_iter_ty BSTFind(bst_ty *bst, void *to_find)
 		
 		ret_node = BSTSearchLocation(bst, to_find);
 		
-		if (ret_node->data !equals to_find)
+		if (ret node is null which means not match)
 			ret_node = bst->stub;
 			
 		return ret_node;
