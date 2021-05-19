@@ -166,13 +166,23 @@ int BSTIsEmpty(const bst_ty *bst)
 /******************************************************************************/
 static bst_node_ty *CreateNodeIMP(void *data)
 {
+	bst_node_ty *new_node - NULL;
+	
 	assert(data); /*	NULL data isn't accepted in this BST	*/
 	
-    /*	creates a new node with the received data				*/
+	/*	creates a new node with the received data				*/
     /* 	allocates memory, checks for allocation errors			*/
-    /*	set data as data, right, left and parent ptrs as null	*/
-    /*	return created node										*/
-
+	new_node = (bst_node_ty *)malloc(sizeof(bst_node_ty));
+	
+	if (new_node)
+	{
+		/*	set data as data 									*/
+		/* 	set right, left and parent pointers as null			*/
+		new_node->data = data;
+		new_node->children = new_node->parent = NULL;
+    }
+    
+    return (new_node);
 }
 
 bst_iter_ty BSTInsert(bst_ty *bst, void *data)
