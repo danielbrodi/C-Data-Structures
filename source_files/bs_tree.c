@@ -18,12 +18,16 @@
 /******************************* Macros & enums *******************************/
 
 #define DEAD_MEM(type) ((type)0xdeadbeef)
+#define UNUSED(x) (void)(x)
 
 /*	from which direction the child node connected to its parent node	*/
-enum sides
+/*	status indication of a finished operation							*/
+enum
 {
 	LEFT = 0,
-	RIGHT = 1
+	RIGHT = 1,
+	SUCCESS = 0,
+	FAILURE = 1
 };
 
 /***************************** Structs Definition *****************************/
@@ -111,44 +115,54 @@ bst_ty *BSTCreate(Cmp_Func_ty sorting_func, const void *param)
 /******************************************************************************/
 void BSTDestroy(bst_ty *bst)
 {
-
-		assert bst
-		
-		while node != BST END:
-			node = Remove(node);
-		
-		free bst end & bst
+	
+	assert(bst);
+	
+	/*	while node != BST END:		*/
+	/*		node = Remove(node);	*/
+	
+	while()
+	
+	/*		free bst end & bst		*/
 	
 }
 /******************************************************************************/
 static int NodesCounterIMP(void *data, void *counter)
 {
-/*	assert						*/
-/* unused data					*/
-/*	*(size_t*)counter += 1;		*/
+	assert(counter);
 	
-	return 0;
+	UNUSED(data);
+	
+	++(*(size_t *)counter);
+	
+	return (SUCCESS);
 }
-
+/******************************************************************************/
 size_t BSTSize(const bst_ty *bst)
 {
+	bst_iter_ty minimum_key = NULL;
+	bst_iter_ty end_of_tree = NULL;
+	
+	assert(bst);
+		
+	size_t counter = 0;
 
-		assert bst.
-		
-		size_t counter;
-		
-		use BSTForEach and loop all over the tree with the counter.
-		
-		return count.
+	/*	use BSTForEach and loop all over the tree with the counter.		*/
+	
+	minimum_key = BSTIterBegin(bst);
+	end_of_tree = BSTIterEnd(bst);
+	
+	BSTForEach(minimum_key, end_of_tree, NodesCounterIMP, &counter);
+		 									 
+	return (counter);
 	
 }
 /******************************************************************************/
 int BSTIsEmpty(const bst_ty *bst)
 {
-
-		assert bst.
+	assert(bst);
 		
-		return value of (bst->stub->left == NULL). //does root exist?
+	return (bst->stub->left == NULL);
 	
 }
 /******************************************************************************/
