@@ -3,7 +3,7 @@
 * Author:			Daniel Brodsky				 		  												  								
 * Date:				15/05/2021
 * Code Reviewer:	Rostik						   								
-* Version:			1.7			   								
+* Version:			2.0		   								
 * Description:		Binary Search Tree iterative implementation Pseudocode. 
 \******************************************************************************/
 
@@ -40,9 +40,8 @@ struct bst
 /*	handler struct of each node in a binary search tree					*/
 struct bst_node
 {
-	bst_node_ty *up;			/*	parent node							*/
-	bst_node_ty *right;			/*	right child node					*/
-	bst_node_ty *left;			/*	left child node 					*/
+	bst_node_ty *parent;		/*	parent node							*/
+	bst_node_ty children[0,1];	/*	left and right child nodes			*/
 	void *data;					/*	data which is stored in the node	*/
 };
 
@@ -56,19 +55,19 @@ typedef struct bst_location
 
 /**************************** Forward Declarations ****************************/
 /*	creates a new node with the received data	*/
-static bst_node_ty *CreateNode(void *data);
+static bst_node_ty *CreateNodeIMP(void *data);
 
 /*	loop down from a node to find the leftmost or the rightmost leaf	*/
 static bst_node_ty *GetMaxMinIMP(bst_node_ty *node, int side)
 
 
-bst_iter_ty PrevNextImp(bst_iter_ty iter, int side);
+static bst_iter_ty PrevNextImp(bst_iter_ty iter, int side);
 
 /* 	searches for the right location for a node with a key
 	that equals to a given data. 				*/
-static bst_location_ty *BSTSearchLocation(bst_ty *bst, void *data);
+static bst_location_ty *BSTSearchLocationIMP(bst_ty *bst, void *data);
 
-static int NodesCounter(void *counter, void *param);
+static int NodesCounterIMP(void *counter, void *param);
 /*************************** Functions  Pseudocodes ***************************/
 
 bst_ty *BSTCreate(Cmp_Func_ty sorting_func, const void *param)
@@ -80,7 +79,7 @@ bst_ty *BSTCreate(Cmp_Func_ty sorting_func, const void *param)
 		allocate memory for bst's handler struct and return null if any
 		allocation errors.
 	
-		Initialize stub's data, right and up struct members as DEAD_MEM.
+		Initialize stub's data, right child and parent struct members as DEAD_MEM.
 		Initialize stub's left child as null.
 		
 		set the received `sorting_func` as the comparing func of the tree.
@@ -102,7 +101,7 @@ void BSTDestroy(bst_ty *bst)
 	*/
 }
 /******************************************************************************/
-static int NodesCounter(void *data, void *counter)
+static int NodesCounterIMP(void *data, void *counter)
 {
 /*	assert						*/
 /* unused data					*/
@@ -124,8 +123,6 @@ size_t BSTSize(const bst_ty *bst)
 	*/
 }
 /******************************************************************************/
-
-
 int BSTIsEmpty(const bst_ty *bst)
 {
 	/*
@@ -135,16 +132,7 @@ int BSTIsEmpty(const bst_ty *bst)
 	*/
 }
 /******************************************************************************/
-static int IsLeftChild(bst, bst_node_ty parent, bst_node_ty child)
-{
-
-/*	assert*/
-
-/*	return (parent data > child data)	*/
-	
-}
-
-static bst_node_ty *CreateNode(void *data)
+static bst_node_ty *CreateNodeIMP(void *data)
 {
 /*
     /*	creates a new node with the received data		*/
@@ -154,14 +142,12 @@ static bst_node_ty *CreateNode(void *data)
 */
 }
 
-
-
 bst_iter_ty BSTInsert(bst_ty *bst, void *data)
 {
 	/*
 		assert both bst and data (NULL data isn't accepted in this BST).
 		
-		new_node = CreateNode(data);
+		new_node = CreateNodeIMP(data);
 		
 		case 1: if error while creating node:
 			return BST END
@@ -172,7 +158,7 @@ bst_iter_ty BSTInsert(bst_ty *bst, void *data)
 			return new_node.
 			
 		case 3:	
-		found_location = BSTSearchLocation(bst, data); //find potential parent
+		found_location = BSTSearchLocationIMP(bst, data); //find potential parent
 		
 		assert (found_location data is equal to received data); 
 		
@@ -245,7 +231,7 @@ bst_iter_ty BSTIterEnd(const bst_ty *bst)
 	*/
 }
 /******************************************************************************/
-bst_iter_ty PrevNextImp(bst_iter_ty iter, int side)
+static bst_iter_ty PrevNextImp(bst_iter_ty iter, int side)
 {
 	/*
 		assert iter->node
@@ -273,7 +259,7 @@ bst_iter_ty PrevNextImp(bst_iter_ty iter, int side)
 			while parent->right != DEAD_MEM && node == parent->child[side]
 			{
 				node = parent
-				parent = parent->up
+				parent = parent->parent
 			}
 			
 			return parent
@@ -321,7 +307,7 @@ void *BSTGetData(bst_iter_ty iter)
 	*/
 }
 /******************************************************************************/
-static bst_location_ty *BSTSearchLocation(bst_ty *bst, void *data)
+static bst_location_ty *BSTSearchLocationIMP(bst_ty *bst, void *data)
 {
 	/*
 	Loop through the tree nodes from the root (bst->stub->left) using a runner:
@@ -350,7 +336,7 @@ bst_iter_ty BSTFind(bst_ty *bst, void *to_find)
 	/*
 		assert
 		
-		found_location = BSTSearchLocation(bst, to_find);
+		found_location = BSTSearchLocationIMP(bst, to_find);
 		
 		if (found_location data is equal to 'to_find'):
 			set found_location as BST END;
