@@ -500,8 +500,6 @@ static bst_iter_ty NodeToIterIMP(bst_node_ty *node)
 {
 	bst_iter_ty new_iter = {0};
 	
-	assert(node);
-	
 	new_iter.node = node;
 	
 	return (new_iter);
