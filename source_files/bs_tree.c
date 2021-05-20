@@ -14,7 +14,7 @@
 #include <stddef.h>			/*	size_t, NULL	*/
 #include <stdlib.h>			/*	malloc, free	*/
 
-#include "include/bs_tree.h"
+#include "bs_tree.h"
 
 /******************************* Macros & enums *******************************/
 
@@ -22,11 +22,15 @@
 #define UNUSED(x) (void)(x)
 
 /*	from which direction the child node connected to its parent node	*/
-/*	status indication of a finished operation							*/
 enum
 {
 	LEFT = 0,
-	RIGHT = 1,
+	RIGHT = 1
+};
+
+/*	status indication of a finished operation							*/
+enum
+{
 	SUCCESS = 0
 };
 
@@ -68,7 +72,7 @@ typedef struct bst_location
 static bst_node_ty *CreateNodeIMP(void *data);
 
 /*	loop down from a node to find the leftmost or the rightmost node	*/
-static bst_node_ty *GetSideMostIMP(const bst_node_ty *node, int side);
+static bst_node_ty *GetSideMostIMP(bst_node_ty *node, int side);
 
 /* 	searches for the right location for a node with a key
 	that equals to a given data. 										*/
@@ -159,14 +163,16 @@ size_t BSTSize(const bst_ty *bst)
 	bst_iter_ty minimum_key = {0};
 	bst_iter_ty end_of_tree = {0};
 	
+	bst_ty *tree = (bst_ty *)bst; /* cheat and cast const to non-const	*/
+	
 	size_t counter = 0;
 	
 	assert(bst);
 		
 	/*	use BSTForEach and loop all over the tree with the counter.		*/
 	
-	minimum_key = BSTIterBegin(bst);
-	end_of_tree = BSTIterEnd(bst);
+	minimum_key = BSTIterBegin(tree);
+	end_of_tree = BSTIterEnd(tree);
 	
 	BSTForEach(minimum_key, end_of_tree, NodesCounterIMP, &counter);
 		 									 
@@ -314,9 +320,9 @@ bst_iter_ty BSTRemoveIter(bst_iter_ty to_remove)
 }
 /******************************************************************************/
 /*	loop down from a node to find the leftmost or the rightmost node	*/
-static bst_node_ty *GetSideMostIMP(const bst_node_ty *node, int side)
+static bst_node_ty *GetSideMostIMP(bst_node_ty *node, int side)
 {
-	const bst_node_ty *runner = NULL;
+	bst_node_ty *runner = NULL;
 	
 	assert(node);
 	assert(RIGHT == side || LEFT == side);
@@ -333,7 +339,7 @@ static bst_node_ty *GetSideMostIMP(const bst_node_ty *node, int side)
 	return (runner);
 }
 /******************************************************************************/
-bst_iter_ty BSTIterBegin(const bst_ty *bst)
+bst_iter_ty BSTIterBegin(bst_ty *bst)
 {
 	assert(bst);
 	
@@ -341,7 +347,7 @@ bst_iter_ty BSTIterBegin(const bst_ty *bst)
 	return (NodeToIterIMP(GetSideMostIMP(&bst->stub, LEFT)));	
 }
 /******************************************************************************/
-bst_iter_ty BSTIterEnd(const bst_ty *bst)
+bst_iter_ty BSTIterEnd(bst_ty *bst)
 {
 	assert(bst);
 	
@@ -351,7 +357,7 @@ bst_iter_ty BSTIterEnd(const bst_ty *bst)
 static bst_node_ty *PrevNextImp(bst_iter_ty iter, int side)
 {
 	bst_node_ty *ret = NULL;
-	bst_node_ty *node = (assert(iter->node), iter->node);
+	bst_node_ty *node = (assert(iter.node), iter.node);
 	
 	assert(RIGHT == side || LEFT == side);
 	
@@ -373,7 +379,7 @@ static bst_node_ty *PrevNextImp(bst_iter_ty iter, int side)
 		which means its the first key that is smaller or bigger 
 		than the received node. 									*/
 
-		while (node->parent->children[RIGHT] != DEAD_MEM &&
+		while (node->parent->children[RIGHT] != DEAD_MEM(bst_node_ty *) &&
 		 								node == node->parent->children[side])
 		{
 			node = node->parent;
@@ -386,32 +392,32 @@ static bst_node_ty *PrevNextImp(bst_iter_ty iter, int side)
 /******************************************************************************/
 bst_iter_ty BSTIterPrev(bst_iter_ty iter)
 {
-	assert(iter->node);
-	/* TODO assert somehow that iter->node doesn't point to begin	*/
+	assert(iter.node);
 	
 	return (NodeToIterIMP(PrevNextImp(iter, LEFT)));
 }
 /******************************************************************************/
 bst_iter_ty BSTIterNext(bst_iter_ty iter)
 {
-	assert(iter->node);
-	assert(iter->node->children[RIGHT] != DEAD_MEM) /* check iter != BST END */
+	assert(iter.node);
+	/* check iter != BST END */
+	assert(iter.node->children[RIGHT] != DEAD_MEM(bst_node_ty *));
 	
 	return (NodeToIterIMP(PrevNextImp(iter, RIGHT)));
 }
 /******************************************************************************/
 int BSTIterIsEqual(bst_iter_ty iter1, bst_iter_ty iter2)
 {
-	assert (iter1->node && iter2->node);
+	assert (iter1.node && iter2.node);
 		
-	return (iter1->node == iter2->node);
+	return (iter1.node == iter2.node);
 }
 /******************************************************************************/
 void *BSTGetData(bst_iter_ty iter)
 {
-	assert(iter->node);
+	assert(iter.node);
 	
-	return (iter->node->data);	
+	return (iter.node->data);	
 }
 /******************************************************************************/
 static bst_location_ty BSTSearchLocationIMP(bst_ty *bst, void *data)
@@ -425,13 +431,13 @@ static bst_location_ty BSTSearchLocationIMP(bst_ty *bst, void *data)
 	
 	assert(bst && data);
 		
-	runner = bst->stub;	
+	runner = &bst->stub;	
 			
 	while (runner->children[dir] &&
-						bst->compare_func(data, runner->children[dir]->data))
+						bst->compare_func(data, runner->children[dir]->data, 0))
 	{			
 		runner = runner->children[dir];
-		dir = bst->compare_func(data, runner->data);
+		dir = bst->compare_func(data, runner->data, 0);
 	}
 		
 	found_location.parent = runner;
@@ -450,11 +456,11 @@ bst_iter_ty BSTFind(bst_ty *bst, void *to_find)
 		
 	potential_location = BSTSearchLocationIMP(bst, to_find);
 	
-	found_location = NodeToIterIMP(potential_location->parent->
-									children[potential_location->direction]);
-	if (!found_location)
+	found_location = NodeToIterIMP(potential_location.parent->
+									children[potential_location.direction]);
+	if (!found_location.node)
 	{
-		found_location = NodeToIterIMP(bst->stub);
+		found_location = NodeToIterIMP(&bst->stub);
 	}	
 	
 	return (found_location);

@@ -51,23 +51,23 @@ bst_iter_ty BSTInsert(bst_ty *bst, void *data);
 bst_iter_ty BSTRemoveIter(bst_iter_ty to_remove);
 
 /* 	Complexity O(log (n)) - n is tree size 					*/
-bst_iter_ty BSTIterBegin(const bst_ty *bst);
+bst_iter_ty BSTIterBegin(bst_ty *bst);
 
 /* 	Complexity O(1) 										*/
-bst_iter_ty BSTIterEnd(const bst_ty *bst);
+bst_iter_ty BSTIterEnd(bst_ty *bst);
 
 /* 	Undefined behavior if iter is BEGIN 					*/
 /* 	Complexity O(log (n)) - n is tree size 					*/
 bst_iter_ty BSTIterPrev(bst_iter_ty iter);
 
-/* 	Undefined behavior if iter is End 						*/
+/* 	Undefined behavior if iter is END 						*/
 /* 	Complexity O(log (n)) - n is tree size  				*/
 bst_iter_ty BSTIterNext(bst_iter_ty iter);
 
 /* 	Complexity O(1) 										*/
 int BSTIterIsEqual(bst_iter_ty iter1, bst_iter_ty iter2);
 
-/* 	Undefined behavior if iter is End 						*/
+/* 	Undefined behavior if iter is END 						*/
 /* 	Complexity O(1) 										*/
 void *BSTGetData(bst_iter_ty iter);
 
