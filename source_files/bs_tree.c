@@ -394,19 +394,22 @@ bst_iter_ty BSTFind(bst_ty *bst, void *to_find)
 int BSTForEach(bst_iter_ty from_iter, bst_iter_ty to_iter, 
 									Action_Func_ty action_func, void *param)
 {
+	bst_iter_ty runner = 0;
+	int status = SUCCESS;
+	
+	assert(from_iter->node);
+	assert(to_iter->node);
+	assert(action_func);
 
-		
-		assert : from_iter->node, to_iter->node, action_func;
-		
-		status = 0
-		
-		while (!BSTIterIsEqual(from_iter, to_iter) && !status)
-		{
-			status = execute action_func on each node with the given param.
-			move to next node using BSTIterNext.
-		}
+	runner = from_iter;
+	
+	while (!BSTIterIsEqual(runner, to_iter) && !status)
+	{
+		status = action_func(runner->node->data, param);
+		runner = BSTIterNext(runner);
+	}
 
-		return (status); // SUCCESS			
+	return (status); // SUCCESS			
 }
 /******************************************************************************/
 static bst_node_ty *IterToNodeIMP(bst_iter_ty iter)
