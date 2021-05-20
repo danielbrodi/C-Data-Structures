@@ -85,10 +85,10 @@ int BSTForEach(bst_iter_ty from_iter, bst_iter_ty to_iter,
 /*	BST's iterator definition								*/
 typedef struct bst_node bst_node_ty;
 
-typedef struct bst_iter
+struct bst_iter
 {
 	bst_node_ty *node;
-	DEBUG_ONLY(size_t version;)
-} bst_iter_ty;
+/*	DEBUG_ONLY(size_t version;)*/
+};
 
 #endif	/* __BS_TREE_H__ */

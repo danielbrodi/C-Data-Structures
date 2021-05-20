@@ -12,8 +12,9 @@
 
 #include <assert.h>			/*	assert			*/
 #include <stddef.h>			/*	size_t, NULL	*/
+#include <stdlib.h>			/*	malloc, free	*/
 
-#include "bs_tree.h"
+#include "../include/bs_tree.h"
 
 /******************************* Macros & enums *******************************/
 
@@ -31,6 +32,15 @@ enum
 
 /***************************** Structs Definition *****************************/
 
+/*	handler struct of each node in a binary search tree					*/
+struct bst_node
+{
+	bst_node_ty *parent;		/*	parent node							*/
+	bst_node_ty *children[2];	/*	left and right child nodes	
+								 *	left = 0, right = 1					*/
+	void *data;					/*	data which is stored in the node	*/	
+};
+
 /*	handler struct of a binary search tree								*/
 struct bst
 {
@@ -41,19 +51,10 @@ struct bst
 								 *	its left child node is the
 								 *	root of the tree					*/
 								 
-	void *param;				/*	param which is given by the user	
+	const void *param;				/*	param which is given by the user	*/
 };
 
-/*	handler struct of each node in a binary search tree					*/
-struct bst_node
-{
-	bst_node_ty *parent;		/*	parent node							*/
-	bst_node_ty children[2];	/*	left and right child nodes	
-								 *	left = 0, right = 1					*/
-	void *data;					/*	data which is stored in the node	
-};
-
-/*	return type for potential location of a node						*/
+/*	return type for a potential location of a node						*/
 typedef struct bst_location
 {
 	bst_node_ty *parent;		/*	parent node of the found location	*/
@@ -67,7 +68,7 @@ typedef struct bst_location
 static bst_node_ty *CreateNodeIMP(void *data);
 
 /*	loop down from a node to find the leftmost or the rightmost node	*/
-static bst_node_ty *GetSideMostIMP(bst_node_ty *node, int side)
+static bst_node_ty *GetSideMostIMP(const bst_node_ty *node, int side);
 
 /* 	searches for the right location for a node with a key
 	that equals to a given data. 										*/
@@ -89,7 +90,6 @@ static int NodesCounterIMP(void *counter, void *param);
 bst_ty *BSTCreate(Cmp_Func_ty sorting_func, const void *param)
 {
 	bst_ty *new_bst = NULL;
-	bst_node_ty *stub = NULL;
 	
 	/*	assure that `sorting_func` isn't null because
 		a bst without a sorting	definition is meaningless.					*/
@@ -105,9 +105,8 @@ bst_ty *BSTCreate(Cmp_Func_ty sorting_func, const void *param)
 	
 	/*	Initialize bst's stub data, right child and parent as DEAD_MEM.		*/
 	/*	Initialize stub's left child pointer as null.						*/
-	stub = new_bst->stub;
-	stub->data = stub->children[RIGHT] = stub->parent = DEAD_MEM(bst_node_ty *);
-	stub->children[LEFT] = NULL;
+	new_bst->stub.data = new_bst->stub.children[RIGHT] = new_bst->stub.parent = DEAD_MEM(bst_node_ty *);
+	new_bst->stub.children[LEFT] = NULL;
 	
 	/*	set the received `sorting_func` as the comparing func of the tree.	*/
 	new_bst->compare_func = sorting_func;
@@ -130,12 +129,12 @@ void BSTDestroy(bst_ty *bst)
 	tree_runner = BSTIterBegin(bst);
 	end_of_tree = BSTIterEnd(bst);
 	
-	while (tree_runner != end_of_tree)
+	while (tree_runner.node != end_of_tree.node)
 	{
 		tree_runner = BSTRemoveIter(tree_runner);
 	}
 	
-	bst->stub = NULL;
+	/* bst->stub should be also NULL somehow TODO	*/
 	bst->compare_func = NULL;
 	bst->param = NULL;
 	
@@ -156,13 +155,13 @@ static int NodesCounterIMP(void *data, void *counter)
 /******************************************************************************/
 size_t BSTSize(const bst_ty *bst)
 {
-	bst_iter_ty minimum_key = NULL;
-	bst_iter_ty end_of_tree = NULL;
+	bst_iter_ty minimum_key = {0};
+	bst_iter_ty end_of_tree = {0};
+	
+	size_t counter = 0;
 	
 	assert(bst);
 		
-	size_t counter = 0;
-
 	/*	use BSTForEach and loop all over the tree with the counter.		*/
 	
 	minimum_key = BSTIterBegin(bst);
@@ -177,12 +176,13 @@ int BSTIsEmpty(const bst_ty *bst)
 {
 	assert(bst);
 	
-	return (NULL == bst->stub->left); /* checks if the root node exists	*/
+	/* checks if the root node exists									*/
+	return (bst->stub.children[LEFT] == NULL);
 }
 /******************************************************************************/
 static bst_node_ty *CreateNodeIMP(void *data)
 {
-	bst_node_ty *new_node - NULL;
+	bst_node_ty *new_node = NULL;
 	
 	assert(data); /*	NULL data isn't accepted in this BST			*/
 	
@@ -195,7 +195,8 @@ static bst_node_ty *CreateNodeIMP(void *data)
 		/*	set data as data 											*/
 		/* 	set children and parent pointers as null					*/
 		new_node->data = data;
-		new_node->children = new_node->parent = NULL;
+		new_node->children[LEFT] = new_node->children[RIGHT] = NULL;
+		new_node->parent = NULL;
     }
     
     return (new_node);
@@ -204,7 +205,7 @@ static bst_node_ty *CreateNodeIMP(void *data)
 bst_iter_ty BSTInsert(bst_ty *bst, void *data)
 {
 		bst_node_ty *new_node = NULL;
-		bst_location_ty found_location = NULL;
+		bst_location_ty found_location = {0};
 		
 		assert(bst);
 		assert(data); /*	NULL data isn't accepted in this BST		*/
@@ -214,20 +215,20 @@ bst_iter_ty BSTInsert(bst_ty *bst, void *data)
 		/*	case 1: if any error occured while creating the node 		*/
 		if (!new_node)
 		{
-			return (bst->stub);
+			return (NodeToIterIMP(&bst->stub));
 		}
 			
 		/* case 2:	find a potential parent for the created node 		*/
 		found_location = BSTSearchLocationIMP(bst, data); 
 		
 		/* check if data with the same key was found in the tree		*/
-		assert (!(found_location->parent->children[found_location->direction])); 
+		assert (!(found_location.parent->children[found_location.direction])); 
 		
-		/*	assign new_node's parent as found_location->parent			*/
-		new_node->parent = found_location->parent;
+		/*	assign new_node's parent as found_location.parent			*/
+		new_node->parent = found_location.parent;
 		
 		/*	assign the new created node in the found location			*/
-		found_location->parent->children[found_location->direction] = new_node;
+		found_location.parent->children[found_location.direction] = new_node;
 												
 		return (NodeToIterIMP(new_node));
 }
@@ -239,17 +240,17 @@ bst_iter_ty BSTRemoveIter(bst_iter_ty to_remove)
 	
 	bst_iter_ty successor = {0};
 	
-	int	child_side = -1;
+	int	child_side = -1, succ_side = -1;
 	
-	assert(to_remove->node);
+	assert(to_remove.node);
 	/*	check if to_remove is not end of the tree							*/
-	assert(to_remove->node->data != DEAD_MEM); 
+	assert(to_remove.node->data != DEAD_MEM(void *)); 
 	
 	node = IterToNodeIMP(to_remove);
 	
 	/*	find the successor of to_remove										*/
 	successor = BSTIterNext(to_remove);
-	succ_node = successor->node;
+	succ_node = successor.node;
 	
 	/* determine the sides of node & succ as child nodes of their parents	*/
 	child_side = node->parent->children[RIGHT] == node ? RIGHT : LEFT;
@@ -289,7 +290,7 @@ bst_iter_ty BSTRemoveIter(bst_iter_ty to_remove)
 	/*	#case3 - to_remove has 2 subtrees:									*/
 	else
 	{
-		/*	Copy successor's data to to_remove->data*/
+		/*	Copy successor's data to to_remove.data*/
 		node->data = succ_node->data;
 		
 		/*	make successor's parent to point to successor's right subtree	*/
@@ -312,19 +313,23 @@ bst_iter_ty BSTRemoveIter(bst_iter_ty to_remove)
 }
 /******************************************************************************/
 /*	loop down from a node to find the leftmost or the rightmost node	*/
-static bst_node_ty *GetSideMostIMP(bst_node_ty *node, int side)
+static bst_node_ty *GetSideMostIMP(const bst_node_ty *node, int side)
 {
+	const bst_node_ty *runner = NULL;
+	
 	assert(node);
 	assert(RIGHT == side || LEFT == side);
 	
+	runner = node;
+	
 	/*	while node's child on the received side exists:					*/
 	/*	go to that child.												*/
-	while (node->children[side])
+	while (runner->children[side])
 	{
-		node = node->children[side];
+		runner = runner->children[side];
 	}
 	
-	return (node);  
+	return (runner);
 }
 /******************************************************************************/
 bst_iter_ty BSTIterBegin(const bst_ty *bst)
@@ -332,14 +337,14 @@ bst_iter_ty BSTIterBegin(const bst_ty *bst)
 	assert(bst);
 	
 	/*	loop from the stub on the left sub-tree to find the minimum key	*/
-	return (NodeToIterIMP(GetSideMostIMP(bst->stub, LEFT)));	
+	return (NodeToIterIMP(GetSideMostIMP(&bst->stub, LEFT)));	
 }
 /******************************************************************************/
 bst_iter_ty BSTIterEnd(const bst_ty *bst)
 {
 	assert(bst);
 	
-	return (NodeToIterIMP(bst->stub));
+	return (NodeToIterIMP(&bst->stub));
 }
 /******************************************************************************/
 static bst_node_ty *PrevNextImp(bst_iter_ty iter, int side)
@@ -412,7 +417,7 @@ static bst_location_ty BSTSearchLocationIMP(bst_ty *bst, void *data)
 {
 	bst_node_ty *runner = NULL;
 	
-	bst_location_ty found_location = 0;
+	bst_location_ty found_location = {0};
 
 	int dir = LEFT;	/*	the runner starts at bst's stub which  
 					 *	has only a left subtree.					*/	
@@ -428,17 +433,17 @@ static bst_location_ty BSTSearchLocationIMP(bst_ty *bst, void *data)
 		dir = bst->compare_func(data, runner->data);
 	}
 		
-	found_location->parent = runner;
-	found_location->direction = dir;
+	found_location.parent = runner;
+	found_location.direction = dir;
 	
 	return (found_location);
 }
 /******************************************************************************/
 bst_iter_ty BSTFind(bst_ty *bst, void *to_find)
 {
-	bst_iter_ty found_location = 0;
+	bst_iter_ty found_location = {0};
 	
-	bst_location_ty potential_location = 0;
+	bst_location_ty potential_location = {0};
 	
 	assert(bst && to_find);
 		
@@ -457,18 +462,18 @@ bst_iter_ty BSTFind(bst_ty *bst, void *to_find)
 int BSTForEach(bst_iter_ty from_iter, bst_iter_ty to_iter, 
 									Action_Func_ty action_func, void *param)
 {
-	bst_iter_ty runner = 0;
+	bst_iter_ty runner = {0};
 	int status = SUCCESS;
 	
-	assert(from_iter->node);
-	assert(to_iter->node);
+	assert(from_iter.node);
+	assert(to_iter.node);
 	assert(action_func);
 
 	runner = from_iter;
 	
 	while (!BSTIterIsEqual(runner, to_iter) && !status)
 	{
-		status = action_func(runner->node->data, param);
+		status = action_func(runner.node->data, param);
 		runner = BSTIterNext(runner);
 	}
 
@@ -477,16 +482,18 @@ int BSTForEach(bst_iter_ty from_iter, bst_iter_ty to_iter,
 /******************************************************************************/
 static bst_node_ty *IterToNodeIMP(bst_iter_ty iter)
 {
-	assert(iter->node);
+	assert(iter.node);
 	
-	return (iter->node);
+	return (iter.node);
 }
 /******************************************************************************/
 static bst_iter_ty NodeToIterIMP(bst_node_ty *node)
 {
+	bst_iter_ty new_iter = {0};
+	
 	assert(node);
 	
-	bst_iter_ty new_iter = {node};
+	new_iter.node = node;
 	
 	return (new_iter);
 }
