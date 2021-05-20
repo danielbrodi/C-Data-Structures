@@ -4,7 +4,7 @@
 * Date:				15/05/2021
 * Code Reviewer:	Rostik
 * Pseudo Reviewer: 	Eran					   								
-* Version:			2.0		   								
+* Version:			2.1	   								
 * Description:		Binary Search Tree iterative implementation. 
 \******************************************************************************/
 
