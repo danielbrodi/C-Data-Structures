@@ -62,7 +62,7 @@ struct bst
 typedef struct bst_location
 {
 	bst_node_ty *parent;		/*	parent node of the found location	*/
-	int direction;				/*	0 if its the left child,
+	sides_ty direction;			/*	0 if its the left child,
 								 *	1 if its the right child			*/		
 } bst_location_ty;
 
@@ -426,8 +426,8 @@ static bst_location_ty BSTSearchLocationIMP(bst_ty *bst, void *data)
 	
 	bst_location_ty found_location = {0};
 
-	int dir = LEFT;	/*	the runner starts at bst's stub which  
-					 *	has only a left subtree.					*/	
+	sides_ty dir = LEFT;	/*	the runner starts at bst's stub which  
+					 		*	has only a left subtree.					*/	
 	
 	assert(bst && data);
 		
