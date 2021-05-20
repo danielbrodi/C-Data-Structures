@@ -41,11 +41,8 @@ int main()
 	int local_init = 3;
 	int local_not_init;
 	
-	void (*func_ptr)(char, void *);
+	void (*func_ptr)(char *, void *);
     func_ptr = PrintMemAddress;
-	
-	
-	
 	
 	printf("\n");
 	

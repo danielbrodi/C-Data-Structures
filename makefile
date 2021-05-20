@@ -1,59 +1,58 @@
-#PATHS
-SRCDIR=./source/
-TSTDIR=./test/
-OBJDIR=./obj/
-HDRDIR=./include/
-#vpaths
+#COMPILER
+CC=gcc
+CFLAGS=-I./include/ -L. -Wl,-rpath=. -Wall
+CORFLAGS=-I./include/ -c -ansi -pedantic-errors -Wall -Wextra -g
+COFLAGS=-I./include/ -Wall -Werror -fpic -c
+CSOFLAGS=-shared
+#vpath
 vpath %.h ./include/
 vpath %.c ./test/
 vpath %.c ./source/
 vpath %.o ./obj/
-vpath %.d ./obj/
-#COMPILER
-CC=gcc
-CFLAGS=-ansi -pedantic-errors -Wall -Wextra -fpic -g -I$(HDRDIR) # C flags
-LDFLAGS=-L./ -Wl,-rpath=./ # linking flags
-TARGET_LIB = libds.so  # target lib
-LDLIBS=-lds
-#FILES
-TESTS=$(wildcard ./test/*.c)
-CFILESWP=$(patsubst %_test.c,%.c,$(TESTS))
-SRCS=$(notdir $(CFILESWP))
-TARGETS=$(patsubst %.c,%,$(SRCS))
-SRCOBJS=$(SRCS:.c=.o)
-TSTOBJS=$(TESTS:.c=.o)
-HFILES=$(SRCS:.c=.h)
+#PATH
+SOURCE=./source/
+OUT=-o ./obj/$@
+TEST=./test/
+OBJPATH=./obj/
+#LISTS
+CFILESWP=$(wildcard ./source/*.c)
+TFILESWP=$(wildcard ./test/*.c)
+CFILES=$(notdir $(CFILESWP))
+TFILES=$(notdir $(TFILESWP))
+TOFILES=$(TFILES:.c=.o)
+OFILES=$(CFILES:.c=.o)
+OFILESWP=$(addprefix ./obj/,$(OFILES))
+NAMES=$(TOFILES:_test.o=)
+HFILES=$(CFILES:.c=.h)
+	
+	
+.PHONY: clean debug release all
 
-.PHONY: all clean
+debug: CSOFLAGS+=-g
+debug: libds.so
 
-# build shared objects
-all: ${TARGET_LIB} 
-# build executable (ELF) files with dubged shared object 
-test: $(TARGETS)
+release: CSOFLAGS+=-O2
+release: libds.so
 
-#CREATE EXECUTABLES
-$(TARGETS): $(TSTOBJS)
-	$(CC) $(CFLAGS) $(LDFLAGS) $(TSTDIR)$@_test.o -o $@ $(LDLIBS)
-	mv $(TSTDIR)$@_test.o $(OBJDIR)
+test: $(NAMES)
+
+all: libds.so $(NAMES)
 	
-#CREATE A SHARED LIBRARY
-$(TARGET_LIB): $(SRCOBJS) $(HFILES)
-	$(CC) -shared -o $@ $^
-	mv *.o $(OBJDIR)
+
+%: %_test.c libds.so
+	$(CC) $(CFLAGS) -o $@ $< -lds
 	
-$(SRCS:.c=.d):%.d:%.c %.h
-	$(CC) $(CFLAGS) -MM $< >$@
-	mv *.d $(OBJDIR)
+#SHARED LIBRARY
+libds.so: $(OFILES)
+	$(CC) $(CSOFLAGS) -o libds.so $(OFILES)
 	
-$(TESTS:.c=.d):%.d:%.c $(TARGETS).h
-	$(CC) $(CFLAGS) -MM $< >$@
-	
-#%.d:%.c
-#	$(CC) $(CFLAGS) -MM $< >$@
-	
--include $(SRCS:.c=.d)
+#OBJFILES
+%.o: %.c %.h
+	$(CC) $(COFLAGS) -o $@ $<
+
+
 
 #CLEAN
 clean:
-	rm -f $(OBJDIR)*.o $(OBJDIR)*.d
-	rm -f $(TARGETS) libds.so
+	rm -f *.o
+	rm -f $(NAMES) libds.so

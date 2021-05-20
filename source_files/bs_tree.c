@@ -236,7 +236,7 @@ bst_iter_ty BSTInsert(bst_ty *bst, void *data)
 		
 		/*	assign the new created node in the found location			*/
 		found_location.parent->children[found_location.direction] = new_node;
-												
+								
 		return (NodeToIterIMP(new_node));
 }
 /******************************************************************************/
@@ -361,6 +361,8 @@ static bst_node_ty *PrevNextImp(bst_iter_ty iter, sides_ty side)
 	
 	assert(RIGHT == side || LEFT == side);
 	
+	ret = iter.node->parent;
+	
 	/*	if node's child on the received side exists:				*/
 	if (node->children[side])
 	{
@@ -437,7 +439,7 @@ static bst_location_ty BSTSearchLocationIMP(bst_ty *bst, void *data)
 						bst->compare_func(data, runner->children[dir]->data, 0))
 	{			
 		runner = runner->children[dir];
-		dir = bst->compare_func(data, runner->data, 0);
+		dir = bst->compare_func(data, runner->data, 0) > 0;
 	}
 		
 	found_location.parent = runner;
