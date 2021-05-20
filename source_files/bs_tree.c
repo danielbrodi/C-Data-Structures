@@ -14,7 +14,7 @@
 #include <stddef.h>			/*	size_t, NULL	*/
 #include <stdlib.h>			/*	malloc, free	*/
 
-#include "../include/bs_tree.h"
+#include "include/bs_tree.h"
 
 /******************************* Macros & enums *******************************/
 
