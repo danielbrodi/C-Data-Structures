@@ -75,7 +75,7 @@ static bst_node_ty *GetSideMostIMP(bst_node_ty *node, int side)
 static bst_location_ty BSTSearchLocationIMP(bst_ty *bst, void *data);
 
 /*	searchs and returns the predecessor or the successor of a key		*/
-static bst_iter_ty PrevNextImp(bst_iter_ty iter, int side);
+static bst_node_ty *PrevNextImp(bst_iter_ty iter, int side);
 
 /*	creates and returns an iterator for a given node 					*/
 static bst_iter_ty NodeToIterIMP(bst_node_ty *node);
@@ -272,8 +272,8 @@ static bst_node_ty *GetSideMostIMP(bst_node_ty *node, int side)
 bst_iter_ty BSTIterBegin(const bst_ty *bst)
 {
 	assert(bst);
+	
 	/*	loop from the stub on the left sub-tree to find the minimum key	*/
-		
 	return (NodeToIterIMP(GetSideMostIMP(bst->stub, LEFT)));	
 }
 /******************************************************************************/
@@ -284,7 +284,7 @@ bst_iter_ty BSTIterEnd(const bst_ty *bst)
 	return (NodeToIterIMP(bst->stub));
 }
 /******************************************************************************/
-static bst_iter_ty PrevNextImp(bst_iter_ty iter, int side)
+static bst_node_ty *PrevNextImp(bst_iter_ty iter, int side)
 {
 
 		assert iter->node
@@ -319,23 +319,19 @@ static bst_iter_ty PrevNextImp(bst_iter_ty iter, int side)
 /******************************************************************************/
 bst_iter_ty BSTIterPrev(bst_iter_ty iter)
 {
-
-		assert iter->node
-		TODO assert its not begin
+	assert(iter->node);
+	/* TODO assert somehow that iter->node doesn't point to begin	*/
 	
-		return PrevNextImp(node, LEFT);
+		return (NodeToIterIMP(PrevNextImp(iter, LEFT)));
 	
 }
 /******************************************************************************/
 bst_iter_ty BSTIterNext(bst_iter_ty iter)
 {
-
-		assert(iter->node);
-		assert(deadbeef != iter->node->right) // check if iter != BST_END
-		
-		return PrevNextImp(node, RIGHT);
-			
+	assert(iter->node);
+	assert(iter->node->children[RIGHT] != DEAD_MEM) /* check iter != BST END */
 	
+	return (NodeToIterIMP(PrevNextImp(iter, RIGHT)));
 }
 /******************************************************************************/
 int BSTIterIsEqual(bst_iter_ty iter1, bst_iter_ty iter2)
