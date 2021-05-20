@@ -35,9 +35,8 @@ release: CSOFLAGS+=-O2
 release: libds.so
 
 test: $(NAMES)
-
+		
 all: libds.so $(NAMES)
-	
 
 %: %_test.c libds.so
 	$(CC) $(CFLAGS) -o $@ $< -lds
@@ -45,14 +44,13 @@ all: libds.so $(NAMES)
 #SHARED LIBRARY
 libds.so: $(OFILES)
 	$(CC) $(CSOFLAGS) -o libds.so $(OFILES)
+	mv *.o $(OBJPATH)
 	
 #OBJFILES
 %.o: %.c %.h
 	$(CC) $(COFLAGS) -o $@ $<
 
-
-
 #CLEAN
 clean:
-	rm -f *.o
+	rm -f *.o $(OBJPATH)*.o
 	rm -f $(NAMES) libds.so
