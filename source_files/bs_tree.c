@@ -439,7 +439,7 @@ static bst_location_ty BSTSearchLocationIMP(bst_ty *bst, void *data)
 						bst->compare_func(data, runner->children[dir]->data, 0))
 	{			
 		runner = runner->children[dir];
-		dir = bst->compare_func(data, runner->data, 0) > 0;
+		dir = bst->compare_func(runner->data, data, 0) > 0;
 	}
 		
 	found_location.parent = runner;

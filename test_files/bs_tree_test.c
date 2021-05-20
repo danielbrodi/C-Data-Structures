@@ -112,9 +112,7 @@ static void TestInserting(bst_ty *bst, bot_ty bots[], size_t size)
 		STATUS_TEST(BSTSize, bst, i+1, "Size")
 	}
 	STATUS_TEST(BSTSize, bst, size, "Size")
-	printf("CASE1");
 	STATUS_TEST(BSTIsEmpty, bst, 0, "IsEmpty")
-	printf("CASE2");
 	STATUS_TEST_2PARAM(BSTIterIsEqual, BSTIterBegin(bst), BSTIterEnd(bst), 0, "IsEqual, Begin, or End")
 	printf("\tExpect:\ta b c d e f g h i j\n");
 	printf("\tResult:\t");

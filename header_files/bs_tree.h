@@ -16,8 +16,8 @@ typedef struct bst_iter bst_iter_ty;
 
 /*	Compare Func returns:
  *	0 if data1 equals to data2
- *	Positive value if data1 belongs somewhere after data2
- *	Negative value if data2 belongs somewhere after data1	*/
+ *	Positive value if data2 belongs somewhere after data1
+ *	Negative value if data1 belongs somewhere after data2	*/
 typedef int (*Cmp_Func_ty)(const void *data1, const void *data2, 
 															const void *param);
 
