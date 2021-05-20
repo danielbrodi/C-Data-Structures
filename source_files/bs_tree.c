@@ -4,7 +4,7 @@
 * Date:				15/05/2021
 * Code Reviewer:	Rostik
 * Pseudo Reviewer: 	Eran					   								
-* Version:			2.1	   								
+* Version:			2.2   								
 * Description:		Binary Search Tree iterative implementation. 
 \******************************************************************************/
 
@@ -139,7 +139,7 @@ void BSTDestroy(bst_ty *bst)
 		tree_runner = BSTRemoveIter(tree_runner);
 	}
 	
-	/* bst->stub should be also NULL somehow TODO	*/
+	bst->stub.parent = bst->stub.data = bst->stub.children[LEFT] = NULL;
 	bst->compare_func = NULL;
 	bst->param = NULL;
 	
@@ -259,10 +259,9 @@ bst_iter_ty BSTRemoveIter(bst_iter_ty to_remove)
 	successor = BSTIterNext(to_remove);
 	succ_node = successor.node;
 	
-	/* determine the sides of node & succ as child nodes of their parents	*/
-	child_side = node->parent->children[RIGHT] == node ? RIGHT : LEFT;
-	succ_side = succ_node->parent->children[RIGHT] == succ_node ? RIGHT : LEFT;
-
+	/* determine the side of the node as a child node of its parent			*/
+	child_side = node->parent->children[LEFT] == node ? LEFT : RIGHT;
+	
 	/*	#case1 - if to_remove is a leaf (no subtrees):						*/
 	if (!node->children[LEFT] && !node->children[RIGHT])
 	{
@@ -271,6 +270,7 @@ bst_iter_ty BSTRemoveIter(bst_iter_ty to_remove)
 		
 		/*	free node of 'to_remove'										*/
 		free(node);
+		node = NULL;
 	}
 	
 	/*	#case2 - if only one child:											*/
@@ -292,11 +292,15 @@ bst_iter_ty BSTRemoveIter(bst_iter_ty to_remove)
 		
 		/*	free node of 'to_remove'										*/
 		free(node);
+		node = NULL;
 	}
 	
 	/*	#case3 - to_remove has 2 subtrees:									*/
 	else
 	{
+		/* 	determine the side of the successor as a child node				*/
+		succ_side = succ_node->parent->children[LEFT] == succ_node ? LEFT : RIGHT;
+		
 		/*	Copy successor's data to to_remove.data*/
 		node->data = succ_node->data;
 		
@@ -314,6 +318,7 @@ bst_iter_ty BSTRemoveIter(bst_iter_ty to_remove)
 		
 		/*	free successor's node											*/
 		free(succ_node);
+		succ_node = NULL;
 	}
 		
 	return (successor);
