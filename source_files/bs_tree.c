@@ -235,32 +235,81 @@ bst_iter_ty BSTInsert(bst_ty *bst, void *data)
 /******************************************************************************/
 bst_iter_ty BSTRemoveIter(bst_iter_ty to_remove)
 {
-
-		assert iter
-		assert to_remove->data != deadbeef
-		
-		ret = next of to_remove;
-		
-		#case1: if to_remove is a leaf (no subtrees):
-					set to_remove's parent child as null.
-					free to_remove		
-		
-		#case2: if only one child:
-					link to_remove parent to to_remove subtree.
-					free to_remove		
-						
-		#case3: to_remove has 2 subtrees:
-					Find successor of to_remove
-					Copy successor's data to to_remove->data
-					make successor's parent to point to successor's right subtree.
-					
-					if successor has a right child - change its parent to the parent of the successor.		
-					ret = to_remove;
-					free successor
-
-				
-		return ret;			
+	bst_node_ty *node;
+	bst_node_ty *succ_node;
 	
+	bst_iter_ty successor = 0;
+	
+	int	child_side = -1;
+	
+	assert(to_remove->node);
+	/*	check if to_remove is not end of the tree							*/
+	assert(to_remove->node->data != DEAD_MEM); 
+	
+	node = IterToNodeIMP(to_remove);
+	
+	/*	find the successor of to_remove										*/
+	successor = BSTIterNext(to_remove);
+	succ_node = successor->node;
+	
+	/* determine the sides of node & succ as child nodes of their parents	*/
+	child_side = node->parent->children[RIGHT] == node ? RIGHT : LEFT;
+	succ_side = succ_node->parent->children[RIGHT] == succ_node ? RIGHT : LEFT;
+
+	/*	#case1 - if to_remove is a leaf (no subtrees):						*/
+	if (!node->children[LEFT] && !node->children[RIGHT])
+	{
+		/*	set to_remove's parent child as null.							*/
+		node->parent->children[child_side] = NULL;
+		
+		/*	free node of 'to_remove'										*/
+		free(node);
+	}
+	
+	/*	#case2 - if only one child:											*/
+	else if (!node->children[LEFT] || !node->children[RIGHT])
+	{
+		/*	link to_remove's parent to to_remove right subtree				*/
+		if (node->children[RIGHT])
+		{
+			node->parent->children[child_side] = node->children[RIGHT];
+			node->children[RIGHT]->parent = node->parent;
+		}
+		
+		/*	link to_remove's parent to to_remove left subtree				*/
+		else
+		{
+			node->parent->children[child_side] = node->children[LEFT];
+			node->children[LEFT]->parent = node->parent;
+		}
+		
+		/*	free node of 'to_remove'										*/
+		free(node);
+	}
+	
+	/*	#case3 - to_remove has 2 subtrees:									*/
+	else
+	{
+		/*	Copy successor's data to to_remove->data*/
+		node->data = succ_node->data;
+		
+		/*	make successor's parent to point to successor's right subtree	*/
+		succ_node->parent->children[succ_side] = succ_node->children[RIGHT];
+		
+		/*	if successor has a right child -
+		 *	change its parent to the parent of the successor.				*/
+		 if (succ_node->children[RIGHT])
+		 {
+		 	succ_node->children[RIGHT]->parent = succ_node->parent;
+		 }
+		 
+		successor = to_remove;
+		
+		/*	free successor's node											*/
+		free(succ_node);
+	}
+		
+	return (successor);
 }
 /******************************************************************************/
 /*	loop down from a node to find the leftmost or the rightmost node	*/
