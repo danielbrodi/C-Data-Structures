@@ -423,7 +423,7 @@ static bst_location_ty BSTSearchLocationIMP(bst_ty *bst, void *data)
 		
 	runner = bst->stub;	
 			
-	while ((runner->children[dir]) && 0 != dir)
+	while (0 != dir && (runner->children[dir]))
 	{			
 		runner = runner->children[dir];
 		dir = bst->compare_func(data, runner->data);
