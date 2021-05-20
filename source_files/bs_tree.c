@@ -373,15 +373,22 @@ static bst_location_ty BSTSearchLocationIMP(bst_ty *bst, void *data)
 /******************************************************************************/
 bst_iter_ty BSTFind(bst_ty *bst, void *to_find)
 {
-
-		assert
+	bst_iter_ty found_location = 0;
+	
+	bst_location_ty potential_location = 0;
+	
+	assert(bst && to_find);
 		
-		found_location = BSTSearchLocationIMP(bst, to_find);
-		
-		if (found_location's child data is null):
-			set found_location as BST END;
-		
-		return found_location's child;
+	potential_location = BSTSearchLocationIMP(bst, to_find);
+	
+	found_location = NodeToIterIMP(potential_location->parent->
+									children[potential_location->direction]);
+	if (!found_location)
+	{
+		found_location = NodeToIterIMP(bst->stub);
+	}	
+	
+	return (found_location);
 }
 /******************************************************************************/
 int BSTForEach(bst_iter_ty from_iter, bst_iter_ty to_iter, 
