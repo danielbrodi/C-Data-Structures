@@ -8,7 +8,7 @@
 #include <stdio.h>
 
 #include "utils_testing.h"
-#include "utils.h"	/* status_ty */
+#include "utils_er.h"	/* status_ty */
 #include "bs_tree.h"
 
 /************** Macros and Structs ************/

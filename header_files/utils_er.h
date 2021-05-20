@@ -19,8 +19,8 @@
 #define ANSI_COLOR_GREEN   "\x1b[32m"
 #define ANSI_COLOR_CYAN    "\x1b[36m"
 #define ANSI_COLOR_RESET   "\x1b[0m"
-#define VOID_PTR_TO_INT(x) ((int)(long)(x))
-#define INT_TO_VOID_PTR(x) ((void *)(long)(x))
+#define VOID_PTR_TO_INTS(x) ((int)(long)(x))
+#define INT_TO_VOIDS_PTR(x) ((void *)(long)(x))
 #define LEN_OF_LOCAL_ARR(arr) (sizeof(arr)/sizeof(arr[0]))
 
 #define WRITE_PASSED (printf(GREEN "Passed.\n" RESET))
