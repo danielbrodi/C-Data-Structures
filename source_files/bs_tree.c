@@ -253,7 +253,7 @@ bst_iter_ty BSTRemoveIter(bst_iter_ty to_remove)
 	
 }
 /******************************************************************************/
-/*	loop down from a node to find the leftmost or the rightmost leaf	*/
+/*	loop down from a node to find the leftmost or the rightmost node	*/
 static bst_node_ty *GetSideMostIMP(bst_node_ty *node, int side)
 {
 	assert(node);
@@ -271,14 +271,10 @@ static bst_node_ty *GetSideMostIMP(bst_node_ty *node, int side)
 /******************************************************************************/
 bst_iter_ty BSTIterBegin(const bst_ty *bst)
 {
-
-		assert bst
+	assert(bst);
+	/*	loop from the stub on the left sub-tree to find the minimum key	*/
 		
-		//loop from the root only on the left sub-tree to find the minimum value
-		in the tree.
-		
-		return (GetSideMostIMP(tree stub, LEFT));
-	
+	return (NodeToIterIMP(GetSideMostIMP(bst->stub, LEFT)));	
 }
 /******************************************************************************/
 bst_iter_ty BSTIterEnd(const bst_ty *bst)
