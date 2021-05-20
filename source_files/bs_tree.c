@@ -51,7 +51,7 @@ struct bst
 								 *	its left child node is the
 								 *	root of the tree					*/
 								 
-	const void *param;				/*	param which is given by the user	*/
+	const void *param;			/*	param which is given by the user	*/
 };
 
 /*	return type for a potential location of a node						*/
@@ -105,7 +105,8 @@ bst_ty *BSTCreate(Cmp_Func_ty sorting_func, const void *param)
 	
 	/*	Initialize bst's stub data, right child and parent as DEAD_MEM.		*/
 	/*	Initialize stub's left child pointer as null.						*/
-	new_bst->stub.data = new_bst->stub.children[RIGHT] = new_bst->stub.parent = DEAD_MEM(bst_node_ty *);
+	new_bst->stub.data = new_bst->stub.children[RIGHT] = DEAD_MEM(bst_node_ty *);
+	new_bst->stub.parent = DEAD_MEM(bst_node_ty *);
 	new_bst->stub.children[LEFT] = NULL;
 	
 	/*	set the received `sorting_func` as the comparing func of the tree.	*/
