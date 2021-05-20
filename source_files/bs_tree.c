@@ -256,16 +256,19 @@ bst_iter_ty BSTRemoveIter(bst_iter_ty to_remove)
 /*	loop down from a node to find the leftmost or the rightmost leaf	*/
 static bst_node_ty *GetSideMostIMP(bst_node_ty *node, int side)
 {
-  
-	assert
+	assert(node);
+	assert(RIGHT == side || LEFT == side);
 	
-    	while node's child on the received side exists:
-    		go to that child.
-    		
-    return the last visited node.
-    
+	/*	while node's child on the received side exists:					*/
+	/*	go to that child.												*/
+	while (node->children[side])
+	{
+		node = node->children[side];
+	}
+	
+	return (node);  
 }
-
+/******************************************************************************/
 bst_iter_ty BSTIterBegin(const bst_ty *bst)
 {
 
