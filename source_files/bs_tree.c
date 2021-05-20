@@ -22,11 +22,11 @@
 #define UNUSED(x) (void)(x)
 
 /*	from which direction the child node connected to its parent node	*/
-enum
+typedef enum sides
 {
 	LEFT = 0,
 	RIGHT = 1
-};
+}sides_ty;
 
 /*	status indication of a finished operation							*/
 enum
@@ -72,14 +72,14 @@ typedef struct bst_location
 static bst_node_ty *CreateNodeIMP(void *data);
 
 /*	loop down from a node to find the leftmost or the rightmost node	*/
-static bst_node_ty *GetSideMostIMP(bst_node_ty *node, int side);
+static bst_node_ty *GetSideMostIMP(bst_node_ty *node, sides_ty side);
 
 /* 	searches for the right location for a node with a key
 	that equals to a given data. 										*/
 static bst_location_ty BSTSearchLocationIMP(bst_ty *bst, void *data);
 
 /*	searchs and returns the predecessor or the successor of a key		*/
-static bst_node_ty *PrevNextImp(bst_iter_ty iter, int side);
+static bst_node_ty *PrevNextImp(bst_iter_ty iter, sides_ty side);
 
 /*	creates and returns an iterator for a given node 					*/
 static bst_iter_ty NodeToIterIMP(bst_node_ty *node);
@@ -320,7 +320,7 @@ bst_iter_ty BSTRemoveIter(bst_iter_ty to_remove)
 }
 /******************************************************************************/
 /*	loop down from a node to find the leftmost or the rightmost node	*/
-static bst_node_ty *GetSideMostIMP(bst_node_ty *node, int side)
+static bst_node_ty *GetSideMostIMP(bst_node_ty *node, sides_ty side)
 {
 	bst_node_ty *runner = NULL;
 	
@@ -354,7 +354,7 @@ bst_iter_ty BSTIterEnd(bst_ty *bst)
 	return (NodeToIterIMP(&bst->stub));
 }
 /******************************************************************************/
-static bst_node_ty *PrevNextImp(bst_iter_ty iter, int side)
+static bst_node_ty *PrevNextImp(bst_iter_ty iter, sides_ty side)
 {
 	bst_node_ty *ret = NULL;
 	bst_node_ty *node = (assert(iter.node), iter.node);
