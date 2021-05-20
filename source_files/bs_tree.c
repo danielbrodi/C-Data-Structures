@@ -122,16 +122,26 @@ bst_ty *BSTCreate(Cmp_Func_ty sorting_func, const void *param)
 /******************************************************************************/
 void BSTDestroy(bst_ty *bst)
 {
+	bst_iter_ty tree_runner = 0;
+	
+	bst_iter_ty end_of_tree;
 	
 	assert(bst);
 	
-	/*	while node != BST END:		*/
-	/*		node = Remove(node);	*/
+	tree_runner = BSTIterBegin(bst);
+	end_of_tree = BSTIterEnd(bst);
 	
-	while()
+	while (tree_runner != end_of_tree)
+	{
+		tree_runner = BSTRemoveIter(tree_runner);
+	}
 	
-	/*		free bst end & bst		*/
+	bst->stub = NULL;
+	bst->compare_func = NULL;
+	bst->param = NULL;
 	
+	free(bst);
+	bst = NULL;
 }
 /******************************************************************************/
 static int NodesCounterIMP(void *data, void *counter)
@@ -322,7 +332,7 @@ bst_iter_ty BSTIterPrev(bst_iter_ty iter)
 	assert(iter->node);
 	/* TODO assert somehow that iter->node doesn't point to begin	*/
 	
-		return (NodeToIterIMP(PrevNextImp(iter, LEFT)));
+	return (NodeToIterIMP(PrevNextImp(iter, LEFT)));
 	
 }
 /******************************************************************************/
@@ -409,7 +419,7 @@ int BSTForEach(bst_iter_ty from_iter, bst_iter_ty to_iter,
 		runner = BSTIterNext(runner);
 	}
 
-	return (status); // SUCCESS			
+	return (status);		
 }
 /******************************************************************************/
 static bst_node_ty *IterToNodeIMP(bst_iter_ty iter)
