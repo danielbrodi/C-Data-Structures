@@ -345,35 +345,38 @@ bst_iter_ty BSTIterEnd(const bst_ty *bst)
 /******************************************************************************/
 static bst_node_ty *PrevNextImp(bst_iter_ty iter, int side)
 {
-
-		assert iter->node
-		
-		if node's child on the received side exists:
-		
-			//	the predecessor is the rightmost child of left subtree.//
-			 	
-			 	the successor is the leftmost child of right subtree.//
-			
-			ret = GetSideMostIMP(node->child[side], !side);
-			
-		else:
-			
-			// 	no left or right (based on needed key) child is available. 
-			Thus - we need to climb up each time and verify that we come from
-			the correct subtree.
-			At the moment that we will come from the other direction, it will 
-			mean that the parent is smaller or bigger, 
-			which means its the first key that is smaller or bigger 
-			than the received node. //
-			
-			while parent's right child != DEAD_MEM && node == parent->child[side]
-			{
-				node = parent
-				parent = parent->parent
-			}
-			
-			return parent
+	bst_node_ty *ret = NULL;
+	bst_node_ty *node = (assert(iter->node), iter->node);
 	
+	assert(RIGHT == side || LEFT == side);
+	
+	/*	if node's child on the received side exists:				*/
+	if (node->children[side])
+	{
+		/*	the predecessor is the rightmost child of left subtree	*/
+		/*	the successor is the leftmost child of right subtree	*/
+		ret = GetSideMostIMP(node->children[side], !side);
+	}
+	
+	else
+	{
+	/*	no left or right (based on needed key) child is available. 
+		Thus - we need to climb up each time and verify that we come from
+		the correct subtree.
+		At the moment that we will come from the other direction, it will 
+		mean that the parent is smaller or bigger, 
+		which means its the first key that is smaller or bigger 
+		than the received node. 									*/
+
+		while (node->parent->children[RIGHT] != DEAD_MEM &&
+		 								node == node->parent->children[side])
+		{
+			node = node->parent;
+			ret = node->parent;
+		}
+	}
+	
+	return (ret);
 }
 /******************************************************************************/
 bst_iter_ty BSTIterPrev(bst_iter_ty iter)
