@@ -336,20 +336,16 @@ bst_iter_ty BSTIterNext(bst_iter_ty iter)
 /******************************************************************************/
 int BSTIterIsEqual(bst_iter_ty iter1, bst_iter_ty iter2)
 {
-
-		assert
+	assert (iter1->node && iter2->node);
 		
-		return iter1->node == iter2->node;
-	
+	return (iter1->node == iter2->node);
 }
 /******************************************************************************/
 void *BSTGetData(bst_iter_ty iter)
 {
-
-		assert iter->node;
-		
-		return (iter->node)->data;
+	assert(iter->node);
 	
+	return (iter->node->data);	
 }
 /******************************************************************************/
 static bst_location_ty BSTSearchLocationIMP(bst_ty *bst, void *data)
