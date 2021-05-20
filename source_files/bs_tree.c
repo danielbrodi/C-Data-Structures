@@ -412,25 +412,27 @@ void *BSTGetData(bst_iter_ty iter)
 /******************************************************************************/
 static bst_location_ty BSTSearchLocationIMP(bst_ty *bst, void *data)
 {
-
-	Loop through the tree nodes from the (bst->stub) using a runner:
-		
-		runner = bst->stub;
+	bst_node_ty *runner = NULL;
 	
-		bst_location_ty found_location;
+	bst_location_ty found_location = 0;
+
+	int dir = LEFT;	/*	the runner starts at bst's stub which  
+					 *	has only a left subtree.					*/	
+	
+	assert(bst && data);
 		
-		dir = LEFT		
-				
-		while runner->child[dir] isn't null and child[dir]->data isn't equal to param data:
-					
-			runner = runner->child[dir]
+	runner = bst->stub;	
 			
-			dir = the direction we will move, based on cmp_func result.
-			
-		assign runner to found_location->parent
-		assign dir to found_location->direction
+	while ((runner->children[dir]) && 0 != dir)
+	{			
+		runner = runner->children[dir];
+		dir = bst->compare_func(data, runner->data);
+	}
 		
-		return found_location.
+	found_location->parent = runner;
+	found_location->direction = dir;
+	
+	return (found_location);
 }
 /******************************************************************************/
 bst_iter_ty BSTFind(bst_ty *bst, void *to_find)
