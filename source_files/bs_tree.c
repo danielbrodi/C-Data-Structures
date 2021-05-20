@@ -58,7 +58,7 @@ typedef struct bst_location
 {
 	bst_node_ty *parent;		/*	parent node of the found location	*/
 	int direction;				/*	0 if its the left child,
-								 *	1 if its the right child			
+								 *	1 if its the right child			*/		
 } bst_location_ty;
 
 /**************************** Forward Declarations ****************************/
@@ -106,7 +106,7 @@ bst_ty *BSTCreate(Cmp_Func_ty sorting_func, const void *param)
 	/*	Initialize bst's stub data, right child and parent as DEAD_MEM.		*/
 	/*	Initialize stub's left child pointer as null.						*/
 	stub = new_bst->stub;
-	stub->data = stub->children[RIGHT] = stub->parent = DEAD_MEM;
+	stub->data = stub->children[RIGHT] = stub->parent = DEAD_MEM(bst_node_ty *);
 	stub->children[LEFT] = NULL;
 	
 	/*	set the received `sorting_func` as the comparing func of the tree.	*/
@@ -121,9 +121,9 @@ bst_ty *BSTCreate(Cmp_Func_ty sorting_func, const void *param)
 /******************************************************************************/
 void BSTDestroy(bst_ty *bst)
 {
-	bst_iter_ty tree_runner = 0;
+	bst_iter_ty tree_runner = {0};
 	
-	bst_iter_ty end_of_tree;
+	bst_iter_ty end_of_tree = {0};
 	
 	assert(bst);
 	
@@ -237,7 +237,7 @@ bst_iter_ty BSTRemoveIter(bst_iter_ty to_remove)
 	bst_node_ty *node;
 	bst_node_ty *succ_node;
 	
-	bst_iter_ty successor = 0;
+	bst_iter_ty successor = {0};
 	
 	int	child_side = -1;
 	
@@ -486,8 +486,8 @@ static bst_iter_ty NodeToIterIMP(bst_node_ty *node)
 {
 	assert(node);
 	
-	bst_iter_ty new_iter = (bst_iter_ty)node;
+	bst_iter_ty new_iter = {node};
 	
-	return (new_iter->node);
+	return (new_iter);
 }
 /******************************************************************************/
