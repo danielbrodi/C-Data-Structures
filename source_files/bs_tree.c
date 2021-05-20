@@ -26,8 +26,7 @@ enum
 {
 	LEFT = 0,
 	RIGHT = 1,
-	SUCCESS = 0,
-	FAILURE = 1
+	SUCCESS = 0
 };
 
 /***************************** Structs Definition *****************************/
@@ -385,7 +384,6 @@ bst_iter_ty BSTIterPrev(bst_iter_ty iter)
 	/* TODO assert somehow that iter->node doesn't point to begin	*/
 	
 	return (NodeToIterIMP(PrevNextImp(iter, LEFT)));
-	
 }
 /******************************************************************************/
 bst_iter_ty BSTIterNext(bst_iter_ty iter)
