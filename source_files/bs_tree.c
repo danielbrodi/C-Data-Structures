@@ -211,11 +211,12 @@ bst_iter_ty BSTInsert(bst_ty *bst, void *data)
 		/* case 2:	find a potential parent for the created node 		*/
 		found_location = BSTSearchLocationIMP(bst, data); 
 		
-		/* check if a data with the same key was found in the tree		*/
-		assert (!found_location->parent->children[found_location->direction]); 
+		/* check if data with the same key was found in the tree		*/
+		assert (!(found_location->parent->children[found_location->direction])); 
 		
 		/*	assign new_node's parent as found_location->parent			*/
 		new_node->parent = found_location->parent;
+		
 		/*	assign the new created node in the found location			*/
 		found_location->parent->children[found_location->direction] = new_node;
 												
@@ -279,10 +280,9 @@ bst_iter_ty BSTIterBegin(const bst_ty *bst)
 /******************************************************************************/
 bst_iter_ty BSTIterEnd(const bst_ty *bst)
 {
-
-		assert bst
-		return bst->stub;
+	assert(bst);
 	
+	return (NodeToIterIMP(bst->stub));
 }
 /******************************************************************************/
 static bst_iter_ty PrevNextImp(bst_iter_ty iter, int side)
