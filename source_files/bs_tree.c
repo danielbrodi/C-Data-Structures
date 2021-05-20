@@ -74,7 +74,14 @@ static bst_node_ty *GetSideMostIMP(bst_node_ty *node, int side)
 	that equals to a given data. 										*/
 static bst_location_ty BSTSearchLocationIMP(bst_ty *bst, void *data);
 
+/*	searchs and returns the predecessor or the successor of a key		*/
 static bst_iter_ty PrevNextImp(bst_iter_ty iter, int side);
+
+/*	creates and returns an iterator for a given node 					*/
+static bst_iter_ty NodeToIterIMP(bst_node_ty *node);
+
+/*	returns the node which is pointed by a given iterator				*/
+static bst_node_ty *IterToNodeIMP(bst_iter_ty iter);
 
 static int NodesCounterIMP(void *counter, void *param);
 
@@ -168,47 +175,53 @@ static bst_node_ty *CreateNodeIMP(void *data)
 {
 	bst_node_ty *new_node - NULL;
 	
-	assert(data); /*	NULL data isn't accepted in this BST	*/
+	assert(data); /*	NULL data isn't accepted in this BST			*/
 	
-	/*	creates a new node with the received data				*/
-    /* 	allocates memory, checks for allocation errors			*/
+	/*	creates a new node with the received data						*/
+    /* 	allocates memory, checks for allocation errors					*/
 	new_node = (bst_node_ty *)malloc(sizeof(bst_node_ty));
 	
 	if (new_node)
 	{
-		/*	set data as data 									*/
-		/* 	set right, left and parent pointers as null			*/
+		/*	set data as data 											*/
+		/* 	set children and parent pointers as null					*/
 		new_node->data = data;
 		new_node->children = new_node->parent = NULL;
     }
     
     return (new_node);
 }
-
+/******************************************************************************/
 bst_iter_ty BSTInsert(bst_ty *bst, void *data)
 {
-
-		assert both bst and data (NULL data isn't accepted in this BST).
+		bst_node_ty *new_node = NULL;
+		bst_location_ty found_location = NULL;
+		
+		assert(bst);
+		assert(data); /*	NULL data isn't accepted in this BST		*/
 		
 		new_node = CreateNodeIMP(data);
 		
-		case 1: if error while creating node:
-			return BST END
+		/*	case 1: if any error occured while creating the node 		*/
+		if (!new_node)
+		{
+			return (bst->stub);
+		}
 			
-		case 2:	
-		found_location = BSTSearchLocationIMP(bst, data); //find potential parent
+		/* case 2:	find a potential parent for the created node 		*/
+		found_location = BSTSearchLocationIMP(bst, data); 
 		
-		assert (found_location data is not equal to received data); 
+		/* check if a data with the same key was found in the tree		*/
+		assert (!found_location->parent->children[found_location->direction]); 
 		
-		get to the found_location by the recevied data and assign new_node.
-		assign new_node's parent as found_location->parent.
-		assign found_location->parent child by the received direction as new_node.
-													
-		return (new_node);
-	
+		/*	assign new_node's parent as found_location->parent			*/
+		new_node->parent = found_location->parent;
+		/*	assign the new created node in the found location			*/
+		found_location->parent->children[found_location->direction] = new_node;
+												
+		return (NodeToIterIMP(new_node));
 }
 /******************************************************************************/
-
 bst_iter_ty BSTRemoveIter(bst_iter_ty to_remove)
 {
 
@@ -264,8 +277,6 @@ bst_iter_ty BSTIterBegin(const bst_ty *bst)
 	
 }
 /******************************************************************************/
-
-
 bst_iter_ty BSTIterEnd(const bst_ty *bst)
 {
 
@@ -317,8 +328,6 @@ bst_iter_ty BSTIterPrev(bst_iter_ty iter)
 	
 }
 /******************************************************************************/
-
-
 bst_iter_ty BSTIterNext(bst_iter_ty iter)
 {
 
@@ -330,8 +339,6 @@ bst_iter_ty BSTIterNext(bst_iter_ty iter)
 	
 }
 /******************************************************************************/
-
-
 int BSTIterIsEqual(bst_iter_ty iter1, bst_iter_ty iter2)
 {
 
@@ -341,7 +348,6 @@ int BSTIterIsEqual(bst_iter_ty iter1, bst_iter_ty iter2)
 	
 }
 /******************************************************************************/
-
 void *BSTGetData(bst_iter_ty iter)
 {
 
@@ -351,7 +357,7 @@ void *BSTGetData(bst_iter_ty iter)
 	
 }
 /******************************************************************************/
-static bst_location_ty *BSTSearchLocationIMP(bst_ty *bst, void *data)
+static bst_location_ty BSTSearchLocationIMP(bst_ty *bst, void *data)
 {
 
 	Loop through the tree nodes from the (bst->stub) using a runner:
@@ -372,9 +378,8 @@ static bst_location_ty *BSTSearchLocationIMP(bst_ty *bst, void *data)
 		assign dir to found_location->direction
 		
 		return found_location.
-	
 }
-
+/******************************************************************************/
 bst_iter_ty BSTFind(bst_ty *bst, void *to_find)
 {
 
@@ -386,11 +391,8 @@ bst_iter_ty BSTFind(bst_ty *bst, void *to_find)
 			set found_location as BST END;
 		
 		return found_location's child;
-	
 }
 /******************************************************************************/
-
-
 int BSTForEach(bst_iter_ty from_iter, bst_iter_ty to_iter, 
 									Action_Func_ty action_func, void *param)
 {
@@ -407,7 +409,21 @@ int BSTForEach(bst_iter_ty from_iter, bst_iter_ty to_iter,
 		}
 
 		return (status); // SUCCESS			
+}
+/******************************************************************************/
+static bst_node_ty *IterToNodeIMP(bst_iter_ty iter)
+{
+	assert(iter->node);
 	
+	return (iter->node);
+}
+/******************************************************************************/
+static bst_iter_ty NodeToIterIMP(bst_node_ty *node)
+{
+	assert(node);
 	
+	bst_iter_ty new_iter = (bst_iter_ty)node;
+	
+	return (new_iter->node);
 }
 /******************************************************************************/
