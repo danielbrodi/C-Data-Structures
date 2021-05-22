@@ -22,7 +22,7 @@
 #define UNUSED(x) (void)(x)
 
 /*	from which direction the child node connected to its parent node	*/
-typedef enum sides
+typedef enum
 {
 	LEFT = 0,
 	RIGHT = 1
@@ -51,7 +51,8 @@ struct bst
 	Cmp_Func_ty compare_func;	/*	helps to sort the nodes by
 								 *	comparing them by its criteria		*/
 	
-	bst_node_ty stub;			/*	end dummy node of the tree:
+	bst_node_ty stub;			/*	a stub that indicates on 
+								 *	the end of the tree:
 								 *	its left child node is the
 								 *	root of the tree					*/
 								 
@@ -126,7 +127,6 @@ bst_ty *BSTCreate(Cmp_Func_ty sorting_func, const void *param)
 void BSTDestroy(bst_ty *bst)
 {
 	bst_iter_ty tree_runner = {0};
-	
 	bst_iter_ty end_of_tree = {0};
 	
 	assert(bst);
@@ -134,12 +134,14 @@ void BSTDestroy(bst_ty *bst)
 	tree_runner = BSTIterBegin(bst);
 	end_of_tree = BSTIterEnd(bst);
 	
-	while (tree_runner.node != end_of_tree.node)
+	/* loop through the whole tree, and delete the nodes 	*/
+	while (!BSTIterIsEqual(tree_runner, end_of_tree))
 	{
 		tree_runner = BSTRemoveIter(tree_runner);
 	}
 	
-	bst->stub.parent = bst->stub.data = bst->stub.children[LEFT] = NULL;
+	/*	assign NULL to avoid dangling pointers				*/
+	bst->stub.parent = bst->stub.data = bst->stub.children[LEFT] = NULL;	
 	bst->compare_func = NULL;
 	bst->param = NULL;
 	
@@ -407,7 +409,7 @@ bst_iter_ty BSTIterPrev(bst_iter_ty iter)
 bst_iter_ty BSTIterNext(bst_iter_ty iter)
 {
 	assert(iter.node);
-	/* check iter != BST END */
+	/* check iter is not BST END */
 	assert(iter.node->children[RIGHT] != DEAD_MEM(bst_node_ty *));
 	
 	return (NodeToIterIMP(PrevNextImp(iter, RIGHT)));
@@ -434,7 +436,7 @@ static bst_location_ty BSTSearchLocationIMP(bst_ty *bst, void *data)
 	bst_location_ty found_location = {0};
 
 	sides_ty dir = LEFT;	/*	the runner starts at bst's stub which  
-					 		*	has only a left subtree.					*/	
+					 		 *	has only a left subtree.					*/	
 	
 	assert(bst && data);
 		
