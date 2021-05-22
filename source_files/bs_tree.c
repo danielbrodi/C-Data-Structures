@@ -186,7 +186,7 @@ int BSTIsEmpty(const bst_ty *bst)
 	assert(bst);
 	
 	/* checks if the root node exists									*/
-	return (bst->stub.children[LEFT] == NULL);
+	return (!bst->stub.children[LEFT]);
 }
 /******************************************************************************/
 static bst_node_ty *CreateNodeIMP(void *data)
@@ -198,7 +198,6 @@ static bst_node_ty *CreateNodeIMP(void *data)
 	/*	creates a new node with the received data						*/
     /* 	allocates memory, checks for allocation errors					*/
 	new_node = (bst_node_ty *)malloc(sizeof(bst_node_ty));
-	
 	if (new_node)
 	{
 		/*	set data as data 											*/
@@ -443,10 +442,11 @@ static bst_location_ty BSTSearchLocationIMP(bst_ty *bst, void *data)
 	runner = &bst->stub;	
 			
 	while (runner->children[dir] &&
-						bst->compare_func(data, runner->children[dir]->data, 0))
+						bst->compare_func(data, runner->children[dir]->data, 
+																	bst->param))
 	{			
 		runner = runner->children[dir];
-		dir = bst->compare_func(runner->data, data, 0) > 0;
+		dir = bst->compare_func(runner->data, data, bst->param) > 0;
 	}
 		
 	found_location.parent = runner;
