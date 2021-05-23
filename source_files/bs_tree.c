@@ -146,7 +146,6 @@ void BSTDestroy(bst_ty *bst)
 	bst->param = NULL;
 	
 	free(bst);
-	bst = NULL;
 }
 /******************************************************************************/
 static int NodesCounterIMP(void *data, void *counter)
