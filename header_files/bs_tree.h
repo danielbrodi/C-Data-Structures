@@ -28,10 +28,10 @@ typedef int (*Action_Func_ty)(void *data, void *param);
 /* 	Complexity O(1) 										*/
 bst_ty *BSTCreate(Cmp_Func_ty sorting_func, const void *param);
 
-/* 	Complexity O(n) - n is tree size 						*/
+/* 	Complexity O(n*logn) - n is tree size 					*/
 void BSTDestroy(bst_ty *bst);
 
-/* 	Complexity O(n) - n is tree size 						*/
+/* 	Complexity O(n*logn) - n is tree size 					*/
 size_t BSTSize(const bst_ty *bst);
 
 /* 	Complexity O(1) 										*/
@@ -41,7 +41,7 @@ int BSTIsEmpty(const bst_ty *bst);
 /* 	On memory allocation failure, returns iterator END 		*/
 /*	IMPORTANT: 	Undefined behavior if data with the
  *				same key is already in the tree 			*/
- 				
+/*	Invalidates existing iterators							*/
 /* 	Complexity O(log (n)) - n is tree size 					*/
 bst_iter_ty BSTInsert(bst_ty *bst, void *data);
 
