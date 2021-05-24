@@ -7,7 +7,13 @@
 #define	__UTILS_H__
 /******************************************************************************/
 #include <stdio.h>
-#include <assert.h>
+
+/*	frequently used macros	*/
+#define DEAD_MEM(type) ((type)0xdeadbeef)
+#define UNUSED(x) (void)(x)
+
+/*	Radix sort API macros			*/
+
 
 /* escape keys for printf to color output for StdOut */
 #define ANSI_COLOR_RED     "\x1b[31m"
