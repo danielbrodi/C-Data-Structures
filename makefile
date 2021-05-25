@@ -39,7 +39,7 @@ test: $(NAMES)
 all: libds.so $(NAMES)
 
 %: %_test.c libds.so
-	$(CC) $(CFLAGS) -o $@ $< -lds
+	$(CC) $(CFLAGS) -o $@ $< -lds -g
 	
 #SHARED LIBRARY
 libds.so: $(OFILES)
@@ -48,7 +48,7 @@ libds.so: $(OFILES)
 	
 #OBJFILES
 %.o: %.c %.h
-	$(CC) $(COFLAGS) -o $@ $<
+	$(CC) $(COFLAGS) -o $@ $< -g
 
 #CLEAN
 clean:
