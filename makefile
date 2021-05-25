@@ -1,4 +1,4 @@
-#COMPILER
+	#COMPILER
 CC=gcc
 CFLAGS=-I./include/ -L. -Wl,-rpath=. -Wall
 CORFLAGS=-I./include/ -c -ansi -pedantic-errors -Wall -Wextra -g
@@ -44,7 +44,6 @@ all: libds.so $(NAMES)
 #SHARED LIBRARY
 libds.so: $(OFILES)
 	$(CC) $(CSOFLAGS) -o libds.so $(OFILES)
-	mv *.o $(OBJPATH)
 	
 #OBJFILES
 %.o: %.c %.h
