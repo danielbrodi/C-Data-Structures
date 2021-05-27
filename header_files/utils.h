@@ -14,11 +14,14 @@
 #define UNUSED(x) (void)(x)
 
 /* escape keys for printf to color output for StdOut */
+#define ANSI_COLOR_BLACK    "\x1b[30m"
 #define ANSI_COLOR_RED     "\x1b[31m"
 #define ANSI_COLOR_GREEN   "\x1b[32m"
 #define ANSI_COLOR_CYAN    "\x1b[36m"
+#define ANSI_COLOR_YELLOW    "\x1b[33m"
 #define ANSI_COLOR_RESET   "\x1b[0m"
 
+#define BLACK   "\x1b[30m"
 #define RED     "\x1b[31m"
 #define GREEN   "\x1b[32m"
 #define YELLOW  "\x1b[33m"
@@ -31,10 +34,12 @@
 #define PRINT_SUCCESS printf (ANSI_COLOR_GREEN "SUCCESS\n" ANSI_COLOR_RESET)
 #define PRINT_FAILURE printf (ANSI_COLOR_RED "FAILURE\n" ANSI_COLOR_RESET)
 
-#define PRINT_RED printf(ANSI_COLOR_RED)
-#define PRINT_GREEN printf(ANSI_COLOR_GREEN)
-#define PRINT_CYAN printf(ANSI_COLOR_CYAN)
-#define RESET_PRINT_COLOR printf(ANSI_COLOR_RESET)
+#define PRINT_BLACK (printf(ANSI_COLOR_BLACK))
+#define PRINT_RED (printf(ANSI_COLOR_RED))
+#define PRINT_GREEN (printf(ANSI_COLOR_GREEN))
+#define PRINT_YELLOW (printf(ANSI_COLOR_YELLOW))
+#define PRINT_CYAN (printf(ANSI_COLOR_CYAN))
+#define RESET_PRINT_COLOR (printf(ANSI_COLOR_RESET))
 /******************************************************************************/
 
 typedef enum
