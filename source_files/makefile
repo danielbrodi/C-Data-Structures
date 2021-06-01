@@ -8,12 +8,14 @@ CC = gcc
 CFLAGS = -ansi -pedantic-errors -Wall -Wextra -g -I$(IDIR)
 RM = rm -rf
 
-TARGETS := vector slist slist_ex queue cbuffer dlist uid fixed_size_allocator variable_size_allocator cmp_sort bs_tree recursion
+TARGETS := vector slist slist_ex queue cbuffer dlist uid fixed_size_allocator variable_size_allocator cmp_sort bs_tree
 
 .PHONY = all clean
 
 all: $(TARGETS)
 
+rec: recursion.c $(TDIR)recursion_test.c int_stack.c stack.c
+	$(CC) $(CFLAGS) -o a.out $^
 scheduler: scheduler.c $(TDIR)scheduler_test.c task.c pqueue.c UID.c sorted_list.c dlist.c
 	$(CC) $(CFLAGS) -o a.out $^
 
