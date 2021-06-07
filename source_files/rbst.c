@@ -28,7 +28,8 @@ typedef enum
 /*	status indication of a finished operation							*/
 enum
 {
-	SUCCESS = 0
+	SUCCESS = 0,
+	FAILURE = 1
 };
 
 /**************************** Structs  Definitions ****************************/
@@ -63,6 +64,11 @@ typedef struct rbst_location
 
 static rbst_location_ty SearchLocationIMP(bst_ty *bst, void *data);
 
+static void DestroyNodesIMP(rbst_node_ty *node);
+
+static rbst_node_ty *CreateNodeIMP(void *data);
+
+static int InsertNewNodeIMP(rbst_ty *rbst, rbst_node_ty *node, void *data);
 /************************* Functions  Implementations *************************/
 rbst_ty *RBSTCreate(Cmp_Func_ty cmp_func, const void *param)
 {
@@ -127,62 +133,146 @@ static void DestroyNodesIMP(rbst_node_ty *node)
 /******************************************************************************/
 void RBSTRemove(rbst_ty *rbst, const void *data)
 {
-	/*asserts*/
+	rbst_location_ty found_location = {0};
 	
-
-/*	use findIMP func to receive node with the needed data if exists*/
-/* TODO create FindIMP(could return both succ and parent), FindSucc, FindParent */
-
-	/* CASE A: */
-	/*if node with the same data wasn't found*/
-		/*do nothing: return*/
-	/* end CASE A	*/
-
-	/* #CASE B#: */
-	/*if data was found inside :*/
+	rbst_node_ty *found_node = NULL;
 	
-		/*#CASE B.1#*/
-		/* if node has no children nodes: 
-										- free node
-										- return 						*/
+	assert(rbst);
+	assert(data);
+
+	/*	use searching func to receive node with the needed data if exists	*/
+	found_location = SearchLocationIMP(rbst, rbst->root, data);
+	
+	/*	if a node with a matching data was not found: do nothing			*/
+	found_node = found_location.parent->children[found_location.direction];
+	if (!found_node)
+	{
+		return;
+	}
+
+	/*#CASE 1#*/
+	/* if node has no children nodes: 										*/
+	/* TODO maybe create a func that check if leaf & frees the node			*/
+	if (!node->children[RIGHT] && !node->children[LEFT])
+	{
+		/* free node and return											*/							
+		free(node);
+		return;
+	}
+	
+	/*#CASE 2#*/
+	/*	if node has only one child node 									*/
+	else if (!node->children[LEFT] || !node->children[RIGHT])
+	{
+	
+		/* 	if node has only right child:								*/
+		if (node->children[RIGHT])
+		{
+			/*
+			- copy successor's data into node
+			- if successor has right child:
+			- make successor's parent to 
+				point to successor's right
+				subtree.
+			- free successor									
+			*/
+		}
 		
-		/*#CASE B.2#*/
-		/* if node has only left child:
-										- copy child's data into node
-										- link child's children to node
-										- free child node				*/
-		
-		/* if node has only right child:
-										- copy successor's data into node
-										- if successor has right child:
-											- make successor's parent to 
-												point to successor's right
-												 subtree.
-										- free successor				*/
-										
-		/*#CASE B.3#*/
-		/* if node has 2 child nodes:
-										- copy successor's data into node
-										- determine the side of the successor 
-											as a child node by scanning the
-											tree for its parent.
-										- make successor's parent to point to
-											successor's right subtree.
-										- free successor.				*/
-	/* end CASE B */
+		/* 	if node has only left child:								*/
+		else
+		{
+			/*
+			- copy child's data into node
+			- link child's children to node
+			- free child node
+			*/
+			node->parent->children[child_side] = node->children[LEFT];
+			node->children[LEFT]->parent = node->parent;
+		}
+
+		/* free the node which was found								*/
+		free(node);
+		node = NULL;
+	}
+	
+	/*#CASE 3#*/
+	/*	if node has 2 subtrees												*/
+	else
+	{
+		/*
+		- copy successor's data into node
+		- determine the side of the successor 
+			as a child node by scanning the
+			tree for its parent.
+		- make successor's parent to point to
+			successor's right subtree.
+		- free successor.
+		*/
+	}
+	
+	return (successor);
+	
 }
 /******************************************************************************/
 int RBSTInsert(rbst_ty *rbst, void *data)
 {
-	/*if tree is empty or node is null:*/
-		/*create and insert a node with the received data from the user*/
-		/*set root as created node */
-
-/*	find potential place for the received data by using the FindIMP func*/
-/*	*/
-/*	if found return error*/
-/*	else: create node -> set data -> determine side of child from parent and set
-	its																	*/
+	rbst_node_ty *new_node = NULL;
+	
+	rbst_location_ty potential_location = {0};
+	
+	assert(rbst);
+	assert(data); /*	NULL data isn't accepted in this tree				*/
+	
+	/*	create a node with the received data								*/
+	/*	handle memory allocation errors if any								*/
+	new_node = CreateNodeIMP(data);
+	if (!new_node)
+	{
+		return (FAILURE);
+	}
+	
+	/*	if tree is empty													*/
+	if (RBSTIsEmpty(rbst))
+	{
+		/*	set the root of the tree as the created node 	*/
+		rbst->root = new_node;
+		
+		return (SUCCESS);	
+	}
+	
+	/*	if tree is not empty and a new node should be inserted:				*/
+	/*	find a potential place for the node by using a location finder func	*/
+	potential_location = SearchLocationIMP(rbst, rbst->root, data);
+	
+	/*	if the location which was returned points to an exsiting node
+	 *	it means there is already a node with that data -> crash.			*/
+	 assert(!potential_location.parent->children[potential_location.direction]);
+	 
+	/*	if a valid location to insert node was returned:					*/
+	/*	create node -> set data -> set correcly its parent child ptr		*/
+	found_location.parent->children[found_location.direction] = new_node;
+	
+	return(SUCCESS)
+}												
+/*----------------------------------------------------------------------------*/
+static rbst_node_ty *CreateNodeIMP(void *data)
+{
+	rbst_node_ty *new_node = NULL;
+	
+	assert(data); /*	NULL data isn't accepted in this tree			*/
+	
+	/*	creates a new node with the received data						*/
+    /* 	allocates memory, checks for allocation errors					*/
+	new_node = (rbst_node_ty *)malloc(sizeof(rbst_node_ty));
+	if (new_node)
+	{
+		/*	set data as data 											*/
+		/* 	set children pointers as null								*/
+		new_node->data = data;
+		new_node->children[LEFT] = new_node->children[RIGHT] = NULL;
+    }
+    
+    return (new_node);
 }
 /******************************************************************************/
 size_t RBSTHeight(const rbst_ty *rbst)
