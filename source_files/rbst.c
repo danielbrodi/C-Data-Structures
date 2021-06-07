@@ -64,7 +64,8 @@ typedef struct rbst_location
 } rbst_location_ty;
 /**************************** Forward Declarations ****************************/
 
-static rbst_location_ty SearchLocationIMP(bst_ty *bst, void *data);
+static rbst_location_ty SearchLocationIMP(rbst_ty *rbst, rbst_node_ty *node, 
+															const void *data);
 
 static void DestroyNodesIMP(rbst_node_ty *node);
 
@@ -380,6 +381,7 @@ static rbst_location_ty SearchLocationIMP(rbst_ty *rbst, rbst_node_ty *node,
 		return (potential_location);
 	}
 	
+	/*	determine which direction to go based on the result of cmp_func		*/
 	direction_to_go = rbst->cmp_func(node->data, data, rbst->param) > 0;
 	
 	/*	if a node with the needed data was found, return its location		*/
@@ -391,32 +393,40 @@ static rbst_location_ty SearchLocationIMP(rbst_ty *rbst, rbst_node_ty *node,
 		return (potential_location);
 	}
 	
+	/*	recursively traverse through the tree nodes based on the cmp_func	*/
 	SearchLocationIMP(rbst, node->children[direction_to_go], data);
 }
 /******************************************************************************/
 int RBSTForEach(rbst_ty *rbst, Action_Func_ty action_func, void *param)
 {
-	/*	assert*/
+	assert(rbst);
+	assert(action_func);
 
-	/*	return RBSTForEachIMP(root, action_func, param);*/
+	return RunOperationOnTree(rbst->root, action_func, param);
 }
 
-static int RBSTForEachIMP(rbst_node_ty *node, Action_Func_ty action_func,
+static int RunOperationOnTreeIMP(rbst_node_ty *node, Action_Func_ty action_func,
 																void *param)
 {
-/*	IN ORDER:*/
-/*	*/
+	/*	if node is null*/
+	/*		return 0*/
+	if (!node)
+	{
+		return (SUCCESS);
+	}
+	
+	/*	check if there is operation failure of any of the left subtree nodes
+	 *	return FAILURE if 
+	if	(RunOperationOnTreeIMP(node->children[left], action_func, param))
+	{
+		return (FAILURE);
+	}						
 
-/*	if node is null*/
-/*		return 0*/
+	if (action_func(node->data, param))		
+	{
+		return (FAILURE);
+	}									
 
-
-/*        if (RBSTForEachIMP(node->left, action_func, param))
-				return 1;							*/
-
-	/*	if action_func(nodes data, param)			*/
-/*		return 1									*/
-
-/*        return (RBSTForEachIMP(node->right, action_func, param));	*/
+	return (RunOperationOnTreeIMP(node->children[right], action_func, param));
 }
 /******************************************************************************/
