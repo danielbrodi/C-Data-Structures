@@ -36,31 +36,31 @@ enum
 
 /**************************** Structs  Definitions ****************************/
 
-/*	handler struct of each node in a binary search tree					*/
+/*	handler struct of each node in a binary search tree						*/
 typedef struct rbst_node
 {
 	rbst_node_ty *children[2];	/*	left and right child nodes	
-								 *	left = 0, right = 1					*/
-	void *data;					/*	data which is stored in the node	*/	
+								 *	left = 0, right = 1						*/
+	void *data;					/*	data which is stored in the node		*/	
 }rbst_node_ty;
 
-/*	struct handler of a recursive binary search tree					*/
+/*	struct handler of a recursive binary search tree						*/
 struct rbst
 {
 	Cmp_Func_ty compare_func;	/*	helps to sort the nodes by
-								 *	comparing them by its criteria		*/
+								 *	comparing them by its criteria			*/
 	
-	rbst_node_ty *root;			/*	first node & the root of the tree	*/ 
+	rbst_node_ty *root;			/*	first node & the root of the tree		*/ 
 								 
-	const void *param;			/*	a param which is given by the user	*/
+	const void *param;			/*	a param which is given by the user		*/
 };
 
-/*	return type for a potential location of a node						*/
+/*	return type for a potential location of a node							*/
 typedef struct rbst_location
 {
-	rbst_node_ty *parent;		/*	parent node of the found location	*/
+	rbst_node_ty *parent;		/*	parent node of the found location		*/
 	sides_ty direction;			/*	0 if its the left child,
-								 *	1 if its the right child			*/		
+								 *	1 if its the right child				*/		
 } rbst_location_ty;
 /**************************** Forward Declarations ****************************/
 
@@ -119,18 +119,18 @@ void RBSTDestroy(rbst_ty *rbst)
 /*----------------------------------------------------------------------------*/
 static void DestroyNodesIMP(rbst_node_ty *node)
 {
-	/*	if node is null: return 								*/
+	/*	if node is null: return 											*/
 	if (!node)
 	{
 		return;
 	}
 	
-	/*	recursivly scan the left subtree and destroy it			*/
+	/*	recursivly scan the left subtree and destroy it						*/
 	DestroyNodesIMP(node->children[LEFT]);
-	/*	recursivly scan the right subtree and destroy it		*/
+	/*	recursivly scan the right subtree and destroy it					*/
 	DestroyNodesIMP(node->children[RIGHT]);
 	
-	/*	if node is a leaf: free node							*/
+	/*	if node is a leaf: free node										*/
 	if (!node->children[RIGHT] && !node->children[LEFT])
 	{
 		free(node);
@@ -265,15 +265,15 @@ static rbst_node_ty *CreateNodeIMP(void *data)
 {
 	rbst_node_ty *new_node = NULL;
 	
-	assert(data); /*	NULL data isn't accepted in this tree			*/
+	assert(data); /*	NULL data isn't accepted in this tree				*/
 	
-	/*	creates a new node with the received data						*/
-    /* 	allocates memory, checks for allocation errors					*/
+	/*	creates a new node with the received data							*/
+    /* 	allocates memory, checks for allocation errors						*/
 	new_node = (rbst_node_ty *)malloc(sizeof(rbst_node_ty));
 	if (new_node)
 	{
-		/*	set data as data 											*/
-		/* 	set children pointers as null								*/
+		/*	set data as data 												*/
+		/* 	set children pointers as null									*/
 		new_node->data = data;
 		new_node->children[LEFT] = new_node->children[RIGHT] = NULL;
     }
@@ -290,15 +290,15 @@ size_t RBSTHeight(const rbst_ty *rbst)
 
 static size_t CalcTreeHeightIMP(rbst_node_ty *node)
 {
-	/*	Base case: node has no children 								*/
-	/*	if (node has no children) : return 0 							*/
+	/*	Base case: node has no children 									*/
+	/*	if (node has no children) : return 0 								*/
 	if (!node->children[RIGHT] && !node->children[LEFT]);
 	{
 		return (0);
 	}s
 
 	/*	recursively traverse the left and right subtrees and find the 
-	 *	longest path from root to the deepest node depth 				*/
+	 *	longest path from root to the deepest node depth 					*/
 	return (1 + MAX(CalcTreeHeightIMP(node->left), 
 											CalcTreeHeightIMP(node->right))); 
 }
@@ -312,22 +312,22 @@ size_t RBSTSize(const rbst_ty *rbst)
 /*----------------------------------------------------------------------------*/
 size_t GetTreeSizeIMP(rbst_node_ty *node)
 {
-	/*	if node doesn't exist, don't count the its  edge				*/
+	/*	if node doesn't exist, don't count the its  edge					*/
 	if (!node)
 	{
 		return (0);
 	}
 	
-	/*	if node is a leaf, count the edge which connects to it			*/
+	/*	if node is a leaf, count the edge which connects to it				*/
 	if (!node->children[RIGHT] && !node->children[LEFT])
 	{
 		return (1);
 	}
 
-	/*	scan left subtree and return its size							*/
-	/*	add one because of the root										*/
-	/*	scan right subtree and add its size								*/
-	/*	return the sum of the sizes										*/
+	/*	scan left subtree and return its size								*/
+	/*	add one because of the root											*/
+	/*	scan right subtree and add its size									*/
+	/*	return the sum of the sizes											*/
 	return (1 + GetTreeSizeIMP(node->children[LEFT]) + 
 				GetTreeSizeIMP(node->children[RIGHT]));
 }
@@ -336,7 +336,7 @@ int RBSTIsEmpty(const rbst_ty *rbst)
 {
 	assert(rbst);
 	
-	/*	return boolean if root of the tree is null	*/
+	/*	return boolean if root of the tree is null							*/
 	return (NULL == rbst->root);
 }
 /******************************************************************************/
@@ -364,21 +364,34 @@ void *RBSTFind(const rbst_ty *rbst, const void *data_to_find)
 	
 	return (found_node->data);
 }
-
+/*----------------------------------------------------------------------------*/
 static rbst_location_ty SearchLocationIMP(rbst_ty *rbst, rbst_node_ty *node, 
 															const void *data);
 {
+	rbst_location_ty *potential_location = {0};
+	sides_ty direction_to_go = 0;
+	
+	assert(rbst);
+	assert(data);
+	
+	/*	if node doesn't exist, return to previous call						*/
 	if (!node)
 	{
-		return 
+		return (potential_location);
 	}
-		/*	if (node's data equals data to find):*/
-		/*		return node.*/
-		/*	*/
-		/*	if node is null*/
-		/*		return null*/
-
-		/*RBSTFindDataIMP(node->children[result of the cmp func])*/
+	
+	direction_to_go = rbst->cmp_func(node->data, data, rbst->param) > 0;
+	
+	/*	if a node with the needed data was found, return its location		*/
+	if (0 == rbst->cmp_func(node->children[direction_to_go]->data, data))
+	{
+		potential_location.parent = node;
+		potential_location.direction = direction_to_go;
+		
+		return (potential_location);
+	}
+	
+	SearchLocationIMP(rbst, node->children[direction_to_go], data);
 }
 /******************************************************************************/
 int RBSTForEach(rbst_ty *rbst, Action_Func_ty action_func, void *param)
