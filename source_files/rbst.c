@@ -18,6 +18,7 @@
 
 /******************************* Macros & enums *******************************/
 
+/*	returns the bigger value between 2 given values						*/
 #define MAX(a,b) (((a)>(b))?(a):(b))
 
 /*	from which direction the child node connected to its parent node	*/
@@ -66,7 +67,7 @@ typedef struct rbst_location
 
 static rbst_location_ty SearchLocationIMP(rbst_ty *rbst, rbst_node_ty *node, 
 															const void *data);
-
+															
 static void DestroyNodesIMP(rbst_node_ty *node);
 
 static rbst_node_ty *CreateNodeIMP(void *data);
@@ -78,6 +79,9 @@ static size_t CalcTreeHeightIMP(rbst_node_ty *root);
 size_t GetTreeSizeIMP(rbst_node_ty *root);
 
 static int IsALeafIMP(rbst_node_ty *node);
+
+static int RunOperationOnTreeIMP(rbst_node_ty *node, Action_Func_ty action_func,
+																void *param);
 /************************* Functions  Implementations *************************/
 rbst_ty *RBSTCreate(Cmp_Func_ty cmp_func, const void *param)
 {
@@ -401,7 +405,7 @@ int RBSTForEach(rbst_ty *rbst, Action_Func_ty action_func, void *param)
 	assert(rbst);
 	assert(action_func);
 
-	return RunOperationOnTree(rbst->root, action_func, param);
+	return RunOperationOnTreeIMP(rbst->root, action_func, param);
 }
 
 static int RunOperationOnTreeIMP(rbst_node_ty *node, Action_Func_ty action_func,
@@ -414,18 +418,23 @@ static int RunOperationOnTreeIMP(rbst_node_ty *node, Action_Func_ty action_func,
 		return (SUCCESS);
 	}
 	
-	/*	check if there is operation failure of any of the left subtree nodes
-	 *	return FAILURE if 
+	/*	check if any operation failure occured while traversing the 
+	 *	left subtree.
+	 *	Returns FAILURE on the first failed attemp.							*/
 	if	(RunOperationOnTreeIMP(node->children[left], action_func, param))
 	{
 		return (FAILURE);
 	}						
-
+	
+	/*	Returns FAILURE if any operation failure occured while applying
+	 *	it to a given node.													*/
 	if (action_func(node->data, param))		
 	{
 		return (FAILURE);
 	}									
-
+	
+	/*	Traverse the right subtree and apply the operation function to
+	 *	each of its nodes													*/
 	return (RunOperationOnTreeIMP(node->children[right], action_func, param));
 }
 /******************************************************************************/
