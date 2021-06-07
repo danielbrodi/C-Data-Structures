@@ -25,6 +25,12 @@ typedef enum
 	RIGHT = 1
 }sides_ty;
 
+/*	status indication of a finished operation							*/
+enum
+{
+	SUCCESS = 0
+};
+
 /**************************** Structs  Definitions ****************************/
 
 /*	handler struct of each node in a binary search tree					*/
@@ -78,31 +84,45 @@ rbst_ty *RBSTCreate(Cmp_Func_ty cmp_func, const void *param)
 	/*	set the received `param` as the param of the tree.					*/
 	new_tree->param = param;
 	
-	/*	return a pointer to the created bst.								*/
+	/*	return a pointer to the created tree.								*/
 	return (new_tree);
 }
 /******************************************************************************/
 void RBSTDestroy(rbst_ty *rbst)
 {
-	/*assert*/
+	assert(rbst);
 
-/*	RBSTDestroyNodesIMP(rbst_node->root)*/
-/*	*/
-/*	memset to 0 / nullify tree's struct ptrs*/
+	/*	DestroyNodesIMP(root)*/
+	DestroyNodesIMP(rbst->root)
+	
+	/*	memset to 0 / nullify tree's struct ptrs*/
+	rbst->root = NULL;
+	rbst->cmp_func = NULL;
+	rbst->param = NULL;
 	
 	/*free tree handler*/
+	free(rbst);
+	rbst = NULL;
 }
-
-/*static void RBSTDestroyNodesIMP(rbst_node_ty *node)*/
-/*{*/
-/*	if node is null:*/
-/*		return;*/
-/*			*/
-/*	RBSTDestroyNodesIMP(node->left);*/
-/*	RBSTDestroyNodesIMP(node->right);*/
-/*	*/
-/*	if node is a leaf:*/
-/*		free node*/
+/*----------------------------------------------------------------------------*/
+static void DestroyNodesIMP(rbst_node_ty *node)
+{
+	/*	if node is null: return 								*/
+	if (!node)
+	{
+		return;
+	}
+	
+	/*	recursivly scan the left subtree and destroy it			*/
+	DestroyNodesIMP(node->children[LEFT]);
+	/*	recursivly scan the right subtree and destroy it		*/
+	DestroyNodesIMP(node->children[RIGHT]);
+	
+	/*	if node is a leaf: free node							*/
+	if (!node->children[RIGHT] && !node->children[LEFT])
+	{
+		free(node);
+	}
 }
 /******************************************************************************/
 void RBSTRemove(rbst_ty *rbst, const void *data)
