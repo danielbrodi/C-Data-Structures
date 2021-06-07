@@ -37,13 +37,15 @@ enum
 
 /**************************** Structs  Definitions ****************************/
 
-/*	handler struct of each node in a binary search tree						*/
-typedef struct rbst_node
+typedef struct rbst_node rbst_node_ty;
+
+/*	struct handler of each node in a binary search tree						*/
+struct rbst_node
 {
 	rbst_node_ty *children[2];	/*	left and right child nodes	
 								 *	left = 0, right = 1						*/
 	void *data;					/*	data which is stored in the node		*/	
-}rbst_node_ty;
+};
 
 /*	struct handler of a recursive binary search tree						*/
 struct rbst
@@ -65,14 +67,12 @@ typedef struct rbst_location
 } rbst_location_ty;
 /**************************** Forward Declarations ****************************/
 
-static rbst_location_ty SearchLocationIMP(rbst_ty *rbst, rbst_node_ty *node, 
+static rbst_location_ty SearchLocationIMP(const rbst_ty *rbst, rbst_node_ty *node, 
 															const void *data);
 															
 static void DestroyNodesIMP(rbst_node_ty *node);
 
 static rbst_node_ty *CreateNodeIMP(void *data);
-
-static int InsertNewNodeIMP(rbst_ty *rbst, rbst_node_ty *node, void *data);
 
 static size_t CalcTreeHeightIMP(rbst_node_ty *root);
 
@@ -91,7 +91,7 @@ rbst_ty *RBSTCreate(Cmp_Func_ty cmp_func, const void *param)
 	assert(cmp_func);
 	
 	/*	allocate memory for tree's struct handler, handle errors if any		*/
-	new_tree = (rbst_ty *)malloc(rbst_ty);
+	new_tree = (rbst_ty *)malloc(sizeof(rbst_ty));
 	if (!new_tree)
 	{
 		return (NULL);
@@ -112,11 +112,11 @@ void RBSTDestroy(rbst_ty *rbst)
 	assert(rbst);
 
 	/*	DestroyNodesIMP(root)*/
-	DestroyNodesIMP(rbst->root)
+	DestroyNodesIMP(rbst->root);
 	
 	/*	memset to 0 / nullify tree's struct ptrs*/
 	rbst->root = NULL;
-	rbst->cmp_func = NULL;
+	rbst->compare_func = NULL;
 	rbst->param = NULL;
 	
 	/*free tree handler*/
@@ -181,6 +181,7 @@ void RBSTRemove(rbst_ty *rbst, const void *data)
 		if (node->children[RIGHT])
 		{
 			/*
+			TODO create FindSuccessor function 
 			- copy successor's data into node
 			- if successor has right child:
 			- make successor's parent to 
@@ -228,7 +229,7 @@ int RBSTInsert(rbst_ty *rbst, void *data)
 {
 	rbst_node_ty *new_node = NULL;
 	
-	rbst_location_ty potential_location = {0};
+	rbst_location_ty found_location = {0};
 	
 	assert(rbst);
 	assert(data); /*	NULL data isn't accepted in this tree				*/
@@ -252,17 +253,17 @@ int RBSTInsert(rbst_ty *rbst, void *data)
 	
 	/*	if tree is not empty and a new node should be inserted:				*/
 	/*	find a potential place for the node by using a location finder func	*/
-	potential_location = SearchLocationIMP(rbst, rbst->root, data);
+	found_location = SearchLocationIMP(rbst, rbst->root, data);
 	
 	/*	if the location which was returned points to an exsiting node
 	 *	it means there is already a node with that data -> crash.			*/
-	 assert(!potential_location.parent->children[potential_location.direction]);
+	 assert(!found_location.parent->children[found_location.direction]);
 	 
 	/*	if a valid location to insert node was returned:					*/
 	/*	create node -> set data -> set correcly its parent child ptr		*/
 	found_location.parent->children[found_location.direction] = new_node;
 	
-	return(SUCCESS)
+	return(SUCCESS);
 }												
 /*----------------------------------------------------------------------------*/
 static rbst_node_ty *CreateNodeIMP(void *data)
@@ -303,8 +304,8 @@ static size_t CalcTreeHeightIMP(rbst_node_ty *node)
 
 	/*	recursively traverse the left and right subtrees and find the 
 	 *	longest path from root to the deepest node depth 					*/
-	return (1 + MAX(CalcTreeHeightIMP(node->left), 
-											CalcTreeHeightIMP(node->right))); 
+	return (1 + MAX(CalcTreeHeightIMP(node->children[LEFT]), 
+									CalcTreeHeightIMP(node->children[RIGHT]))); 
 }
 /******************************************************************************/
 size_t RBSTSize(const rbst_ty *rbst)
@@ -369,10 +370,10 @@ void *RBSTFind(const rbst_ty *rbst, const void *data_to_find)
 	return (found_node->data);
 }
 /*----------------------------------------------------------------------------*/
-static rbst_location_ty SearchLocationIMP(rbst_ty *rbst, rbst_node_ty *node, 
-															const void *data);
+static rbst_location_ty SearchLocationIMP(const rbst_ty *rbst, rbst_node_ty *node, 
+															const void *data)
 {
-	rbst_location_ty *potential_location = {0};
+	rbst_location_ty potential_location = {0};
 	sides_ty direction_to_go = 0;
 	
 	assert(rbst);
@@ -385,10 +386,10 @@ static rbst_location_ty SearchLocationIMP(rbst_ty *rbst, rbst_node_ty *node,
 	}
 	
 	/*	determine which direction to go based on the result of cmp_func		*/
-	direction_to_go = rbst->cmp_func(node->data, data, rbst->param) > 0;
+	direction_to_go = rbst->compare_func(node->data, data, rbst->param) > 0;
 	
 	/*	if a node with the needed data was found, return its location		*/
-	if (0 == rbst->cmp_func(node->children[direction_to_go]->data, data))
+	if (!rbst->compare_func(node->children[direction_to_go]->data, data, rbst->param))
 	{
 		potential_location.parent = node;
 		potential_location.direction = direction_to_go;
@@ -397,7 +398,7 @@ static rbst_location_ty SearchLocationIMP(rbst_ty *rbst, rbst_node_ty *node,
 	}
 	
 	/*	recursively traverse through the tree nodes based on the cmp_func	*/
-	SearchLocationIMP(rbst, node->children[direction_to_go], data);
+	return (SearchLocationIMP(rbst, node->children[direction_to_go], data));
 }
 /******************************************************************************/
 int RBSTForEach(rbst_ty *rbst, Action_Func_ty action_func, void *param)
@@ -405,9 +406,9 @@ int RBSTForEach(rbst_ty *rbst, Action_Func_ty action_func, void *param)
 	assert(rbst);
 	assert(action_func);
 
-	return RunOperationOnTreeIMP(rbst->root, action_func, param);
+	return (RunOperationOnTreeIMP(rbst->root, action_func, param));
 }
-
+/*----------------------------------------------------------------------------*/
 static int RunOperationOnTreeIMP(rbst_node_ty *node, Action_Func_ty action_func,
 																void *param)
 {
@@ -421,7 +422,7 @@ static int RunOperationOnTreeIMP(rbst_node_ty *node, Action_Func_ty action_func,
 	/*	check if any operation failure occured while traversing the 
 	 *	left subtree.
 	 *	Returns FAILURE on the first failed attemp.							*/
-	if	(RunOperationOnTreeIMP(node->children[left], action_func, param))
+	if	(RunOperationOnTreeIMP(node->children[LEFT], action_func, param))
 	{
 		return (FAILURE);
 	}						
@@ -435,7 +436,7 @@ static int RunOperationOnTreeIMP(rbst_node_ty *node, Action_Func_ty action_func,
 	
 	/*	Traverse the right subtree and apply the operation function to
 	 *	each of its nodes													*/
-	return (RunOperationOnTreeIMP(node->children[right], action_func, param));
+	return (RunOperationOnTreeIMP(node->children[RIGHT], action_func, param));
 }
 /******************************************************************************/
 static int IsALeafIMP(rbst_node_ty *node)
