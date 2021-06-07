@@ -18,6 +18,8 @@
 
 /******************************* Macros & enums *******************************/
 
+#define MAX(a,b) (((a)>(b))?(a):(b))
+
 /*	from which direction the child node connected to its parent node	*/
 typedef enum
 {
@@ -69,6 +71,8 @@ static void DestroyNodesIMP(rbst_node_ty *node);
 static rbst_node_ty *CreateNodeIMP(void *data);
 
 static int InsertNewNodeIMP(rbst_ty *rbst, rbst_node_ty *node, void *data);
+
+static size_t CalcTreeHeightIMP(rbst_node_ty *root);
 /************************* Functions  Implementations *************************/
 rbst_ty *RBSTCreate(Cmp_Func_ty cmp_func, const void *param)
 {
@@ -277,22 +281,23 @@ static rbst_node_ty *CreateNodeIMP(void *data)
 /******************************************************************************/
 size_t RBSTHeight(const rbst_ty *rbst)
 {
-/*	asserts*/
-/*	*/
-/*	return RBSTHeightIMP(root);*/
+	assert(rbst);
+	
+	return (CalcTreeHeightIMP(rbst->root));
 }
 
-static size_t RBSTHeightIMP(rbst_node_ty *node)
+static size_t CalcTreeHeightIMP(rbst_node_ty *node)
 {
-/*	Base case: node has no children */
-/*    if (node has no children)*/
-/*        return (0);*/
- 
-/*	recur for left and right subtree and find longest path from root to the deepest nodedepth */
+	/*	Base case: node has no children 								*/
+	/*	if (node has no children) : return 0 							*/
+	if (!node->children[RIGHT] && !node->children[LEFT]);
+	{
+		return (0);
+	}
 
-    /* return 1 + max(RBSTHeightIMP(node->left), height(node->right)); */
-    /* TODO make max macro/func											*/
-
+	/*	recursively traverse the left and right subtrees and find the 
+	 *	longest path from root to the deepest node depth 				*/
+	return (1 + MAX(RBSTHeightIMP(node->left), height(node->right))); 
 }
 /******************************************************************************/
 size_t RBSTSize(const rbst_ty *rbst)
