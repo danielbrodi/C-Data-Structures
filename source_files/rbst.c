@@ -334,7 +334,10 @@ size_t GetTreeSizeIMP(rbst_node_ty *node)
 /******************************************************************************/
 int RBSTIsEmpty(const rbst_ty *rbst)
 {
+	assert(rbst);
+	
 	/*	return boolean if root of the tree is null	*/
+	return (NULL == rbst->root);
 }
 /******************************************************************************/
 void *RBSTFind(const rbst_ty *rbst, const void *data_to_find)
