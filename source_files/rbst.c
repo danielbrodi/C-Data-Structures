@@ -76,6 +76,8 @@ static int InsertNewNodeIMP(rbst_ty *rbst, rbst_node_ty *node, void *data);
 static size_t CalcTreeHeightIMP(rbst_node_ty *root);
 
 size_t GetTreeSizeIMP(rbst_node_ty *root);
+
+static int IsALeafIMP(rbst_node_ty *node);
 /************************* Functions  Implementations *************************/
 rbst_ty *RBSTCreate(Cmp_Func_ty cmp_func, const void *param)
 {
@@ -132,7 +134,7 @@ static void DestroyNodesIMP(rbst_node_ty *node)
 	DestroyNodesIMP(node->children[RIGHT]);
 	
 	/*	if node is a leaf: free node										*/
-	if (!node->children[RIGHT] && !node->children[LEFT])
+	if (IsALeafIMP(node))
 	{
 		free(node);
 	}
@@ -159,8 +161,7 @@ void RBSTRemove(rbst_ty *rbst, const void *data)
 
 	/*#CASE 1#*/
 	/* if node has no children nodes: 										*/
-	/* TODO maybe create a func that check if leaf & frees the node			*/
-	if (!node->children[RIGHT] && !node->children[LEFT])
+	if (IsALeafIMP(node))
 	{
 		/* free node and return											*/							
 		free(node);
@@ -193,8 +194,6 @@ void RBSTRemove(rbst_ty *rbst, const void *data)
 			- link child's children to node
 			- free child node
 			*/
-			node->parent->children[child_side] = node->children[LEFT];
-			node->children[LEFT]->parent = node->parent;
 		}
 
 		/* free the node which was found								*/
@@ -293,10 +292,10 @@ static size_t CalcTreeHeightIMP(rbst_node_ty *node)
 {
 	/*	Base case: node has no children 									*/
 	/*	if (node has no children) : return 0 								*/
-	if (!node->children[RIGHT] && !node->children[LEFT]);
+	if (IsALeafIMP(node))
 	{
 		return (0);
-	}s
+	}
 
 	/*	recursively traverse the left and right subtrees and find the 
 	 *	longest path from root to the deepest node depth 					*/
@@ -320,7 +319,7 @@ size_t GetTreeSizeIMP(rbst_node_ty *node)
 	}
 	
 	/*	if node is a leaf, count the edge which connects to it				*/
-	if (!node->children[RIGHT] && !node->children[LEFT])
+	if (IsALeafIMP(node))
 	{
 		return (1);
 	}
@@ -430,3 +429,10 @@ static int RunOperationOnTreeIMP(rbst_node_ty *node, Action_Func_ty action_func,
 	return (RunOperationOnTreeIMP(node->children[right], action_func, param));
 }
 /******************************************************************************/
+static int IsALeafIMP(rbst_node_ty *node)
+{
+	assert(node);
+	
+	/*	check whether the node has any children					*/
+	return (!node->children[RIGHT] && !node->children[LEFT]);
+}
