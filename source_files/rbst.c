@@ -342,7 +342,7 @@ int RBSTIsEmpty(const rbst_ty *rbst)
 /******************************************************************************/
 void *RBSTFind(const rbst_ty *rbst, const void *data_to_find)
 {
-	rbst_node_ty *found_location = NULL;
+	rbst_node_ty *found_node = NULL;
 	
 	rbst_location_ty potential_location = {0};
 	
@@ -354,14 +354,15 @@ void *RBSTFind(const rbst_ty *rbst, const void *data_to_find)
 	
 	/*	If a node with a matching key was found, return its data.
 	 *	Otherwise, return NULL 	*/
-	found_location = 
+	found_node = 
 			potential_location.parent->children[potential_location.direction];
-	if (!found_location)
+		
+	if (!found_node)
 	{
 		return (NULL);
 	}
 	
-	return (found_location->data);
+	return (found_node->data);
 }
 
 static rbst_location_ty SearchLocationIMP(rbst_ty *rbst, rbst_node_ty *node, 
@@ -371,14 +372,13 @@ static rbst_location_ty SearchLocationIMP(rbst_ty *rbst, rbst_node_ty *node,
 	{
 		return 
 	}
-/*	if (node's data equals data to find):*/
-/*		return node.*/
-/*	*/
-/*	if node is null*/
-/*		return null*/
+		/*	if (node's data equals data to find):*/
+		/*		return node.*/
+		/*	*/
+		/*	if node is null*/
+		/*		return null*/
 
-	/*RBSTFindDataIMP(node->children[result of the cmp func])*/
-/*	TODO create location struct*/
+		/*RBSTFindDataIMP(node->children[result of the cmp func])*/
 }
 /******************************************************************************/
 int RBSTForEach(rbst_ty *rbst, Action_Func_ty action_func, void *param)
