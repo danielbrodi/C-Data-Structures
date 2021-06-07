@@ -73,6 +73,8 @@ static rbst_node_ty *CreateNodeIMP(void *data);
 static int InsertNewNodeIMP(rbst_ty *rbst, rbst_node_ty *node, void *data);
 
 static size_t CalcTreeHeightIMP(rbst_node_ty *root);
+
+size_t GetTreeSizeIMP(rbst_node_ty *root);
 /************************* Functions  Implementations *************************/
 rbst_ty *RBSTCreate(Cmp_Func_ty cmp_func, const void *param)
 {
@@ -293,31 +295,41 @@ static size_t CalcTreeHeightIMP(rbst_node_ty *node)
 	if (!node->children[RIGHT] && !node->children[LEFT]);
 	{
 		return (0);
-	}
+	}s
 
 	/*	recursively traverse the left and right subtrees and find the 
 	 *	longest path from root to the deepest node depth 				*/
-	return (1 + MAX(RBSTHeightIMP(node->left), height(node->right))); 
+	return (1 + MAX(CalcTreeHeightIMP(node->left), 
+											CalcTreeHeightIMP(node->right))); 
 }
 /******************************************************************************/
 size_t RBSTSize(const rbst_ty *rbst)
 {
-	/*if tree is empty:*/
-		/*return 0*/
-
-/*	return SizeIMP(root)*/
+	assert(rbst);
+	
+	return (GetTreeSizeIMP(rbst->root));
 }
-
-size_t RBSTSizeIMP(rbst_node_ty *root)
+/*----------------------------------------------------------------------------*/
+size_t GetTreeSizeIMP(rbst_node_ty *node)
 {
+	/*	if node doesn't exist, don't count the its  edge				*/
+	if (!node)
+	{
+		return (0);
+	}
+	
+	/*	if node is a leaf, count the edge which connects to it			*/
+	if (!node->children[RIGHT] && !node->children[LEFT])
+	{
+		return (1);
+	}
 
-/*	if node is null*/
-/*	return 0;*/
-
-	/*scan left subtree and return its size*/
-	/*add one because of the root*/
-	/*scan right subtree and add its size*/
-	/*return the sum of the sizes*/
+	/*	scan left subtree and return its size							*/
+	/*	add one because of the root										*/
+	/*	scan right subtree and add its size								*/
+	/*	return the sum of the sizes										*/
+	return (1 + GetTreeSizeIMP(node->children[LEFT]) + 
+				GetTreeSizeIMP(node->children[RIGHT]));
 }
 /******************************************************************************/
 int RBSTIsEmpty(const rbst_ty *rbst)
