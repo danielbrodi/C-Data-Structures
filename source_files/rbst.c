@@ -25,7 +25,6 @@ typedef enum
 	RIGHT = 1
 }sides_ty;
 
-
 /**************************** Structs  Definitions ****************************/
 
 /*	handler struct of each node in a binary search tree					*/
@@ -47,22 +46,40 @@ struct rbst
 	const void *param;			/*	a param which is given by the user	*/
 };
 
+/*	return type for a potential location of a node						*/
+typedef struct rbst_location
+{
+	rbst_node_ty *parent;		/*	parent node of the found location	*/
+	sides_ty direction;			/*	0 if its the left child,
+								 *	1 if its the right child			*/		
+} rbst_location_ty;
 /**************************** Forward Declarations ****************************/
 
-
+static rbst_location_ty SearchLocationIMP(bst_ty *bst, void *data);
 
 /************************* Functions  Implementations *************************/
 rbst_ty *RBSTCreate(Cmp_Func_ty cmp_func, const void *param)
 {
-	/*assert cmp_func because a binary tree without a cmp func is meaningless*/
-
-	/*allocate memory for tree's struct handler, handle errors if any*/
-
-	/*assign received param to tree's param*/
-	/*assign cmp_func to tree's cmp_func*/
-	/*assign NULL to root				*/
+	rbst_ty *new_tree = NULL;
 	
-	/*return the created tree*/
+	/*	assert cmp_func: a binary tree without a cmp func is meaningless	*/
+	assert(cmp_func);
+	
+	/*	allocate memory for tree's struct handler, handle errors if any		*/
+	new_tree = (rbst_ty *)malloc(rbst_ty);
+	if (!new_tree)
+	{
+		return (NULL);
+	}
+	
+	/*	set the received `cmp_func` as the comparing func of the tree.		*/
+	new_tree->compare_func = cmp_func;
+	
+	/*	set the received `param` as the param of the tree.					*/
+	new_tree->param = param;
+	
+	/*	return a pointer to the created bst.								*/
+	return (new_tree);
 }
 /******************************************************************************/
 void RBSTDestroy(rbst_ty *rbst)
@@ -195,12 +212,35 @@ int RBSTIsEmpty(const rbst_ty *rbst)
 /******************************************************************************/
 void *RBSTFind(const rbst_ty *rbst, const void *data_to_find)
 {
-	/*in order search:*/
-		/*return RBSTFindDataIMP(root, data_to_find)*/
+	rbst_node_ty *found_location = NULL;
+	
+	rbst_location_ty potential_location = {0};
+	
+	assert(rbst);
+	assert(data_to_find);
+	
+	/*	search for a potential location of a node with the given data		*/
+	potential_location = SearchLocationIMP(rbst, rbst->root, data_to_find);
+	
+	/*	If a node with a matching key was found, return its data.
+	 *	Otherwise, return NULL 	*/
+	found_location = 
+			potential_location.parent->children[potential_location.direction];
+	if (!found_location)
+	{
+		return (NULL);
+	}
+	
+	return (found_location->data);
 }
 
-static rbst_node_ty *RBSTFindDataIMP(rbst_node_ty *node, const void *data_to_find)
-{	
+static rbst_location_ty SearchLocationIMP(rbst_ty *rbst, rbst_node_ty *node, 
+															const void *data);
+{
+	if (!node)
+	{
+		return 
+	}
 /*	if (node's data equals data to find):*/
 /*		return node.*/
 /*	*/
@@ -218,7 +258,8 @@ int RBSTForEach(rbst_ty *rbst, Action_Func_ty action_func, void *param)
 	/*	return RBSTForEachIMP(root, action_func, param);*/
 }
 
-static int RBSTForEachIMP(rbst_node_ty *node, Action_Func_ty action_func, void *param)
+static int RBSTForEachIMP(rbst_node_ty *node, Action_Func_ty action_func,
+																void *param)
 {
 /*	IN ORDER:*/
 /*	*/
