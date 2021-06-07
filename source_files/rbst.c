@@ -3,7 +3,7 @@
 * Author:			Daniel Brodsky				 		  												  								
 * Date:				06-06-2021
 * Code Reviewer:	Kobi
-* Pseudo Reviewer: 						   								
+* Pseudo Reviewer:	Eran						   								
 * Version:			1.0   								
 * Description:		Recursive Binary Tree implementation pseudo-code.
 \******************************************************************************/
@@ -42,9 +42,7 @@ struct rbst
 	Cmp_Func_ty compare_func;	/*	helps to sort the nodes by
 								 *	comparing them by its criteria		*/
 	
-	/* bst_node_ty root; 			TODO maybe needed 					*/
-								/*	a stub that indicates on 
-								 *	the root of the tree					*/
+	rbst_node_ty *root;			/*	first node & the root of the tree	*/ 
 								 
 	const void *param;			/*	a param which is given by the user	*/
 };
@@ -62,7 +60,8 @@ rbst_ty *RBSTCreate(Cmp_Func_ty cmp_func, const void *param)
 
 	/*assign received param to tree's param*/
 	/*assign cmp_func to tree's cmp_func*/
-
+	/*assign NULL to root				*/
+	
 	/*return the created tree*/
 }
 /******************************************************************************/
@@ -74,8 +73,7 @@ void RBSTDestroy(rbst_ty *rbst)
 /*	*/
 /*	memset to 0 / nullify tree's struct ptrs*/
 	
-	/*if tree is empty:*/
-		/*free tree*/
+	/*free tree handler*/
 }
 
 /*static void RBSTDestroyNodesIMP(rbst_node_ty *node)*/
@@ -94,29 +92,38 @@ void RBSTRemove(rbst_ty *rbst, const void *data)
 {
 	/*asserts*/
 	
-	/* #CASE A#: */
+
+/*	use findIMP func to receive node with the needed data if exists*/
+/* TODO create FindIMP(could return both succ and parent), FindSucc, FindParent */
+
+	/* CASE A: */
+	/*if node with the same data wasn't found*/
+		/*do nothing: return*/
+	/* end CASE A	*/
+
+	/* #CASE B#: */
 	/*if data was found inside :*/
 	
-		/*#CASE A.1#*/
+		/*#CASE B.1#*/
 		/* if node has no children nodes: 
 										- free node
 										- return 						*/
 		
-		/*#CASE A.2#*/
+		/*#CASE B.2#*/
 		/* if node has only left child:
 										- copy child's data into node
-										- link child's childring to node
+										- link child's children to node
 										- free child node				*/
 		
 		/* if node has only right child:
 										- copy successor's data into node
 										- if successor has right child:
-												- set the left child of
-													node's right child as
-													successor's right child.
+											- make successor's parent to 
+												point to successor's right
+												 subtree.
 										- free successor				*/
 										
-		/*#CASE A.3#*/
+		/*#CASE B.3#*/
 		/* if node has 2 child nodes:
 										- copy successor's data into node
 										- determine the side of the successor 
@@ -125,35 +132,20 @@ void RBSTRemove(rbst_ty *rbst, const void *data)
 										- make successor's parent to point to
 											successor's right subtree.
 										- free successor.				*/
-	/* end CASE A */
-	
-	/* CASE B: */
-	/*if node with the same data wasn't found*/
-		/*do nothing: return*/
-	/* end CASE B	*/
-	
-	/*pre order remove:*/
-	/*remove(root)*/
-
-	/*if tree's cmp_func shows that data is on the left sub tree:*/
-		/*remove(root->left)*/
-	/*else*/
-		/*remove(root->right)*/
-	
+	/* end CASE B */
 }
 /******************************************************************************/
 int RBSTInsert(rbst_ty *rbst, void *data)
 {
 	/*if tree is empty or node is null:*/
 		/*create and insert a node with the received data from the user*/
+		/*set root as created node */
 
-	/*in order insert:*/
-		/*insert(rbst->root)*/
-
-	/*if tree's cmp_func shows that data is on the left sub tree:*/
-		/*insert(root->left)*/
-	/*else*/
-		/*insert(root->right)*/
+/*	find potential place for the received data by using the FindIMP func*/
+/*	*/
+/*	if found return error*/
+/*	else: create node -> set data -> determine side of child from parent and set
+	its																	*/
 }
 /******************************************************************************/
 size_t RBSTHeight(const rbst_ty *rbst)
@@ -166,12 +158,13 @@ size_t RBSTHeight(const rbst_ty *rbst)
 static size_t RBSTHeightIMP(rbst_node_ty *node)
 {
 /*	Base case: node has no children */
-    if (node has no children)
-        return (0);
+/*    if (node has no children)*/
+/*        return (0);*/
  
 /*	recur for left and right subtree and find longest path from root to the deepest nodedepth */
 
     /* return 1 + max(RBSTHeightIMP(node->left), height(node->right)); */
+    /* TODO make max macro/func											*/
 
 }
 /******************************************************************************/
@@ -180,10 +173,18 @@ size_t RBSTSize(const rbst_ty *rbst)
 	/*if tree is empty:*/
 		/*return 0*/
 
+/*	return SizeIMP(root)*/
+}
+
+size_t RBSTSizeIMP(rbst_node_ty *root)
+{
+
+/*	if node is null*/
+/*	return 0;*/
+
 	/*scan left subtree and return its size*/
 	/*add one because of the root*/
 	/*scan right subtree and add its size*/
-	
 	/*return the sum of the sizes*/
 }
 /******************************************************************************/
@@ -206,32 +207,32 @@ static rbst_node_ty *RBSTFindDataIMP(rbst_node_ty *node, const void *data_to_fin
 /*	if node is null*/
 /*		return null*/
 
-	/*if tree's cmp_func shows that data is on the left sub tree:*/
-		/*RBSTFindDataIMP(node->left)*/
-	/*else*/
-		/*RBSTFindDataIMP(node->right)*/
+	/*RBSTFindDataIMP(node->children[result of the cmp func])*/
+/*	TODO create location struct*/
 }
 /******************************************************************************/
 int RBSTForEach(rbst_ty *rbst, Action_Func_ty action_func, void *param)
 {
-/*	assert*/
-/* set counter to 0	*/
-/*	return RBSTForEachIMP(root, action_func, param, &counter);*/
+	/*	assert*/
+
+	/*	return RBSTForEachIMP(root, action_func, param);*/
 }
 
-static int RBSTForEachIMP(rbst_node_ty *node, Action_Func_ty action_func, void *param, size_t *counter)
+static int RBSTForEachIMP(rbst_node_ty *node, Action_Func_ty action_func, void *param)
 {
 /*	IN ORDER:*/
 /*	*/
-/*	if(node->left && !counter)*/
-/*        RBSTForEachIMP(node->left, action_func, param, counter);*/
 
-/*    if(action_func && !counter)*/
-/*        *counter += action_func(nodes data, param);*/
+/*	if node is null*/
+/*		return 0*/
 
-/*   if(node->right && !counter)*/
-/*        RBSTForEachIMP(node->left, action_func, param, counter);*/
-/*        */
-/*	return(*counter);*/
+
+/*        if (RBSTForEachIMP(node->left, action_func, param))
+				return 1;							*/
+
+	/*	if action_func(nodes data, param)			*/
+/*		return 1									*/
+
+/*        return (RBSTForEachIMP(node->right, action_func, param));	*/
 }
 /******************************************************************************/
