@@ -137,11 +137,8 @@ static void DestroyNodesIMP(rbst_node_ty *node)
 	/*	recursivly scan the right subtree and destroy it					*/
 	DestroyNodesIMP(node->children[RIGHT]);
 	
-	/*	if node is a leaf: free node										*/
-	if (IsALeafIMP(node))
-	{
+	/*	free reached node because its a leaf								*/
 		free(node);
-	}
 }
 /******************************************************************************/
 void RBSTRemove(rbst_ty *rbst, const void *data)
@@ -154,6 +151,7 @@ void RBSTRemove(rbst_ty *rbst, const void *data)
 	assert(data);
 
 	/*	use searching func to receive node with the needed data if exists	*/
+	/*	it also finds node's parent											*/
 	found_location = SearchLocationIMP(rbst, rbst->root, data);
 	
 	/*	if a node with a matching data was not found: do nothing			*/
@@ -167,43 +165,31 @@ void RBSTRemove(rbst_ty *rbst, const void *data)
 	/* if node has no children nodes: 										*/
 	if (IsALeafIMP(node))
 	{
-		/* free node and return											*/							
+		/* free node													*/							
 		free(node);
-		return;
 	}
 	
 	/*#CASE 2#*/
-	/*	if node has only one child node 									*/
+	/*	if node has only one child node: 									*/											
 	else if (!node->children[LEFT] || !node->children[RIGHT])
 	{
 	
-		/* 	if node has only right child:								*/
+		/* 	if node has only right child, link it to node's parent		*/
 		if (node->children[RIGHT])
 		{
-			/*
-			TODO create FindSuccessor function 
-			- copy successor's data into node
-			- if successor has right child:
-			- make successor's parent to 
-				point to successor's right
-				subtree.
-			- free successor									
-			*/
+			found_location.parent->children[found_location.direction] = 
+														node->children[RIGHT];		
 		}
 		
-		/* 	if node has only left child:								*/
+		/* 	if node has only left child, link it to node's parent		*/
 		else
 		{
-			/*
-			- copy child's data into node
-			- link child's children to node
-			- free child node
-			*/
+			found_location.parent->children[found_location.direction] = 
+														node->children[LEFT];
 		}
 
 		/* free the node which was found								*/
 		free(node);
-		node = NULL;
 	}
 	
 	/*#CASE 3#*/
@@ -221,8 +207,29 @@ void RBSTRemove(rbst_ty *rbst, const void *data)
 		*/
 	}
 	
-	return (successor);
+	return;
+}
+/*----------------------------------------------------------------------------*/
+/*	loop down from a node to find the leftmost or the rightmost node	*/
+static rbst_location_ty GetSideMostIMP(rbst_node_ty *node, sides_ty side)
+{
+	assert(RIGHT == side || LEFT == side);
 	
+	rbst_location_ty found_location = {0};
+	
+	if (!node)
+	{
+		return found_location;
+	}
+	
+	if (!node->children[side])
+	{
+		
+	}
+	
+	/*	while node's child on the received side exists:					*/
+	/*	go to that child.												*/
+	GetSideMostIMP(node->children[side]);
 }
 /******************************************************************************/
 int RBSTInsert(rbst_ty *rbst, void *data)
@@ -292,7 +299,7 @@ size_t RBSTHeight(const rbst_ty *rbst)
 	
 	return (CalcTreeHeightIMP(rbst->root));
 }
-
+/*----------------------------------------------------------------------------*/
 static size_t CalcTreeHeightIMP(rbst_node_ty *node)
 {
 	/*	Base case: node has no children 									*/
@@ -342,7 +349,7 @@ int RBSTIsEmpty(const rbst_ty *rbst)
 	assert(rbst);
 	
 	/*	return boolean if root of the tree is null							*/
-	return (NULL == rbst->root);
+	return (!rbst->root);
 }
 /******************************************************************************/
 void *RBSTFind(const rbst_ty *rbst, const void *data_to_find)
