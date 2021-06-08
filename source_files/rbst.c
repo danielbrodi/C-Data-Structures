@@ -80,6 +80,9 @@ size_t GetTreeSizeIMP(rbst_node_ty *root);
 
 static int IsALeafIMP(rbst_node_ty *node);
 
+/*	traverse down from a node to find the leftmost or the rightmost node	*/
+static rbst_location_ty GetSideMostIMP(rbst_node_ty *node, sides_ty side);
+
 static int RunOperationOnTreeIMP(rbst_node_ty *node, Action_Func_ty action_func,
 																void *param);
 /************************* Functions  Implementations *************************/
@@ -145,7 +148,7 @@ void RBSTRemove(rbst_ty *rbst, const void *data)
 {
 	rbst_location_ty found_location = {0};
 	
-	rbst_node_ty *found_node = NULL;
+	rbst_node_ty *node_to_remove, *successor = NULL, *successor_parent = NULL;
 	
 	assert(rbst);
 	assert(data);
@@ -155,56 +158,70 @@ void RBSTRemove(rbst_ty *rbst, const void *data)
 	found_location = SearchLocationIMP(rbst, rbst->root, data);
 	
 	/*	if a node with a matching data was not found: do nothing			*/
-	found_node = found_location.parent->children[found_location.direction];
-	if (!found_node)
+	node_to_remove = found_location.parent->children[found_location.direction];
+	if (!node_to_remove)
 	{
 		return;
 	}
 
 	/*#CASE 1#*/
 	/* if node has no children nodes: 										*/
-	if (IsALeafIMP(node))
+	if (IsALeafIMP(node_to_remove))
 	{
 		/* free node													*/							
-		free(node);
+		free(node_to_remove);
 	}
 	
 	/*#CASE 2#*/
 	/*	if node has only one child node: 									*/											
-	else if (!node->children[LEFT] || !node->children[RIGHT])
+	else if (!node_to_remove->children[LEFT] || !node_to_remove->children[RIGHT])
 	{
 	
 		/* 	if node has only right child, link it to node's parent		*/
-		if (node->children[RIGHT])
+		if (node_to_remove->children[RIGHT])
 		{
 			found_location.parent->children[found_location.direction] = 
-														node->children[RIGHT];		
+												node_to_remove->children[RIGHT];		
 		}
 		
 		/* 	if node has only left child, link it to node's parent		*/
 		else
 		{
 			found_location.parent->children[found_location.direction] = 
-														node->children[LEFT];
+												node_to_remove->children[LEFT];
 		}
 
 		/* free the node which was found								*/
-		free(node);
+		free(node_to_remove);
 	}
 	
 	/*#CASE 3#*/
 	/*	if node has 2 subtrees												*/
 	else
 	{
-		/*
-		- copy successor's data into node
-		- determine the side of the successor 
-			as a child node by scanning the
-			tree for its parent.
-		- make successor's parent to point to
-			successor's right subtree.
-		- free successor.
-		*/
+		/*	find the successor's parent										*/
+		/*	a successor of a node is the leftmost node of its right child	*/
+		successor_parent = 
+				GetSideMostIMP(node_to_remove->children[RIGHT], LEFT).parent;
+		/*	check if the successor is the right child or the leftmost node	*/
+		if (successor_parent)
+		{
+			successor = successor_parent->children[LEFT];
+			/*	link successor's parent to successor's right subtree	*/
+			successor_parent->children[LEFT] = successor->children[RIGHT];
+		}
+		/*	if the successor is the right child of node_to_remove			*/
+		else
+		{
+			successor = node_to_remove->children[RIGHT];
+			/*	link node_to_remove's right subtree 
+			 *	to successor's right subtree								*/
+			node_to_remove->children[right] = successor->children[RIGHT];
+		}
+		/*  copy successor's data into node									*/
+		node_to_remove->data = successor->data;
+		/*	free successor's node											*/
+		free(successor);
 	}
 	
 	return;
@@ -215,6 +232,7 @@ static rbst_location_ty GetSideMostIMP(rbst_node_ty *node, sides_ty side)
 {
 	rbst_location_ty found_location = {0};
 	
+	assert(node);
 	assert(RIGHT == side || LEFT == side);
 	
 	/*	if no subtree in this direction even exists							*/
