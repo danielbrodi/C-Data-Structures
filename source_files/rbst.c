@@ -216,7 +216,7 @@ void RBSTRemove(rbst_ty *rbst, const void *data)
 			successor = node_to_remove->children[RIGHT];
 			/*	link node_to_remove's right subtree 
 			 *	to successor's right subtree								*/
-			node_to_remove->children[right] = successor->children[RIGHT];
+			node_to_remove->children[RIGHT] = successor->children[RIGHT];
 		}
 		/*  copy successor's data into node									*/
 		node_to_remove->data = successor->data;
@@ -236,7 +236,7 @@ static rbst_location_ty GetSideMostIMP(rbst_node_ty *node, sides_ty side)
 	assert(RIGHT == side || LEFT == side);
 	
 	/*	if no subtree in this direction even exists							*/
-	if (!node->[side])
+	if (!node->children[side])
 	{
 		return (found_location);
 	}
@@ -245,12 +245,12 @@ static rbst_location_ty GetSideMostIMP(rbst_node_ty *node, sides_ty side)
 	/*	save node as parent and go to that child.							*/
 	if (!node->children[side]->children[side])
 	{
-		location.parent = node;
-		location.direction = side;
+		found_location.parent = node;
+		found_location.direction = side;
 		return (found_location);
 	}
 	
-	return (GetSideMostIMP(node->children[side], side, location));
+	return (GetSideMostIMP(node->children[side], side));
 }
 /******************************************************************************/
 int RBSTInsert(rbst_ty *rbst, void *data)
