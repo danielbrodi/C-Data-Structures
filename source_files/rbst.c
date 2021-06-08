@@ -53,7 +53,7 @@ struct rbst
 	Cmp_Func_ty compare_func;	/*	helps to sort the nodes by
 								 *	comparing them by its criteria			*/
 	
-	rbst_node_ty *root;			/*	first node & the root of the tree		*/ 
+	rbst_node_ty *root;			/*	first node and the root of the tree		*/ 
 								 
 	const void *param;			/*	a param which is given by the user		*/
 };
@@ -80,11 +80,13 @@ size_t GetTreeSizeIMP(rbst_node_ty *root);
 
 static int IsALeafIMP(rbst_node_ty *node);
 
+static int IsARootIMP(const rbst_ty *rbst, const void *data);
+
 /*	traverse down from a node to find the leftmost or the rightmost node	*/
 static rbst_location_ty GetSideMostIMP(rbst_node_ty *node, sides_ty side);
 
 static int RunOperationOnTreeIMP(rbst_node_ty *node, Action_Func_ty action_func,
-																void *param);
+																void *param);														
 /************************* Functions  Implementations *************************/
 rbst_ty *RBSTCreate(Cmp_Func_ty cmp_func, const void *param)
 {
@@ -159,7 +161,20 @@ void RBSTRemove(rbst_ty *rbst, const void *data)
 	
 	assert(rbst);
 	assert(data);
-
+	
+	/* SPECIAL CASE: check if the node which will be removed is the root	*/
+	if (IsARootIMP(rbst, data))
+	{
+		node_to_remove = rbst->root;
+		
+		rbst->root = node_to_remove->children[RIGHT] ? 
+			node_to_remove->children[RIGHT] : node_to_remove->children[LEFT];
+			
+		free(node_to_remove);
+		
+		return;
+	}
+	
 	/*	use searching func to receive node with the needed data if exists	*/
 	/*	it also finds node's parent											*/
 	found_location = SearchLocationIMP(rbst, rbst->root, data);
@@ -225,6 +240,7 @@ void RBSTRemove(rbst_ty *rbst, const void *data)
 			 *	to successor's right subtree								*/
 			node_to_remove->children[RIGHT] = successor->children[RIGHT];
 		}
+		
 		/*  copy successor's data into node									*/
 		node_to_remove->data = successor->data;
 		/*	free successor's node											*/
@@ -268,6 +284,9 @@ int RBSTInsert(rbst_ty *rbst, void *data)
 	
 	assert(rbst);
 	assert(data); /*	NULL data isn't accepted in this tree				*/
+	
+	/* SPECIAL CASE: check same data exists in the root						*/
+	assert(!IsARootIMP(rbst, data));
 	
 	/*	create a node with the received data								*/
 	/*	handle memory allocation errors if any								*/
@@ -388,6 +407,12 @@ void *RBSTFind(const rbst_ty *rbst, const void *data_to_find)
 	assert(rbst);
 	assert(data_to_find);
 	
+	/* SPECIAL CASE: check if the data which is searched is in the root		*/
+	if (IsARootIMP(rbst, data_to_find))
+	{
+		return (rbst->root->data);	
+	}
+	
 	/*	search for a potential location of a node with the given data		*/
 	potential_location = SearchLocationIMP(rbst, rbst->root, data_to_find);
 	
@@ -419,7 +444,7 @@ static rbst_location_ty SearchLocationIMP(const rbst_ty *rbst, rbst_node_ty *nod
 	/*	if node doesn't exist or if a node with the needed data was found	*/
 	if (!node->children[direction_to_go] ||
 		!rbst->compare_func(
-		node->children[direction_to_go]->data, data, rbst->param))
+					node->children[direction_to_go]->data, data, rbst->param))
 	{
 		potential_location.parent = node;
 		potential_location.direction = direction_to_go;
@@ -476,3 +501,14 @@ static int IsALeafIMP(rbst_node_ty *node)
 	/*	check whether the node has any children					*/
 	return (!node->children[RIGHT] && !node->children[LEFT]);
 }
+/******************************************************************************/
+static int IsARootIMP(const rbst_ty *rbst, const void *data)
+{	
+	if (rbst->root)
+	{
+		return (!rbst->compare_func(rbst->root->data, data, rbst->param));
+	}
+	
+	return (0);
+}
+/******************************************************************************/

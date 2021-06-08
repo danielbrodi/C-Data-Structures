@@ -33,7 +33,7 @@ typedef struct student
 /**************************** Forward Declarations ****************************/
 int CompareGrades(const void *student1, const void *student2, const void *param);
 
-static void RBSTFindTest(const rbst_ty *tree, const element_ty *students, size_t size);
+static void RBSTFindTest(const rbst_ty *tree);
 
 static void RBSTCreateTest(rbst_ty *tree);
 
@@ -48,6 +48,8 @@ static void PrintArray(element_ty arr[], size_t size);
 static void RBSTIsEmptyTest(rbst_ty *tree);
 
 int PrintTree(void *student, void *param);
+
+static void RBSTRemoveTest(rbst_ty *tree);
 /******************************************************************************/
 /******************************* Main__Function *******************************/
 
@@ -70,7 +72,9 @@ int main()
 	RBSTCreateTest(tree);
 	RBSTIsEmptyTest(tree);
 	RBSTInsertTest(tree, students, size);
-	RBSTFindTest(tree, students, size);
+	RBSTFindTest(tree);
+	RBSTRemoveTest(tree);
+	RBSTFindTest(tree);
 	
 	RBSTDestroyTest(tree);
 	
@@ -100,13 +104,13 @@ static void RBSTInsertTest(rbst_ty *tree, element_ty *arr, size_t arr_size)
 		
 		printf("STATUS: %d for student: %s\n", status, arr[i].name);
 	}
-	printf("SIZE OF TREE: %ld\n\n", RBSTSize(tree));
+	printf("SIZE OF TREE: %ld, Height: %d\n\n", RBSTSize(tree), RBSTHeight(tree));
 	RBSTForEach(tree, PrintTree, 0);
 }
 /******************************************************************************/
-static void RBSTFindTest(const rbst_ty *tree, const element_ty *students, size_t size)
+static void RBSTFindTest(const rbst_ty *tree)
 {
-	element_ty FindMe = {"", 0, 313};
+	element_ty FindMe = {"", 0, 10};
 	element_ty *student = (element_ty *)RBSTFind(tree, &FindMe);
 	
 	if (student)
@@ -127,6 +131,50 @@ static void RBSTIsEmptyTest(rbst_ty *tree)
 	printf(CYAN "IsEmpty Test: " RESET_COLOR);
 	
 	RBSTIsEmpty(tree) ? PRINT_SUCCESS : PRINT_FAILURE;
+}
+/******************************************************************************/
+static void RBSTRemoveTest(rbst_ty *tree)
+{
+	element_ty RemoveMe0 = {"", 0, 10};
+	element_ty RemoveMe1 = {"", 0, 20};
+	element_ty RemoveMe2 = {"", 0, 30};
+	element_ty RemoveMe3 = {"", 0, 40};
+	element_ty RemoveMe4 = {"", 0, 50};
+	
+	printf(RED "REMOVED 10:\n" RESET_COLOR);
+	RBSTRemove(tree, &RemoveMe0);
+	printf("SIZE OF TREE: %ld\n\n", RBSTSize(tree));
+	
+	printf(CYAN "\n\nTREE:\n\n" RESET_COLOR);
+	RBSTForEach(tree, PrintTree, 0);
+	
+	printf(RED "REMOVED 20:\n" RESET_COLOR);
+	RBSTRemove(tree, &RemoveMe1);
+	printf("SIZE OF TREE: %ld\n\n", RBSTSize(tree));
+	
+	printf(CYAN "\n\nTREE:\n\n" RESET_COLOR);
+	RBSTForEach(tree, PrintTree, 0);
+	
+	printf(RED "REMOVED 30:\n" RESET_COLOR);
+	RBSTRemove(tree, &RemoveMe2);
+	printf("SIZE OF TREE: %ld\n\n", RBSTSize(tree));
+	
+	printf(CYAN "\n\nTREE:\n\n" RESET_COLOR);
+	RBSTForEach(tree, PrintTree, 0);
+	
+	printf(RED "REMOVED 40:\n" RESET_COLOR);
+	RBSTRemove(tree, &RemoveMe3);
+	printf("SIZE OF TREE: %ld\n\n", RBSTSize(tree));
+	
+	printf(CYAN "\n\nTREE:\n\n" RESET_COLOR);
+	RBSTForEach(tree, PrintTree, 0);
+	
+	printf(RED "REMOVED 50:\n" RESET_COLOR);
+	RBSTRemove(tree, &RemoveMe4);
+	printf("SIZE OF TREE: %ld\n\n", RBSTSize(tree));
+	
+	printf(CYAN "\n\nTREE:\n\n" RESET_COLOR);
+	RBSTForEach(tree, PrintTree, 0);
 }
 /******************************************************************************/
 int CompareGrades(const void *student1, const void *student2, const void *param)
@@ -168,14 +216,7 @@ static void FillUpArray(element_ty *arr, size_t size)
 	{
 		arr[i].name = names[i];
 		arr[i].id = RANDOM_NUM;
-		if (3 == i)
-		{
-			arr[i].grade = 313;
-		}
-		else
-		{
-			arr[i].grade = RANDOM_NUM;
-		}
+		arr[i].grade = (i+1) * 10;
 	}
 }
 /******************************************************************************/
