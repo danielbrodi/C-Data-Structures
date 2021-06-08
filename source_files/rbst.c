@@ -100,6 +100,9 @@ rbst_ty *RBSTCreate(Cmp_Func_ty cmp_func, const void *param)
 		return (NULL);
 	}
 	
+	/*	set the root of the tree as null because there is no root yet		*/
+	new_tree->root = NULL;
+	
 	/*	set the received `cmp_func` as the comparing func of the tree.		*/
 	new_tree->compare_func = cmp_func;
 	
@@ -113,16 +116,20 @@ rbst_ty *RBSTCreate(Cmp_Func_ty cmp_func, const void *param)
 void RBSTDestroy(rbst_ty *rbst)
 {
 	assert(rbst);
-
-	/*	DestroyNodesIMP(root)*/
-	DestroyNodesIMP(rbst->root);
 	
-	/*	memset to 0 / nullify tree's struct ptrs*/
+	/*	assure that there are nodes to free in the tree						*/
+	if (!RBSTIsEmpty(rbst))
+	{
+		/*	DestroyNodesIMP(root)											*/
+		DestroyNodesIMP(rbst->root);
+	}
+	
+	/*	nullify tree's struct ptrs											*/
 	rbst->root = NULL;
 	rbst->compare_func = NULL;
 	rbst->param = NULL;
 	
-	/*free tree handler*/
+	/*	free tree handler													*/
 	free(rbst);
 	rbst = NULL;
 }
