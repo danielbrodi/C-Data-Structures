@@ -74,7 +74,7 @@ static void DestroyNodesIMP(rbst_node_ty *node);
 
 static rbst_node_ty *CreateNodeIMP(void *data);
 
-static size_t CalcTreeHeightIMP(rbst_node_ty *root);
+static int CalcTreeHeightIMP(rbst_node_ty *root);
 
 size_t GetTreeSizeIMP(rbst_node_ty *root);
 
@@ -321,22 +321,21 @@ static rbst_node_ty *CreateNodeIMP(void *data)
     return (new_node);
 }
 /******************************************************************************/
-size_t RBSTHeight(const rbst_ty *rbst)
-{
+int RBSTHeight(const rbst_ty *rbst)
+{	
 	assert(rbst);
 	
 	return (CalcTreeHeightIMP(rbst->root));
 }
 /*----------------------------------------------------------------------------*/
-static size_t CalcTreeHeightIMP(rbst_node_ty *node)
+static int CalcTreeHeightIMP(rbst_node_ty *node)
 {
-	/*	Base case: node has no children 									*/
-	/*	if (node has no children) : return 0 								*/
-	if (IsALeafIMP(node))
+	/*	if node does not exist, return (-1)									*/
+	if (!node)
 	{
-		return (0);
+		return (-1);
 	}
-
+	
 	/*	recursively traverse the left and right subtrees and find the 
 	 *	longest path from root to the deepest node depth 					*/
 	return (1 + MAX(CalcTreeHeightIMP(node->children[LEFT]), 
@@ -414,21 +413,17 @@ static rbst_location_ty SearchLocationIMP(const rbst_ty *rbst, rbst_node_ty *nod
 	assert(rbst);
 	assert(data);
 	
-	/*	if node doesn't exist, return to previous call						*/
-	if (!node)
-	{
-		return (potential_location);
-	}
-	
 	/*	determine which direction to go based on the result of cmp_func		*/
-	direction_to_go = rbst->compare_func(node->data, data, rbst->param) > 0;
+	direction_to_go = rbst->compare_func(node->data, data, rbst->param) < 0;
 	
-	/*	if a node with the needed data was found, return its location		*/
-	if (!rbst->compare_func(node->children[direction_to_go]->data, data, rbst->param))
+	/*	if node doesn't exist or if a node with the needed data was found	*/
+	if (!node->children[direction_to_go] ||
+		!rbst->compare_func(
+		node->children[direction_to_go]->data, data, rbst->param))
 	{
 		potential_location.parent = node;
 		potential_location.direction = direction_to_go;
-		
+				
 		return (potential_location);
 	}
 	

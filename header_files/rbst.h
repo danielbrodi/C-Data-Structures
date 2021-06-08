@@ -40,7 +40,7 @@ int RBSTInsert(rbst_ty *rbst, void *data);
 
 /*	Number of edges on longest path from root to the deepest node			*/
 /*	Complexity: O() - n is tree size										*/
-size_t RBSTHeight(const rbst_ty *rbst);
+int RBSTHeight(const rbst_ty *rbst);
 
 /*	Complexity O(n) - n is tree size										*/
 size_t RBSTSize(const rbst_ty *rbst);
