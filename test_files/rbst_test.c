@@ -69,6 +69,7 @@ int main()
 	PrintArray(students, size);
 	
 	/*	Runs tests														*/
+	RBSTFindTest(tree);
 	RBSTCreateTest(tree);
 	RBSTIsEmptyTest(tree);
 	RBSTInsertTest(tree, students, size);

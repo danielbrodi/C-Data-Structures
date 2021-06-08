@@ -18,17 +18,17 @@
 
 /******************************* Macros & enums *******************************/
 
-/*	returns the bigger value between 2 given values						*/
+/*	returns the bigger value between 2 given values							*/
 #define MAX(a,b) (((a)>(b))?(a):(b))
 
-/*	from which direction the child node connected to its parent node	*/
+/*	from which direction the child node connected to its parent node		*/
 typedef enum
 {
 	LEFT = 0,
 	RIGHT = 1
 }sides_ty;
 
-/*	status indication of a finished operation							*/
+/*	status indication of a finished operation								*/
 enum
 {
 	SUCCESS = 0,
@@ -162,14 +162,14 @@ void RBSTRemove(rbst_ty *rbst, const void *data)
 	assert(rbst);
 	assert(data);
 	
-	/* SPECIAL CASE: check if the node which will be removed is the root	*/
+	/*	if the data which needs to be removed is located in the root:		*/
 	if (IsARootIMP(rbst, data))
 	{
 		node_to_remove = rbst->root;
-		
+		/*	set one of its childs' nodes as the new root of the tree		*/
 		rbst->root = node_to_remove->children[RIGHT] ? 
 			node_to_remove->children[RIGHT] : node_to_remove->children[LEFT];
-			
+		/*	free the node which used to be the root							*/
 		free(node_to_remove);
 		
 		return;
@@ -190,7 +190,7 @@ void RBSTRemove(rbst_ty *rbst, const void *data)
 	/* if node has no children nodes: 										*/
 	if (IsALeafIMP(node_to_remove))
 	{
-		/* free node													*/							
+		/* free node														*/							
 		free(node_to_remove);
 	}
 	
@@ -199,21 +199,21 @@ void RBSTRemove(rbst_ty *rbst, const void *data)
 	else if (!node_to_remove->children[LEFT] || !node_to_remove->children[RIGHT])
 	{
 	
-		/* 	if node has only right child, link it to node's parent		*/
+		/* 	if node has only right child, link it to node's parent			*/
 		if (node_to_remove->children[RIGHT])
 		{
 			found_location.parent->children[found_location.direction] = 
 												node_to_remove->children[RIGHT];		
 		}
 		
-		/* 	if node has only left child, link it to node's parent		*/
+		/* 	if node has only left child, link it to node's parent			*/
 		else
 		{
 			found_location.parent->children[found_location.direction] = 
 												node_to_remove->children[LEFT];
 		}
 
-		/* free the node which was found								*/
+		/* free the node which was found									*/
 		free(node_to_remove);
 	}
 	
@@ -237,7 +237,7 @@ void RBSTRemove(rbst_ty *rbst, const void *data)
 		{
 			successor = node_to_remove->children[RIGHT];
 			/*	link node_to_remove's right subtree 
-			 *	to successor's right subtree								*/
+			 *	to successor's right subtree							*/
 			node_to_remove->children[RIGHT] = successor->children[RIGHT];
 		}
 		
@@ -285,7 +285,7 @@ int RBSTInsert(rbst_ty *rbst, void *data)
 	assert(rbst);
 	assert(data); /*	NULL data isn't accepted in this tree				*/
 	
-	/* SPECIAL CASE: check same data exists in the root						*/
+	/* assure that the data which needs to be inserted is not in the root	*/
 	assert(!IsARootIMP(rbst, data));
 	
 	/*	create a node with the received data								*/
@@ -299,7 +299,7 @@ int RBSTInsert(rbst_ty *rbst, void *data)
 	/*	if tree is empty													*/
 	if (RBSTIsEmpty(rbst))
 	{
-		/*	set the root of the tree as the created node 	*/
+		/*	set the root of the tree as the created node 			*/
 		rbst->root = new_node;
 		
 		return (SUCCESS);	
@@ -331,8 +331,8 @@ static rbst_node_ty *CreateNodeIMP(void *data)
 	new_node = (rbst_node_ty *)malloc(sizeof(rbst_node_ty));
 	if (new_node)
 	{
-		/*	set data as data 												*/
-		/* 	set children pointers as null									*/
+		/*	set data as data 										*/
+		/* 	set children pointers as null							*/
 		new_node->data = data;
 		new_node->children[LEFT] = new_node->children[RIGHT] = NULL;
     }
@@ -407,7 +407,7 @@ void *RBSTFind(const rbst_ty *rbst, const void *data_to_find)
 	assert(rbst);
 	assert(data_to_find);
 	
-	/* SPECIAL CASE: check if the data which is searched is in the root		*/
+	/* check if the data which is searched is in the root					*/
 	if (IsARootIMP(rbst, data_to_find))
 	{
 		return (rbst->root->data);	
@@ -416,17 +416,15 @@ void *RBSTFind(const rbst_ty *rbst, const void *data_to_find)
 	/*	search for a potential location of a node with the given data		*/
 	potential_location = SearchLocationIMP(rbst, rbst->root, data_to_find);
 	
-	/*	If a node with a matching key was found, return its data.
-	 *	Otherwise, return NULL 	*/
-	found_node = 
-			potential_location.parent->children[potential_location.direction];
-		
-	if (!found_node)
+	if (potential_location.parent)
 	{
-		return (NULL);
+		/*	If a node with a matching key was found, return its data.
+		 *	Otherwise, return NULL 									*/
+		found_node = 
+				potential_location.parent->children[potential_location.direction];
 	}
 	
-	return (found_node->data);
+	return (found_node ? found_node->data : NULL);
 }
 /*----------------------------------------------------------------------------*/
 static rbst_location_ty SearchLocationIMP(const rbst_ty *rbst, rbst_node_ty *node, 
@@ -438,6 +436,11 @@ static rbst_location_ty SearchLocationIMP(const rbst_ty *rbst, rbst_node_ty *nod
 	assert(rbst);
 	assert(data);
 	
+	if (!node)
+	{
+		return (potential_location);
+	}
+		
 	/*	determine which direction to go based on the result of cmp_func		*/
 	direction_to_go = rbst->compare_func(node->data, data, rbst->param) < 0;
 	
@@ -498,7 +501,7 @@ static int IsALeafIMP(rbst_node_ty *node)
 {
 	assert(node);
 	
-	/*	check whether the node has any children					*/
+	/*	check whether the node has any children								*/
 	return (!node->children[RIGHT] && !node->children[LEFT]);
 }
 /******************************************************************************/
@@ -506,6 +509,7 @@ static int IsARootIMP(const rbst_ty *rbst, const void *data)
 {	
 	if (rbst->root)
 	{
+		/* check if the given data is located in the root node		*/
 		return (!rbst->compare_func(rbst->root->data, data, rbst->param));
 	}
 	
