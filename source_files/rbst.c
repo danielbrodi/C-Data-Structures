@@ -210,26 +210,29 @@ void RBSTRemove(rbst_ty *rbst, const void *data)
 	return;
 }
 /*----------------------------------------------------------------------------*/
-/*	loop down from a node to find the leftmost or the rightmost node	*/
+/*	traverse down from a node to find the leftmost or the rightmost node	*/
 static rbst_location_ty GetSideMostIMP(rbst_node_ty *node, sides_ty side)
 {
-	assert(RIGHT == side || LEFT == side);
-	
 	rbst_location_ty found_location = {0};
 	
-	if (!node)
+	assert(RIGHT == side || LEFT == side);
+	
+	/*	if no subtree in this direction even exists							*/
+	if (!node->[side])
 	{
-		return found_location;
+		return (found_location);
 	}
 	
-	if (!node->children[side])
+	/*	while node's child on the received side exists:						*/
+	/*	save node as parent and go to that child.							*/
+	if (!node->children[side]->children[side])
 	{
-		
+		location.parent = node;
+		location.direction = side;
+		return (found_location);
 	}
 	
-	/*	while node's child on the received side exists:					*/
-	/*	go to that child.												*/
-	GetSideMostIMP(node->children[side]);
+	return (GetSideMostIMP(node->children[side], side, location));
 }
 /******************************************************************************/
 int RBSTInsert(rbst_ty *rbst, void *data)
