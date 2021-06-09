@@ -45,6 +45,7 @@ typedef struct rbst_node
 	void *data;						/*	data which is stored in the node	*/	
 }rbst_node_ty;
 
+/* TODO add stub	*/
 /*	struct handler of a recursive binary search tree						*/
 struct rbst
 {
@@ -205,12 +206,15 @@ void RBSTRemove(rbst_ty *rbst, const void *data)
 	/* if node has no children nodes: 										*/
 	if (IsALeafIMP(node_to_remove))
 	{
+		/*	link parent to null after removing the node						*/
+		found_location.parent->children[found_location.direction] = NULL;
 		/* free node														*/							
 		free(node_to_remove);
 	}
 	
 	/*#CASE 2#*/
-	/*	if node has only one child node: 									*/											
+	/*	if node has only one child node: 									*/
+	/*	TODO change the inside if-else to boolean result					*/
 	else if (!node_to_remove->children[LEFT] || !node_to_remove->children[RIGHT])
 	{
 	
@@ -234,6 +238,7 @@ void RBSTRemove(rbst_ty *rbst, const void *data)
 	
 	/*#CASE 3#*/
 	/*	if node has 2 subtrees												*/
+	/*TODO create function that link/unlink ptrs	*/
 	else
 	{
 		/*	find the successor's parent										*/
@@ -485,8 +490,7 @@ int RBSTForEach(rbst_ty *rbst, Action_Func_ty action_func, void *param)
 static int RunOperationOnTreeIMP(rbst_node_ty *node, Action_Func_ty action_func,
 																void *param)
 {
-	/*	if node is null*/
-	/*		return 0*/
+	/*	if node is null : return 0.											*/
 	if (!node)
 	{
 		return (SUCCESS);

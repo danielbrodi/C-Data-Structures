@@ -49,7 +49,7 @@ static void RBSTIsEmptyTest(rbst_ty *tree);
 
 int PrintTree(void *student, void *param);
 
-static void RBSTRemoveTest(rbst_ty *tree);
+static void RBSTRemoveTest(rbst_ty *tree, element_ty *arr, size_t arr_size);
 /******************************************************************************/
 /******************************* Main__Function *******************************/
 
@@ -69,12 +69,11 @@ int main()
 	PrintArray(students, size);
 	
 	/*	Runs tests														*/
-	RBSTFindTest(tree);
 	RBSTCreateTest(tree);
 	RBSTIsEmptyTest(tree);
 	RBSTInsertTest(tree, students, size);
 	RBSTFindTest(tree);
-	RBSTRemoveTest(tree);
+	RBSTRemoveTest(tree, students, size);
 	RBSTFindTest(tree);
 	
 	RBSTDestroyTest(tree);
@@ -95,87 +94,84 @@ static void RBSTDestroyTest(rbst_ty *tree)
 /******************************************************************************/
 static void RBSTInsertTest(rbst_ty *tree, element_ty *arr, size_t arr_size)
 {
-	size_t num_of_elements = arr_size, i = 0;
-	int status = 0;
+	size_t num_of_elements = arr_size, i = 0, tree_size = 0;
+	int is_working_insert = 1, is_working_size = 1;
 	
 	for (i = 0; i < num_of_elements; ++i)
 	{
-		printf("SIZE OF TREE: %ld, Height: %d\n\n", RBSTSize(tree), RBSTHeight(tree));
-		status = RBSTInsert(tree, &arr[i]);
-		
-		printf("STATUS: %d for student: %s\n", status, arr[i].name);
+		is_working_insert *= (RBSTSize(tree) == tree_size);
+		if (RBSTInsert(tree, &arr[i]))
+		{
+			is_working_insert = 0;
+			printf(RED "STATUS: FAILED for student: %s\n" RESET_COLOR, arr[i].name);
+		}
+		++tree_size;
 	}
-	printf("SIZE OF TREE: %ld, Height: %d\n\n", RBSTSize(tree), RBSTHeight(tree));
-	RBSTForEach(tree, PrintTree, 0);
+	
+	is_working_size *= (RBSTSize(tree) == tree_size);
+	
+	printf(CYAN "RBST Insert Test: " RESET_COLOR);
+	
+	is_working_insert ? PRINT_SUCCESS : PRINT_FAILURE;
+	
+	printf(CYAN "RBST Size Test: " RESET_COLOR);
+	
+	is_working_size ? PRINT_SUCCESS : PRINT_FAILURE;
 }
 /******************************************************************************/
 static void RBSTFindTest(const rbst_ty *tree)
 {
-	element_ty FindMe = {"", 0, 10};
+	element_ty FindMe = {"", 0, 300};
 	element_ty *student = (element_ty *)RBSTFind(tree, &FindMe);
+	
+	int is_working = 1;
 	
 	if (student)
 	{
-	printf("Found! Name: %s, ID: %ld, Grade: %ld\n", student->name, student->id,
-																student->grade);	
+/*	printf("Found! Name: %s, ID: %ld, Grade: %ld\n", student->name, student->id,*/
+/*																student->grade);*/
+	is_working *= (student->grade == FindMe.grade);
+		
 	}
 	else
 	{
-		printf("NOT FOUND\n");
+		is_working = 0;
 	}
 	
-	RBSTIsEmpty(tree) ? printf("TREE IS EMPTY!\n'") : printf("TREE IS NOT EMPTY\n");
+	printf(CYAN "RBST Find Test: " RESET_COLOR);
+	
+	is_working ? PRINT_SUCCESS : PRINT_FAILURE;
 }
 /******************************************************************************/
 static void RBSTIsEmptyTest(rbst_ty *tree)
 {
-	printf(CYAN "IsEmpty Test: " RESET_COLOR);
+	printf(CYAN "RBST IsEmpty Test: " RESET_COLOR);
 	
 	RBSTIsEmpty(tree) ? PRINT_SUCCESS : PRINT_FAILURE;
 }
 /******************************************************************************/
-static void RBSTRemoveTest(rbst_ty *tree)
+static void RBSTRemoveTest(rbst_ty *tree, element_ty *arr, size_t arr_size)
 {
-	element_ty RemoveMe0 = {"", 0, 10};
-	element_ty RemoveMe1 = {"", 0, 20};
-	element_ty RemoveMe2 = {"", 0, 30};
-	element_ty RemoveMe3 = {"", 0, 40};
-	element_ty RemoveMe4 = {"", 0, 50};
+	size_t i = 0, num_of_elements = arr_size, is_working = 1, tree_size = 0;
 	
-	printf(RED "REMOVED 10:\n" RESET_COLOR);
-	RBSTRemove(tree, &RemoveMe0);
-	printf("SIZE OF TREE: %ld\n\n", RBSTSize(tree));
+	element_ty RemoveMe = {"", 0, 0};
 	
-	printf(CYAN "\n\nTREE:\n\n" RESET_COLOR);
-	RBSTForEach(tree, PrintTree, 0);
+	tree_size = RBSTSize(tree);
 	
-	printf(RED "REMOVED 20:\n" RESET_COLOR);
-	RBSTRemove(tree, &RemoveMe1);
-	printf("SIZE OF TREE: %ld\n\n", RBSTSize(tree));
+	for (i = 0; i < num_of_elements; ++i)
+	{
+		RemoveMe.grade = arr[i].grade;
+		printf("\nBefore remove - Remove: %ld\n", RemoveMe.grade);
+		RBSTForEach(tree, PrintTree, 0);
+		RBSTRemove(tree, &RemoveMe);
+		printf("\nAfter remove - Remove: %ld\n", RemoveMe.grade);
+		RBSTForEach(tree, PrintTree, 0);
+		--tree_size;
+		
+		is_working *= (tree_size == RBSTSize(tree));
+	}
 	
-	printf(CYAN "\n\nTREE:\n\n" RESET_COLOR);
-	RBSTForEach(tree, PrintTree, 0);
-	
-	printf(RED "REMOVED 30:\n" RESET_COLOR);
-	RBSTRemove(tree, &RemoveMe2);
-	printf("SIZE OF TREE: %ld\n\n", RBSTSize(tree));
-	
-	printf(CYAN "\n\nTREE:\n\n" RESET_COLOR);
-	RBSTForEach(tree, PrintTree, 0);
-	
-	printf(RED "REMOVED 40:\n" RESET_COLOR);
-	RBSTRemove(tree, &RemoveMe3);
-	printf("SIZE OF TREE: %ld\n\n", RBSTSize(tree));
-	
-	printf(CYAN "\n\nTREE:\n\n" RESET_COLOR);
-	RBSTForEach(tree, PrintTree, 0);
-	
-	printf(RED "REMOVED 50:\n" RESET_COLOR);
-	RBSTRemove(tree, &RemoveMe4);
-	printf("SIZE OF TREE: %ld\n\n", RBSTSize(tree));
-	
-	printf(CYAN "\n\nTREE:\n\n" RESET_COLOR);
-	RBSTForEach(tree, PrintTree, 0);
+	is_working ? PRINT_SUCCESS : PRINT_FAILURE;
 }
 /******************************************************************************/
 int CompareGrades(const void *student1, const void *student2, const void *param)
@@ -210,14 +206,15 @@ int PrintTree(void *student, void *param)
 /******************************************************************************/
 static void FillUpArray(element_ty *arr, size_t size) 
 {
-	size_t i = 0;
+	int i = 0;
 	char *names[5] = {"Peter Parker", "Uncle Ben", "Mary Jane", "Aunt May",
-																"Harry Osborn"};
-	for (i = 0; i < size; ++i)
+														"Harry Osborn"};
+	int random_student = rand() % 5;
+	for (i = 0; i < (int)size; ++i)
 	{
 		arr[i].name = names[i];
 		arr[i].id = RANDOM_NUM;
-		arr[i].grade = (i+1) * 10;
+		arr[i].grade = (random_student == i) ? 300 : RANDOM_NUM;
 	}
 }
 /******************************************************************************/
@@ -225,7 +222,7 @@ static void PrintArray(element_ty arr[], size_t size)
 {
 	size_t i = 0;
 		
-	printf(GREEN "Students that will be inserted into the tree:\n\n");
+	printf(GREEN "\nStudents that will be inserted into the tree:\n\n");
 	
 	for (i = 0; i < size; ++i)
 	{
