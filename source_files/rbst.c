@@ -18,6 +18,9 @@
 
 /******************************* macros & enums *******************************/
 
+#define DEAD_MEM(type) ((type)0xdeadbeef)
+#define UNUSED(x) (void)(x)
+
 /*	returns the bigger value between 2 given values							*/
 #define MAX(a,b) (((a)>(b))?(a):(b))
 
@@ -45,15 +48,13 @@ typedef struct rbst_node
 	void *data;						/*	data which is stored in the node	*/	
 }rbst_node_ty;
 
-/* TODO add stub	*/
 /*	struct handler of a recursive binary search tree						*/
 struct rbst
 {
 	Cmp_Func_ty compare_func;	/*	helps to sort the nodes by
 								 *	comparing them by its criteria			*/
 	
-	rbst_node_ty *root;			/*	first node and the root of the tree		*/
-								/*	will point to NULL when tree is empty	*/
+	rbst_node_ty stub;			/*	its left child is the root of the tree	*/
 								 
 	const void *param;			/*	a param which is given by the user		*/
 };
@@ -93,7 +94,7 @@ static size_t GetTreeSizeIMP(rbst_node_ty *root);
 static int IsALeafIMP(rbst_node_ty *node);
 
 /*	checks if a given data is located in the root node						*/
-static int IsARootIMP(const rbst_ty *rbst, const void *data);
+/*static int IsARootIMP(const rbst_ty *rbst, const void *data);*/
 
 /*	recursively traverses down from a node to find the
  *	leftmost or the rightmost node											*/
@@ -102,7 +103,15 @@ static rbst_location_ty GetSideMostIMP(rbst_node_ty *node, sides_ty side);
 /*	traverses both subtrees and applys a given operation function to
  *	each the nodes. Returns 0 if succeeded and 1 otherwise. 				*/
 static int RunOperationOnTreeIMP(rbst_node_ty *node, Action_Func_ty action_func,
-																void *param);														
+																void *param);
+
+static void RemoveLeaf(rbst_node_ty *node, rbst_location_ty node_location);							
+
+static void RemoveNodeWithOneSubTree(rbst_node_ty *node,
+rbst_location_ty node_location);
+
+static void RemoveNodeWithTwoSubTrees(rbst_node_ty *node);
+
 /************************* Functions  Implementations *************************/
 rbst_ty *RBSTCreate(Cmp_Func_ty cmp_func, const void *param)
 {
@@ -118,8 +127,11 @@ rbst_ty *RBSTCreate(Cmp_Func_ty cmp_func, const void *param)
 		return (NULL);
 	}
 	
-	/*	set the root of the tree as null because there is no root yet		*/
-	new_tree->root = NULL;
+	/*	Initialize tree's stub data and right child as DEAD_MEM.			*/
+	/*	Initialize stub's left child pointer as null.						*/
+	new_tree->stub.data = DEAD_MEM(void *);
+	new_tree->stub.children[RIGHT] = DEAD_MEM(rbst_node_ty *);
+	new_tree->stub.children[LEFT] = NULL;
 	
 	/*	set the received `cmp_func` as the comparing func of the tree.		*/
 	new_tree->compare_func = cmp_func;
@@ -139,11 +151,11 @@ void RBSTDestroy(rbst_ty *rbst)
 	if (!RBSTIsEmpty(rbst))
 	{
 		/*	DestroyNodesIMP(root)											*/
-		DestroyNodesIMP(rbst->root);
+		DestroyNodesIMP(rbst->stub.children[LEFT]);
 	}
 	
 	/*	nullify tree's struct ptrs											*/
-	rbst->root = NULL;
+	rbst->stub.data = rbst->stub.children[LEFT] = NULL;
 	rbst->compare_func = NULL;
 	rbst->param = NULL;
 	
@@ -155,7 +167,7 @@ void RBSTDestroy(rbst_ty *rbst)
 static void DestroyNodesIMP(rbst_node_ty *node)
 {
 	/*	if node is null: return 											*/
-	if (!node)
+	if (node->data == DEAD_MEM(void *))
 	{
 		return;
 	}
@@ -173,25 +185,26 @@ void RBSTRemove(rbst_ty *rbst, const void *data)
 {
 	rbst_location_ty found_location = {0};
 	
-	rbst_node_ty *node_to_remove, *successor = NULL, *successor_parent = NULL;
+	rbst_node_ty *node_to_remove = NULL;
 	
 	assert(rbst);
 	assert(data);
 	
-	
-	/*	use searching func to receive node with the needed data if exists	*/
-	/*	it also finds node's parent											*/
-	found_location = SearchLocationIMP(rbst, rbst->root, data);
-	
-	/*	if a node with a matching data was not found: do nothing			*/
-	node_to_remove = found_location.parent->children[found_location.direction];
-	
-	/*	if the data which needs to be removed is located in the root:		*/
-	if (IsARootIMP(rbst, data))
+	if (!rbst->compare_func(rbst->stub.children[LEFT]->data, data, rbst->param))
 	{
-		node_to_remove = rbst->root;
+		found_location.parent = &rbst->stub;
+		found_location.direction = LEFT;
+	}
+	else
+	{
+		/*	use searching func to receive node with the needed data if exists	*/
+		/*	it also finds node's parent											*/
+		found_location = SearchLocationIMP(rbst, rbst->stub.children[LEFT], data);
 	}
 	
+	node_to_remove = found_location.parent->children[found_location.direction];
+	
+		/*	if a node with a matching data was not found: do nothing			*/
 	if (!node_to_remove)
 	{
 		return;
@@ -206,18 +219,75 @@ void RBSTRemove(rbst_ty *rbst, const void *data)
 	
 	/*#CASE 2#*/
 	/*	if node has only one child node: 									*/
-	/*	TODO change the inside if-else to boolean result					*/
-	else if (!node_to_remove->children[LEFT] ^ !node_to_remove->children[RIGHT])
+	else if (!node_to_remove->children[LEFT] || !node_to_remove->children[RIGHT])
 	{
 		RemoveNodeWithOneSubTree(node_to_remove, found_location);
 	}
 	
 	/*#CASE 3#*/
 	/*	if node has 2 subtrees												*/
-	/*TODO create function that link/unlink ptrs	*/
 	else
 	{
-		/*	find the successor's parent										*/
+		RemoveNodeWithTwoSubTrees(node_to_remove);
+	}
+	
+	return;
+}
+/*----------------------------------------------------------------------------*/
+static void RemoveLeaf(rbst_node_ty *node, rbst_location_ty node_location)
+{
+	rbst_node_ty *node_to_remove = NULL;
+	
+	assert(node);
+	
+	node_to_remove = node;
+	
+	/*	link parent to null after removing the node						*/
+	if(node_location.parent)
+	{
+		node_location.parent->children[node_location.direction] = NULL;
+	}
+	/* free node														*/							
+	free(node_to_remove);
+}
+/*----------------------------------------------------------------------------*/
+static void RemoveNodeWithOneSubTree(rbst_node_ty *node,
+												rbst_location_ty node_location)
+{
+	rbst_node_ty *node_to_remove = NULL;
+	
+	assert(node);
+	
+	node_to_remove = node;
+	
+	/* 	if node has only right child, link it to node's parent			*/
+	if (node_to_remove->children[RIGHT])
+	{
+		node_location.parent->children[node_location.direction] = 
+											node_to_remove->children[RIGHT];		
+	}
+	
+	/* 	if node has only left child, link it to node's parent			*/
+	else
+	{
+		node_location.parent->children[node_location.direction] = 
+											node_to_remove->children[LEFT];
+	}
+
+	/* free the node which was found									*/
+	free(node_to_remove);
+}
+/*----------------------------------------------------------------------------*/
+static void RemoveNodeWithTwoSubTrees(rbst_node_ty *node)
+{
+	rbst_node_ty *node_to_remove = NULL, *successor = NULL,
+													*successor_parent = NULL;
+	
+	assert(node);
+	
+	node_to_remove = node;
+	
+	/*	find the successor's parent										*/
 		/*	a successor of a node is the leftmost node of its right child	*/
 		successor_parent = 
 				GetSideMostIMP(node_to_remove->children[RIGHT], LEFT).parent;
@@ -241,50 +311,6 @@ void RBSTRemove(rbst_ty *rbst, const void *data)
 		node_to_remove->data = successor->data;
 		/*	free successor's node											*/
 		free(successor);
-	}
-	
-	return;
-}
-/*----------------------------------------------------------------------------*/
-static void RemoveLeaf(rbst_node_ty *node, rbst_location_ty node_location)
-{
-	rbst_node_ty *node_to_remove = node;
-	
-	/*	link parent to null after removing the node						*/
-	if(node_location.parent)
-	{
-		node_location.parent->children[node_location.direction] = NULL;
-	}
-	/* free node														*/							
-	free(node_to_remove);
-}
-/*----------------------------------------------------------------------------*/
-static void RemoveNodeWithOneSubTree(rbst_node_ty *node,
-												rbst_location_ty node_location)
-{
-	rbst_node_ty *node_to_remove = node;
-	
-	/* 	if node has only right child, link it to node's parent			*/
-	if (node_to_remove->children[RIGHT])
-	{
-		node_location.parent->children[node_location.direction] = 
-											node_to_remove->children[RIGHT];		
-	}
-	
-	/* 	if node has only left child, link it to node's parent			*/
-	else
-	{
-		node_location.parent->children[node_location.direction] = 
-											node_to_remove->children[LEFT];
-	}
-
-	/* free the node which was found									*/
-	free(node_to_remove);
-}
-/*----------------------------------------------------------------------------*/
-static void RemoveNodeWithTwoSubTrees(rbst_location_ty location)
-{
-
 }
 /*----------------------------------------------------------------------------*/
 /*	traverse down from a node to find the leftmost or the rightmost node	*/
@@ -323,7 +349,7 @@ int RBSTInsert(rbst_ty *rbst, void *data)
 	assert(data); /*	NULL data isn't accepted in this tree				*/
 	
 	/* assure that the data which needs to be inserted is not in the root	*/
-	assert(!IsARootIMP(rbst, data));
+/*	assert(!IsARootIMP(rbst, data));*/
 	
 	/*	create a node with the received data								*/
 	/*	handle memory allocation errors if any								*/
@@ -337,14 +363,14 @@ int RBSTInsert(rbst_ty *rbst, void *data)
 	if (RBSTIsEmpty(rbst))
 	{
 		/*	set the root of the tree as the created node 			*/
-		rbst->root = new_node;
+		rbst->stub.children[LEFT] = new_node;
 		
 		return (SUCCESS);	
 	}
 	
 	/*	if tree is not empty and a new node should be inserted:				*/
 	/*	find a potential place for the node by using a location finder func	*/
-	found_location = SearchLocationIMP(rbst, rbst->root, data);
+	found_location = SearchLocationIMP(rbst, rbst->stub.children[LEFT], data);
 	
 	/*	if the location which was returned points to an exsiting node
 	 *	it means there is already a node with that data -> crash.			*/
@@ -381,7 +407,7 @@ int RBSTHeight(const rbst_ty *rbst)
 {	
 	assert(rbst);
 	
-	return (CalcTreeHeightIMP(rbst->root));
+	return (CalcTreeHeightIMP(rbst->stub.children[LEFT]));
 }
 /*----------------------------------------------------------------------------*/
 static int CalcTreeHeightIMP(rbst_node_ty *node)
@@ -402,7 +428,7 @@ size_t RBSTSize(const rbst_ty *rbst)
 {
 	assert(rbst);
 	
-	return (GetTreeSizeIMP(rbst->root));
+	return (GetTreeSizeIMP(rbst->stub.children[LEFT]));
 }
 /*----------------------------------------------------------------------------*/
 static size_t GetTreeSizeIMP(rbst_node_ty *node)
@@ -432,7 +458,7 @@ int RBSTIsEmpty(const rbst_ty *rbst)
 	assert(rbst);
 	
 	/*	return boolean if root of the tree is null							*/
-	return (!rbst->root);
+	return (!rbst->stub.children[LEFT]);
 }
 /******************************************************************************/
 void *RBSTFind(const rbst_ty *rbst, const void *data_to_find)
@@ -444,14 +470,9 @@ void *RBSTFind(const rbst_ty *rbst, const void *data_to_find)
 	assert(rbst);
 	assert(data_to_find);
 	
-	/* check if the data which is searched is in the root					*/
-	if (IsARootIMP(rbst, data_to_find))
-	{
-		return (rbst->root->data);	
-	}
 	
 	/*	search for a potential location of a node with the given data		*/
-	potential_location = SearchLocationIMP(rbst, rbst->root, data_to_find);
+	potential_location = SearchLocationIMP(rbst, rbst->stub.children[LEFT], data_to_find);
 	
 	if (potential_location.parent)
 	{
@@ -501,7 +522,7 @@ int RBSTForEach(rbst_ty *rbst, Action_Func_ty action_func, void *param)
 	assert(rbst);
 	assert(action_func);
 
-	return (RunOperationOnTreeIMP(rbst->root, action_func, param));
+	return (RunOperationOnTreeIMP(rbst->stub.children[LEFT], action_func, param));
 }
 /*----------------------------------------------------------------------------*/
 static int RunOperationOnTreeIMP(rbst_node_ty *node, Action_Func_ty action_func,
@@ -539,11 +560,5 @@ static int IsALeafIMP(rbst_node_ty *node)
 	
 	/*	check whether the node has any children								*/
 	return (!node->children[RIGHT] && !node->children[LEFT]);
-}
-/******************************************************************************/
-static int IsARootIMP(const rbst_ty *rbst, const void *data)
-{	
-	/* check if the given data is located in the root node				*/
-	return (rbst->root && !rbst->compare_func(rbst->root->data, data, rbst->param));
 }
 /******************************************************************************/
