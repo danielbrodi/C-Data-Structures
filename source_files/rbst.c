@@ -526,12 +526,7 @@ static int IsALeafIMP(rbst_node_ty *node)
 /******************************************************************************/
 static int IsARootIMP(const rbst_ty *rbst, const void *data)
 {	
-	if (rbst->root)
-	{
-		/* check if the given data is located in the root node				*/
-		return (!rbst->compare_func(rbst->root->data, data, rbst->param));
-	}
-	
-	return (0);
+	/* check if the given data is located in the root node				*/
+	return (rbst->root && !rbst->compare_func(rbst->root->data, data, rbst->param));
 }
 /******************************************************************************/
