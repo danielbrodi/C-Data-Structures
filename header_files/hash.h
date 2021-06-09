@@ -24,7 +24,7 @@ typedef size_t (*hash_func_ty)(const void *data, const void *param);
 typedef int (*is_same_key_func_ty)(const void *data1, const void *data2);
 
 /*Complexity: O(1)*/
-ht_ty *HTCreate(size_t capacity, hash_func_ty hash_func, Is_Same_Key_ty is_same_func, const void *hash_param);
+ht_ty *HTCreate(size_t capacity, hash_func_ty hash_func, is_same_key_ty is_same_func, const void *hash_param);
 
 /*Doesn't release user's data*/
 /*Complexity: O(1)*/
