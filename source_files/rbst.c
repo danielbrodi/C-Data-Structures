@@ -178,18 +178,6 @@ void RBSTRemove(rbst_ty *rbst, const void *data)
 	assert(rbst);
 	assert(data);
 	
-	/*	if the data which needs to be removed is located in the root:		*/
-	if (IsARootIMP(rbst, data))
-	{
-		node_to_remove = rbst->root;
-		/*	set one of its childs' nodes as the new root of the tree		*/
-		rbst->root = node_to_remove->children[RIGHT] ? 
-			node_to_remove->children[RIGHT] : node_to_remove->children[LEFT];
-		/*	free the node which used to be the root							*/
-		free(node_to_remove);
-		
-		return;
-	}
 	
 	/*	use searching func to receive node with the needed data if exists	*/
 	/*	it also finds node's parent											*/
@@ -197,6 +185,13 @@ void RBSTRemove(rbst_ty *rbst, const void *data)
 	
 	/*	if a node with a matching data was not found: do nothing			*/
 	node_to_remove = found_location.parent->children[found_location.direction];
+	
+	/*	if the data which needs to be removed is located in the root:		*/
+	if (IsARootIMP(rbst, data))
+	{
+		node_to_remove = rbst->root;
+	}
+	
 	if (!node_to_remove)
 	{
 		return;
@@ -207,7 +202,14 @@ void RBSTRemove(rbst_ty *rbst, const void *data)
 	if (IsALeafIMP(node_to_remove))
 	{
 		/*	link parent to null after removing the node						*/
-		found_location.parent->children[found_location.direction] = NULL;
+		if(found_location.parent)
+		{
+			found_location.parent->children[found_location.direction] = NULL;
+		}
+		else
+		{
+			rbst->root = NULL;
+		}
 		/* free node														*/							
 		free(node_to_remove);
 	}
