@@ -50,6 +50,10 @@ static void RBSTIsEmptyTest(rbst_ty *tree);
 int PrintTree(void *student, void *param);
 
 static void RBSTRemoveTest(rbst_ty *tree, element_ty *arr, size_t arr_size);
+
+int SaveGrades(void *student, void *param);
+
+static void ForEachTest(rbst_ty *tree, size_t arr_size);
 /******************************************************************************/
 /******************************* Main__Function *******************************/
 
@@ -70,11 +74,10 @@ int main()
 	
 	/*	Runs tests														*/
 	RBSTCreateTest(tree);
-	RBSTIsEmptyTest(tree);
 	RBSTInsertTest(tree, students, size);
 	RBSTFindTest(tree);
+	ForEachTest(tree, size);
 	RBSTRemoveTest(tree, students, size);
-	RBSTFindTest(tree);
 	
 	RBSTDestroyTest(tree);
 	
@@ -161,17 +164,17 @@ static void RBSTRemoveTest(rbst_ty *tree, element_ty *arr, size_t arr_size)
 	for (i = 0; i < num_of_elements; ++i)
 	{
 		RemoveMe.grade = arr[i].grade;
-		printf("\nBefore remove - Remove: %ld\n", RemoveMe.grade);
-		RBSTForEach(tree, PrintTree, 0);
-		RBSTRemove(tree, &RemoveMe);
-		printf("\nAfter remove - Remove: %ld\n", RemoveMe.grade);
-		RBSTForEach(tree, PrintTree, 0);
+		RBSTRemove(tree, &RemoveMe);;
 		--tree_size;
 		
 		is_working *= (tree_size == RBSTSize(tree));
 	}
 	
+	printf(CYAN "RBST Remove Test: " RESET_COLOR);
+	
 	is_working ? PRINT_SUCCESS : PRINT_FAILURE;
+	
+	RBSTIsEmptyTest(tree);
 }
 /******************************************************************************/
 int CompareGrades(const void *student1, const void *student2, const void *param)
@@ -202,6 +205,49 @@ int PrintTree(void *student, void *param)
 	printf("Name: %s, Grade: %d\n", ((element_ty *)student)->name, grade);
 	
 	return (0);
+}
+/******************************************************************************/
+int SaveGrades(void *student, void *output)
+{
+	
+	static int index = 0;
+	
+	int grade = -1;
+	
+	assert(student);
+	
+	grade = ((element_ty *)student)->grade;
+	
+	*((int *)output + index) = grade;
+	
+	++index;
+	
+	return (0);
+}
+/******************************************************************************/
+static void ForEachTest(rbst_ty *tree, size_t arr_size)
+{
+	int *grades = (int *)malloc(sizeof(int) * arr_size);
+	
+	size_t i = 0, is_working = 1;
+	
+	printf(CYAN "RBST ForEach Test: " RESET_COLOR);
+	
+	if (!grades)
+	{
+		PRINT_FAILURE;
+	}
+	
+	RBSTForEach(tree, SaveGrades, grades);
+	
+	for (i = 1; i < arr_size; ++i)
+	{
+		is_working *= (grades[i-1] < grades[i]);
+	}
+		
+	is_working ? PRINT_SUCCESS : PRINT_FAILURE;
+	
+	free(grades);
 }
 /******************************************************************************/
 static void FillUpArray(element_ty *arr, size_t size) 

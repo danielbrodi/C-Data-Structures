@@ -19,7 +19,6 @@
 /******************************* macros & enums *******************************/
 
 #define DEAD_MEM(type) ((type)0xdeadbeef)
-#define UNUSED(x) (void)(x)
 
 /*	returns the bigger value between 2 given values							*/
 #define MAX(a,b) (((a)>(b))?(a):(b))
