@@ -201,41 +201,15 @@ void RBSTRemove(rbst_ty *rbst, const void *data)
 	/* if node has no children nodes: 										*/
 	if (IsALeafIMP(node_to_remove))
 	{
-		/*	link parent to null after removing the node						*/
-		if(found_location.parent)
-		{
-			found_location.parent->children[found_location.direction] = NULL;
-		}
-		else
-		{
-			rbst->root = NULL;
-		}
-		/* free node														*/							
-		free(node_to_remove);
+		RemoveLeaf(node_to_remove, found_location);
 	}
 	
 	/*#CASE 2#*/
 	/*	if node has only one child node: 									*/
 	/*	TODO change the inside if-else to boolean result					*/
-	else if (!node_to_remove->children[LEFT] || !node_to_remove->children[RIGHT])
+	else if (!node_to_remove->children[LEFT] ^ !node_to_remove->children[RIGHT])
 	{
-	
-		/* 	if node has only right child, link it to node's parent			*/
-		if (node_to_remove->children[RIGHT])
-		{
-			found_location.parent->children[found_location.direction] = 
-												node_to_remove->children[RIGHT];		
-		}
-		
-		/* 	if node has only left child, link it to node's parent			*/
-		else
-		{
-			found_location.parent->children[found_location.direction] = 
-												node_to_remove->children[LEFT];
-		}
-
-		/* free the node which was found									*/
-		free(node_to_remove);
+		RemoveNodeWithOneSubTree(node_to_remove, found_location);
 	}
 	
 	/*#CASE 3#*/
@@ -270,6 +244,47 @@ void RBSTRemove(rbst_ty *rbst, const void *data)
 	}
 	
 	return;
+}
+/*----------------------------------------------------------------------------*/
+static void RemoveLeaf(rbst_node_ty *node, rbst_location_ty node_location)
+{
+	rbst_node_ty *node_to_remove = node;
+	
+	/*	link parent to null after removing the node						*/
+	if(node_location.parent)
+	{
+		node_location.parent->children[node_location.direction] = NULL;
+	}
+	/* free node														*/							
+	free(node_to_remove);
+}
+/*----------------------------------------------------------------------------*/
+static void RemoveNodeWithOneSubTree(rbst_node_ty *node,
+												rbst_location_ty node_location)
+{
+	rbst_node_ty *node_to_remove = node;
+	
+	/* 	if node has only right child, link it to node's parent			*/
+	if (node_to_remove->children[RIGHT])
+	{
+		node_location.parent->children[node_location.direction] = 
+											node_to_remove->children[RIGHT];		
+	}
+	
+	/* 	if node has only left child, link it to node's parent			*/
+	else
+	{
+		node_location.parent->children[node_location.direction] = 
+											node_to_remove->children[LEFT];
+	}
+
+	/* free the node which was found									*/
+	free(node_to_remove);
+}
+/*----------------------------------------------------------------------------*/
+static void RemoveNodeWithTwoSubTrees(rbst_location_ty location)
+{
+
 }
 /*----------------------------------------------------------------------------*/
 /*	traverse down from a node to find the leftmost or the rightmost node	*/
