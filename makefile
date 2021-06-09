@@ -1,4 +1,4 @@
-	#COMPILER
+#COMPILER
 CC=gcc
 CFLAGS=-I./include/ -L. -Wl,-rpath=. -Wall
 CORFLAGS=-I./include/ -c -ansi -pedantic-errors -Wall -Wextra -g

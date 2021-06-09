@@ -5,7 +5,7 @@
 * Code Reviewer:	Kobi
 * Pseudo Reviewer:	Eran						   								
 * Version:			1.0   								
-* Description:		Recursive Binary Tree implementation pseudo-code.
+* Description:		Recursive Binary Tree implementation.
 \******************************************************************************/
 
 /********************************* Inclusions *********************************/
@@ -37,15 +37,13 @@ enum
 
 /**************************** Structs  Definitions ****************************/
 
-typedef struct rbst_node rbst_node_ty;
-
 /*	struct handler of each node in a binary search tree						*/
-struct rbst_node
+typedef struct rbst_node
 {
-	rbst_node_ty *children[2];	/*	left and right child nodes	
-								 *	left = 0, right = 1						*/
-	void *data;					/*	data which is stored in the node		*/	
-};
+	struct rbst_node *children[2];	/*	left and right child nodes:	
+								 	 *	left = 0, right = 1					*/
+	void *data;						/*	data which is stored in the node	*/	
+}rbst_node_ty;
 
 /*	struct handler of a recursive binary search tree						*/
 struct rbst
@@ -68,24 +66,40 @@ typedef struct rbst_location
 } rbst_location_ty;
 /**************************** Forward Declarations ****************************/
 
+/* 	recursively searches for the right location in the tree for a given data:
+ *	Returns the parent and the direction from it to that found location.
+ *	The found location may be NULL if no node with the matching data
+ 	has been found in the tree												*/
 static rbst_location_ty SearchLocationIMP(const rbst_ty *rbst, rbst_node_ty *node, 
 															const void *data);
-															
+/*	recursively traverses through tree, in a post order way,
+ *	and frees every node.													*/												
 static void DestroyNodesIMP(rbst_node_ty *node);
 
+/*	creates a new node with the received data.								*/
 static rbst_node_ty *CreateNodeIMP(void *data);
 
+/*	recursively traverses the left and right subtrees and finds the 
+ *	longest path from the root to the deepest node. 					
+ 	Returns the longest path between the two.								*/
 static int CalcTreeHeightIMP(rbst_node_ty *root);
 
+/*	recursively traverses the tree and counts each node.
+ *	Returns the final count.												*/
 size_t GetTreeSizeIMP(rbst_node_ty *root);
 
+/*	checks whether a given node has any children							*/
 static int IsALeafIMP(rbst_node_ty *node);
 
+/*	checks if a given data is located in the root node						*/
 static int IsARootIMP(const rbst_ty *rbst, const void *data);
 
-/*	traverse down from a node to find the leftmost or the rightmost node	*/
+/*	recursively traverses down from a node to find the
+ *	leftmost or the rightmost node											*/
 static rbst_location_ty GetSideMostIMP(rbst_node_ty *node, sides_ty side);
 
+/*	traverses both subtrees and applys a given operation function to
+ *	each the nodes. Returns 0 if succeeded and 1 otherwise. 				*/
 static int RunOperationOnTreeIMP(rbst_node_ty *node, Action_Func_ty action_func,
 																void *param);														
 /************************* Functions  Implementations *************************/
@@ -510,7 +524,7 @@ static int IsARootIMP(const rbst_ty *rbst, const void *data)
 {	
 	if (rbst->root)
 	{
-		/* check if the given data is located in the root node		*/
+		/* check if the given data is located in the root node				*/
 		return (!rbst->compare_func(rbst->root->data, data, rbst->param));
 	}
 	
