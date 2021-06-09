@@ -86,7 +86,7 @@ static int CalcTreeHeightIMP(rbst_node_ty *root);
 
 /*	recursively traverses the tree and counts each node.
  *	Returns the final count.												*/
-size_t GetTreeSizeIMP(rbst_node_ty *root);
+static size_t GetTreeSizeIMP(rbst_node_ty *root);
 
 /*	checks whether a given node has any children							*/
 static int IsALeafIMP(rbst_node_ty *node);
@@ -383,7 +383,7 @@ size_t RBSTSize(const rbst_ty *rbst)
 	return (GetTreeSizeIMP(rbst->root));
 }
 /*----------------------------------------------------------------------------*/
-size_t GetTreeSizeIMP(rbst_node_ty *node)
+static size_t GetTreeSizeIMP(rbst_node_ty *node)
 {
 	/*	if node doesn't exist, don't count the its  edge					*/
 	if (!node)
