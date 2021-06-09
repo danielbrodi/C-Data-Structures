@@ -16,7 +16,7 @@
 
 #include "rbst.h"
 
-/******************************* Macros & enums *******************************/
+/******************************* macros & enums *******************************/
 
 /*	returns the bigger value between 2 given values							*/
 #define MAX(a,b) (((a)>(b))?(a):(b))
@@ -53,7 +53,8 @@ struct rbst
 	Cmp_Func_ty compare_func;	/*	helps to sort the nodes by
 								 *	comparing them by its criteria			*/
 	
-	rbst_node_ty *root;			/*	first node and the root of the tree		*/ 
+	rbst_node_ty *root;			/*	first node and the root of the tree		*/
+								/*	will point to NULL when tree is empty	*/
 								 
 	const void *param;			/*	a param which is given by the user		*/
 };
