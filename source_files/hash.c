@@ -115,19 +115,31 @@ int HTInsert(ht_ty *hash_table, void *data)
 	bin_index = hash_table->hash_func(data, hash_table->param);
 	/*	go to that index in the dlists array*/
 	dlist = hash_table->items + bin_index;
-	/*	use the insert func of dlist to insert the data*/
+	/*	use the push func of dlist to insert the data*/
 	ret_status = DlistPushFront(dlist, data);
 	/*	return status of inserttion*/
-}	return (ret_status == DlistIteratorEnd(dlist)) ? FAILURE : SUCCESS;
+	/*	if ret_status is the end iterator of the list it means the
+		insertion was failed.											*/
+}	return (DlistIteratorIsEqual(ret_status, DlistIteratorEnd(dlist)));
 /******************************************************************************/
 size_t HTSize(const ht_ty *hash_table)
 {
+	dlist *curr_list = *last_list = NULL;
+	size_t total_size = 0;
 	/*	assert */
-
+	assert(hash_table);
 	/*	loop on each index in the hash table and check for dlist size using*/
 	/*	dlist size func*/
-
+	curr_list = hash_table->items;	/*	first list	*/
+	last_list = lists_runner + hash_table->capacity;
+	
+	while (curr_list < last_list)
+	{
+		total_size += DlistSize(curr_list);
+	}
+	
 	/*	return the sum of all sizes*/
+	return (total_size);
 }
 /******************************************************************************/
 void *HTFind(ht_ty *hash_table, const void *key)
