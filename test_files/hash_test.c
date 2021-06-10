@@ -37,7 +37,7 @@ int main()
 
 /******************************************************************************/
 
-/*CreateDictFile: */
+/*CreateDict: */
 
 open words file (linux dictionary)
 get the number of total characters in the file
@@ -63,6 +63,6 @@ size_t hash(const void *str, const void *param)
 }
 
 /******************************************************************************/
-
+/* Create HashTable for dict 	*/
 create a hash table of the size of the words array + 10%
 
