@@ -36,22 +36,23 @@ int main ()
     FILE *dictionary = fopen(DICTIONARY_PATH, "r");
     
     size_t i = 0, dict_size = 0;
-    char *dict_arr = NULL;
+    char *dict_arr = NULL, check_me = 0, *runner = NULL;
     
     fseek(dictionary, 0, SEEK_END); /* move ptr to end of dict	*/ 
     
     dict_size = ftell(dictionary);
     
-    printf("%ld", dict_size);
+    printf("\nDICTIONARY SIZE:%ld\n", dict_size);
     
     fseek(dictionary, 0, SEEK_SET); /* move ptr to beginning of dict	*/ 
     
     dict_arr = (char *)malloc(sizeof(char) * dict_size);
     
     
-    while (i < 100)
+    while (i < 50)
     {
-    	*dict_arr++ = fgetc(dictionary);
+    	check_me = fgetc(dictionary);
+    	*dict_arr++ = (check_me == '\n') ? '\0' : check_me;
     	++i;
     }
     
@@ -59,11 +60,19 @@ int main ()
     
     i = 0;
     
-    dict_arr -= 100;
+    dict_arr -= 50;
     
-    while (i < 100)
+    while (i < 50)
     {
-    	printf("%c,",*(dict_arr+i));
+    	runner = dict_arr + i;
+    	if (*runner == '\0')
+    	{
+    		printf("\n");
+    	}
+    	else
+    	{
+    		printf("%c", *runner);
+    	}
     	++i;
     }
     
