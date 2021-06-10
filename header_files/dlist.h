@@ -17,7 +17,7 @@ typedef struct dlist_node dlist_node_ty;
 
 typedef dlist_node_ty *dlist_iter_ty;
 
-typedef boolean_ty (*IsMatch_Func_ty)(const void *data, void *param);
+typedef int (*IsMatch_Func_ty)(const void *data, void *param);
 
 typedef status_ty (*Action_Func_ty)(void *data, void *param);
 

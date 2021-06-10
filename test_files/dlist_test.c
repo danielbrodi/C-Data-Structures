@@ -39,7 +39,7 @@ static void DlistPopFrontTest(dlist_ty *dlist);
 static void DlistPopBackTest(dlist_ty *dlist);
 static void DlistSetDataTest(dlist_ty *dlist);
 static status_ty PrintList(void *data, void *param);
-static boolean_ty IsMatch(const void *data, void *param);
+static int IsMatch(const void *data, void *param);
 static void InsertIntToList(dlist_ty *dlist);
 static void DlistForEachTest(dlist_ty *dlist);
 static void DlistFindTest(dlist_ty *dlist);
@@ -287,7 +287,7 @@ static status_ty PrintList(void *data, void *param)
 	return (SUCCESS);
 }
 /******************************************************************************/
-static boolean_ty IsMatch(const void *data, void *param)
+static int IsMatch(const void *data, void *param)
 {	
 	return (((int)(long)data == (int)(long)param));
 }

@@ -23,13 +23,12 @@ typedef size_t (*hash_func_ty)(const void *data, const void *param);
 
 typedef int (*is_same_key_func_ty)(const void *data1, const void *data2);
 
-/*Complexity: O(capacity)*/
-/*Returns NULL of memory failure*/
+/*Complexity: O(n)*/
 ht_ty *HTCreate(size_t capacity, hash_func_ty hash_func, const void *hash_param,
-												is_same_key_ty is_same_func);
+											is_same_key_func_ty is_same_func);
 
 /*Doesn't release user's data*/
-/*Complexity: O(1)*/
+/*Complexity: O(n)*/
 void HTDestroy(ht_ty *hash_table);
 
 /*Complexity: O(1)*/

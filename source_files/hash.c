@@ -13,6 +13,7 @@
 #include <assert.h>			/*	assert			*/
 #include <stddef.h>			/*	size_t, NULL	*/
 #include <stdlib.h>			/*	malloc, free	*/
+#include <string.h>
 
 #include "dlist.h"
 #include "hash.h"
@@ -29,8 +30,15 @@ struct hash_table
 	dlist_ty **items;
 	hash_func_ty hash_func;
 	size_t capacity;
-	is_same_key_ty is_same;
+	is_same_key_func_ty is_same;
+	const void *hash_param;
 };
+
+typedef struct extended_param
+{
+	ht_ty *hash_table;
+	const void *key;
+}extended_param_ty;
 
 /**************************** Forward Declarations ****************************/
 
@@ -38,7 +46,7 @@ struct hash_table
 
 /************************* Functions  Implementations *************************/
 ht_ty *HTCreate(size_t capacity, hash_func_ty hash_func, const void *hash_param,
-													is_same_key_ty is_same_func)
+											is_same_key_func_ty is_same_func)
 {
 	ht_ty *new_hash_table = NULL;
 	
@@ -50,7 +58,7 @@ ht_ty *HTCreate(size_t capacity, hash_func_ty hash_func, const void *hash_param,
 	assert(is_same_func);
 	
 	/*	allocate memory for hash map structure & handle memory errors if any*/
-	new_hash_table = (ht_ty *)malloc(sizeof(ht_ty) + (capacity)*sizeof(dlist_ty));
+	new_hash_table = (ht_ty *)malloc(sizeof(ht_ty));
 	if (!new_hash_table)
 	{
 		return (NULL);
@@ -62,13 +70,13 @@ ht_ty *HTCreate(size_t capacity, hash_func_ty hash_func, const void *hash_param,
 	/* loop on the array and create dlist at each index				*/
 	for (i = 0; i < capacity; ++i)
 	{
-		*items = DlistCreate();
-		if (!items)
+		*(new_hash_table->items) = DlistCreate();
+		if (!new_hash_table->items)
 		{
 			while (i > 0)
 			{
 				--i;
-				free(items - i)
+				DlistDestroy(*(new_hash_table->items - i));
 			}
 			
 			free(new_hash_table);
@@ -77,10 +85,10 @@ ht_ty *HTCreate(size_t capacity, hash_func_ty hash_func, const void *hash_param,
 	}
 	
 	/*	assign rest of the parameters to the corrosponding struct members*/
-	new_hash_table->items = new_hash_table; /*	first member in the struct 	*/
 	new_hash_table->hash_func = hash_func;
 	new_hash_table->capacity = capacity;
 	new_hash_table->is_same = is_same_func;
+	new_hash_table->hash_param = hash_param;
 	
 	/*	return created hash map*/
 	return (new_hash_table);
@@ -93,9 +101,9 @@ void HTDestroy(ht_ty *hash_table)
 	/*	loop through the map and destory dlist at each index*/
 	while (i < num_of_bins)
 	{
-		DlistDestroy(hash_table->items);
-		hash_table->items = items + i;
-		++i
+		DlistDestroy(*(hash_table->items));
+		hash_table->items += i;
+		++i;
 	}
 	
 	/*	free the hash map*/
@@ -122,7 +130,7 @@ int HTInsert(ht_ty *hash_table, void *data)
 	bin_index = hash_table->hash_func(data, hash_table->hash_param);
 	
 	/*	go to that index in the dlists array*/
-	dlist = hash_table->items + bin_index;
+	dlist = *(hash_table->items + bin_index);
 	
 	/*	use the push func of dlist to insert the data*/
 	ret_status = DlistPushFront(dlist, data);
@@ -135,7 +143,7 @@ int HTInsert(ht_ty *hash_table, void *data)
 /******************************************************************************/
 size_t HTSize(const ht_ty *hash_table)
 {
-	dlist *curr_list = *last_list = NULL;
+	dlist_ty *curr_list = NULL, *last_list = NULL;
 	size_t total_size = 0;
 	
 	/*	assert */
@@ -143,8 +151,8 @@ size_t HTSize(const ht_ty *hash_table)
 	
 	/*	loop on each index in the hash table and check for dlist size using*/
 	/*	dlist size func*/
-	curr_list = hash_table->items;	/*	first list	*/
-	last_list = lists_runner + hash_table->capacity;
+	curr_list = *(hash_table->items);	/*	first list	*/
+	last_list = *(hash_table->items + hash_table->capacity);
 	
 	while (curr_list < last_list)
 	{
@@ -155,12 +163,22 @@ size_t HTSize(const ht_ty *hash_table)
 	return (total_size);
 }
 /******************************************************************************/
+int CompareKeysIMP(const void *data1, void *extended_param)
+{
+	ht_ty *hash_table = ((extended_param_ty *)extended_param)->hash_table;
+	const void *key = ((extended_param_ty *)extended_param)->key;
+	
+	return(hash_table->is_same(data1, key));
+}
+/*----------------------------------------------------------------------------*/
 void *HTFind(ht_ty *hash_table, const void *key)
 {
 	size_t bin_index = -1;
+	
 	dlist_ty *dlist = NULL;
-	void *ret = NULL;
 	dlist_iter_ty ret_iter;
+	
+	extended_param_ty extended_param = {0};
 	
 	/*	asserts*/
 	assert(hash_table);
@@ -169,11 +187,14 @@ void *HTFind(ht_ty *hash_table, const void *key)
 	/*	move to the right index by hash func(key)	*/
 	bin_index = hash_table->hash_func(key, hash_table->hash_param);
 	
-	dlist = hash_table->items + bin_index;
+	dlist = *(hash_table->items + bin_index);
+	
+	extended_param.hash_table = hash_table;
+	extended_param.key = key;
 	
 	/*	 use find function of dlist */
 	ret_iter = DlistFind(DlistIteratorBegin(dlist), DlistIteratorEnd(dlist), 
-										hash_table->is_same, hash_table->param);
+								CompareKeysIMP, &extended_param);
 	
 	/*	return null or the element*/
 	return (DlistIteratorIsEqual(ret_iter, DlistIteratorEnd(dlist)) ? NULL :
@@ -184,8 +205,8 @@ void HTRemove(ht_ty *hash_table, const void *key)
 {
 	size_t bin_index = -1;
 	dlist_ty *dlist = NULL;
-	void *ret = NULL;
 	dlist_iter_ty ret_iter;
+	extended_param_ty extended_param = {0};
 	
 	/*	asserts	*/
 	assert(hash_table);
@@ -194,11 +215,14 @@ void HTRemove(ht_ty *hash_table, const void *key)
 	/*	use hash func to get right index of the right dlist */
 	bin_index = hash_table->hash_func(key, hash_table->hash_param);
 	
-	dlist = hash_table->items + bin_index;
+	dlist = *(hash_table->items + bin_index);
+	
+	extended_param.hash_table = hash_table;
+	extended_param.key = key;
 	
 	/*	 use find function of dlist */
 	ret_iter = DlistFind(DlistIteratorBegin(dlist), DlistIteratorEnd(dlist), 
-										hash_table->is_same, hash_table->param);
+										CompareKeysIMP, &extended_param);
 										
 	/*	remove on the iterator that recieved from the dlist find function 	*/
 	if (!DlistIteratorIsEqual(ret_iter, DlistIteratorEnd(dlist)))
