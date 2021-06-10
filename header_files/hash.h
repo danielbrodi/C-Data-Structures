@@ -23,7 +23,8 @@ typedef size_t (*hash_func_ty)(const void *data, const void *param);
 
 typedef int (*is_same_key_func_ty)(const void *data1, const void *data2);
 
-/*Complexity: O(1)*/
+/*Complexity: O(capacity)*/
+/*Returns NULL of memory failure*/
 ht_ty *HTCreate(size_t capacity, hash_func_ty hash_func, const void *hash_param,
 												is_same_key_ty is_same_func);
 
@@ -49,7 +50,5 @@ void HTRemove(ht_ty *hash_table, const void *key);
 /*Complexity: O(n)*/ /*Phase 2*/
 statistics_ty HTGetStatistics(const ht_ty *hash_table);
 /*longest list, median list, and standard deviation as a struct*/
-
-#endif /*__HASH_H__*/
 
 #endif /*__HASH_H__*/
