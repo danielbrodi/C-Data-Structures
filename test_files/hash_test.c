@@ -9,106 +9,204 @@
 
 /********************************* Inclusions *********************************/
 
-#include <stddef.h>	/*	size_t						*/
-#include <stdio.h>	/*	printf						*/
-#include <stdlib.h>	/*	rand, srand					*/
-#include <time.h>	/*	time						*/
+#include <stdio.h>	/* printf	*/
+#include <stdlib.h>	/*	malloc, free, realloc 	*/
 
-#include "../include/utils.h"	/*	PRINT_COLOR, COLOR			*/
-#include "../include/hash.h"
-
-/***************************** Macros Definitions *****************************/
+/******************************* Macros & enums *******************************/
 
 #define DICTIONARY_PATH ("/usr/share/dict/words")
 
-/* generates random number from -99 to 99 			*/
-#define RANDOM_NUM ((rand() % 200 - 100))	
+/**************************** Structs  Definitions ****************************/
 
-/**************************** Forward Declarations ****************************/
-
-
-
+/* dynamic memory storage - dictionary */
+typedef struct dictionary
+{
+    size_t size;
+    size_t reserved;
+    char** words;
+}dictionary_ty;
 /******************************************************************************/
+
+/* creates a dictionary_ty */
+dictionary_ty* DictionaryCreate();
+
+/* destroy a store */
+void DictionaryDestroy(dictionary_ty* dict);
+
+/* reserve more space for the characters if needed */
+int DictionaryResize(dictionary_ty* dict, size_t new_res);
+
+/* change 5/4 to a larger value for more aggressive
+ * increase of memory allocation */
+int DictionaryIsFull(dictionary_ty* dict);
+
+/* adds a character to the dictionary_ty */
+int DictionaryAddTo(dictionary_ty* dict, char* character_to_add);
+
+void CharsToWords(dictionary_ty* dict, char* characters_arr);
+
+void TextFileToArray(char *file_path, char **input_arr);
+
 /******************************* Main__Function *******************************/
 
-int main ()
+int main() 
 {
-    FILE *dictionary = fopen(DICTIONARY_PATH, "r");
+	char *characters;
+	
+	size_t i = 0;
+	
+	dictionary_ty* dict = DictionaryCreate();
+	if (!dict)
+	{
+		return(1);
+	}
     
-    size_t i = 0, dict_size = 0;
-    char *dict_arr = NULL, check_me = 0, *runner = NULL;
+/*    TextFileToArray(DICTIONARY_PATH, &characters);*/
     
-    fseek(dictionary, 0, SEEK_END); /* move ptr to end of dict	*/ 
+    CharsToWords(dict, DICTIONARY_PATH, &characters);
     
-    dict_size = ftell(dictionary);
-    
-    printf("\nDICTIONARY SIZE:%ld\n", dict_size);
-    
-    fseek(dictionary, 0, SEEK_SET); /* move ptr to beginning of dict	*/ 
-    
-    dict_arr = (char *)malloc(sizeof(char) * dict_size);
-    
-    
-    while (i < 50)
+    for(i = 0; i < dict->size; ++i)
     {
-    	check_me = fgetc(dictionary);
-    	*dict_arr++ = (check_me == '\n') ? '\0' : check_me;
-    	++i;
+        printf("%ld: %s\n", i, dict->words[i]);
     }
-    
-    fclose(dictionary);
-    
-    i = 0;
-    
-    dict_arr -= 50;
-    
-    while (i < 50)
-    {
-    	runner = dict_arr + i;
-    	if (*runner == '\0')
-    	{
-    		printf("\n");
-    	}
-    	else
-    	{
-    		printf("%c", *runner);
-    	}
-    	++i;
-    }
-    
-    printf("\n\n");
+
+	free(characters);	
+	
+    DictionaryDestroy(dict);
     
     return(0);
-}
+}	
 
 /******************************************************************************/
 
-/*CreateDict: */
-
-/*open words file (linux dictionary)*/
-/*get the number of total characters in the file*/
-/*create a char array of size of that number*/
-/*allocate a dynamic array of char * to store ptrs to the beginning of each word*/
-/*simultaneously go through both arrays:*/
-/*	for each words: store first char in the char * array*/
-/*					change "\n" in the original array to "\0"*/
-
-/******************************************************************************/
-
-/*size_t hash(const void *str, const void *param)*/
+/*void TextFileToArray(char *file_path, char **input_arr)*/
 /*{*/
-/*	void(param);*/
+/*	size_t i = 0, num_of_chars = 0;*/
 /*	*/
-/*    size_t hash = 5381;*/
-/*    int c = 0;*/
-
-/*    while (c = *str++)*/
-/*        hash = ((hash << 5) + hash) + c; */
-
-/*    return (hash);*/
+/*	int character = 0;*/
+/*    */
+/*	FILE *text_file = fopen((char *)file_path, "r");*/
+/*    */
+/*    fseek(text_file, 0, SEEK_END); /* move ptr to end of dict	*/ */
+/*    */
+/*    num_of_chars = ftell(text_file);*/
+/*    */
+/*    printf("\nDictionary SIZE:%ld\n", num_of_chars);*/
+/*    */
+/*    fseek(text_file, 0, SEEK_SET); /* move ptr to beginning of dict	*/ */
+/*    */
+/*    *input_arr = (char *)malloc(sizeof(char) * num_of_chars);*/
+/*    */
+/*    while (i < 200)*/
+/*    {*/
+/*    	character = fgetc(text_file);*/
+/*    	*/
+/*    	if (character == EOF)*/
+/*    	{*/
+/*    		break;*/
+/*    	}*/
+/*    	*/
+/*    	*(*input_arr + i) = character;*/
+/*    	++i;*/
+/*    }*/
 /*}*/
-
 /******************************************************************************/
-/* Create HashTable for dict 	*/
-/*create a hash table of the size of the words array + 10%*/
-
+dictionary_ty* DictionaryCreate() 
+{
+    dictionary_ty* dict = malloc(sizeof(dictionary_ty));
+    
+    if (dict) 
+    {
+        /* initialize values */
+        dict->size = 0;
+        dict->reserved = 1;
+        dict->words = malloc(sizeof(char*) * dict->reserved);
+        if (!dict->words) 
+        {
+            free(dict);
+            dict = NULL;
+        }
+    }
+    
+    return (dict);
+}
+/******************************************************************************/
+void DictionaryDestroy(dictionary_ty* dict) 
+{
+    /* free the words array */
+    free(dict->words);
+    
+    /* free the dictionary struct */
+    free(dict);
+}
+/******************************************************************************/
+int DictionaryResize(dictionary_ty* dict, size_t new_res) 
+{
+	char **temp = NULL;
+	
+    /* reserve more space for the chars if needed */
+    if (new_res > dict->reserved)
+     {
+        temp = realloc(dict->words, sizeof(char*) * new_res);
+        if (!temp)
+        {
+        	return (1); /* memory allocation failure */
+        } 
+        dict->reserved = new_res;
+        dict->words = temp;
+    }
+    
+    return (0);
+}
+/******************************************************************************/
+int DictionaryIsFull(dictionary_ty* dict)
+{
+    if (dict->size == dict->reserved)
+    {
+        /* change 5/4 to a larger value for more aggressive
+         * increase of memory allocation */
+        return (DictionaryResize(dict, (dict->reserved+1) * 5 / 4));
+	}
+    else
+    {
+        return (0);
+    }
+    
+   return (1);
+}
+/******************************************************************************/
+int DictionaryAddTo(dictionary_ty* dict, char* character_to_add)
+{
+    if (DictionaryIsFull(dict)) 
+    {
+    	return (1);
+	}
+	
+    dict->words[dict->size++] = character_to_add;
+    
+    return (0);
+}
+/******************************************************************************/
+void CharsToWords(dictionary_ty* dict, char *file_path, char** &input_arr) 
+{
+	char *curr_char = characters_arr;
+	
+	while(*curr_char != '\0')
+	{
+		DictionaryAddTo(dict, curr_char);
+		
+		while(*curr_char != '\n')
+		{
+			++curr_char;
+			
+			if (*curr_char == '\0')
+			{
+				return;
+			}
+		}
+		
+		*curr_char = '\0';
+		++curr_char;
+	}
+}
+/******************************************************************************/
