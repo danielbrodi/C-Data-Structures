@@ -37,7 +37,8 @@ struct hash_table
 
 
 /************************* Functions  Implementations *************************/
-ht_ty *HTCreate(size_t capacity, hash_func_ty hash_func, is_same_key_ty is_same_func, const void *hash_param)
+ht_ty *HTCreate(size_t capacity, hash_func_ty hash_func, const void *hash_param,
+													is_same_key_ty is_same_func)
 {
 	/*	asserts for parameters*/
 
