@@ -64,5 +64,5 @@ size_t hash(const void *str, const void *param)
 
 /******************************************************************************/
 
-create a hash table of the size of the words
+create a hash table of the size of the words array + 10%
 
