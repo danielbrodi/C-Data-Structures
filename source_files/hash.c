@@ -33,7 +33,7 @@ struct hash_table
 	is_same_key_func_ty is_same;
 	const void *hash_param;
 };
-
+/* TODO maybe create it locally because it used only by one function */
 typedef struct extended_param
 {
 	ht_ty *hash_table;
@@ -43,7 +43,8 @@ typedef struct extended_param
 /**************************** Forward Declarations ****************************/
 
 
-
+/*TODO create helper functions because remove, insert and find use the same
+		things	*/
 /************************* Functions  Implementations *************************/
 ht_ty *HTCreate(size_t capacity, hash_func_ty hash_func, const void *hash_param,
 											is_same_key_func_ty is_same_func)
