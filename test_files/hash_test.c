@@ -39,13 +39,13 @@ int main()
 
 /*CreateDict: */
 
-open words file (linux dictionary)
-get the number of total characters in the file
-create a char array of size of that number
-allocate a dynamic array of char * to store ptrs to the beginning of each word
-simultaneously go through both arrays:
-	for each words: store first char in the char * array
-					change "\n" in the original array to "\0"
+/*open words file (linux dictionary)*/
+/*get the number of total characters in the file*/
+/*create a char array of size of that number*/
+/*allocate a dynamic array of char * to store ptrs to the beginning of each word*/
+/*simultaneously go through both arrays:*/
+/*	for each words: store first char in the char * array*/
+/*					change "\n" in the original array to "\0"*/
 
 /******************************************************************************/
 
@@ -64,5 +64,5 @@ size_t hash(const void *str, const void *param)
 
 /******************************************************************************/
 /* Create HashTable for dict 	*/
-create a hash table of the size of the words array + 10%
+/*create a hash table of the size of the words array + 10%*/
 
