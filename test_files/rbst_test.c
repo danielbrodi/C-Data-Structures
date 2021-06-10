@@ -260,7 +260,7 @@ static void FillUpArray(element_ty *arr, size_t size)
 	{
 		arr[i].name = names[i];
 		arr[i].id = RANDOM_NUM;
-		arr[i].grade = (random_student == i) ? 300 : RANDOM_NUM;
+		arr[i].grade = (random_student == i)  ? 300 : RANDOM_NUM;
 	}
 }
 /******************************************************************************/
