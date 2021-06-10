@@ -41,17 +41,21 @@ ht_ty *HTCreate(size_t capacity, hash_func_ty hash_func, const void *hash_param,
 													is_same_key_ty is_same_func)
 {
 	ht_ty *new_hash_table = NULL;
+	
 	size_t i = 0;
+	
 	/*	asserts for parameters*/
 	assert(capacity);
 	assert(hash_func);
 	assert(is_same_func);
+	
 	/*	allocate memory for hash map structure & handle memory errors if any*/
 	new_hash_table = (ht_ty *)malloc(sizeof(ht_ty) + (capacity)*sizeof(dlist_ty));
 	if (!new_hash_table)
 	{
 		return (NULL);
 	}
+	
 	/*	create and allocate memory for an array of */
 	/*	dlists of size of capacity,*/
 	/*	and assign to the struct member, handle memory errors if any.*/
@@ -85,6 +89,7 @@ ht_ty *HTCreate(size_t capacity, hash_func_ty hash_func, const void *hash_param,
 void HTDestroy(ht_ty *hash_table)
 {
 	size_t num_of_bins = hash_table->capacity, i = 0;
+	
 	/*	loop through the map and destory dlist at each index*/
 	while (i < num_of_bins)
 	{
@@ -94,7 +99,7 @@ void HTDestroy(ht_ty *hash_table)
 	}
 	
 	/*	free the hash map*/
-	memset(hash_table, 0, hash_table->capacity + sizeof(ht_ty));
+	memset(hash_table, 0, sizeof(ht_ty));
 	
 	free(hash_table);
 	
@@ -104,7 +109,9 @@ void HTDestroy(ht_ty *hash_table)
 int HTInsert(ht_ty *hash_table, void *data)
 {
 	size_t bin_index = -1;
+	
 	dlist_ty *dlist = NULL;
+	
 	dlist_iter_ty ret_status;
 	
 	/*	assert*/
@@ -112,22 +119,28 @@ int HTInsert(ht_ty *hash_table, void *data)
 	assert(data);	/* NULL data is not allowed in tis hash table	*/
 	
 	/*	use hash func to get the right index to insert data into*/
-	bin_index = hash_table->hash_func(data, hash_table->param);
+	bin_index = hash_table->hash_func(data, hash_table->hash_param);
+	
 	/*	go to that index in the dlists array*/
 	dlist = hash_table->items + bin_index;
+	
 	/*	use the push func of dlist to insert the data*/
 	ret_status = DlistPushFront(dlist, data);
+	
 	/*	return status of inserttion*/
 	/*	if ret_status is the end iterator of the list it means the
 		insertion was failed.											*/
-}	return (DlistIteratorIsEqual(ret_status, DlistIteratorEnd(dlist)));
+	return (DlistIteratorIsEqual(ret_status, DlistIteratorEnd(dlist)));
+}
 /******************************************************************************/
 size_t HTSize(const ht_ty *hash_table)
 {
 	dlist *curr_list = *last_list = NULL;
 	size_t total_size = 0;
+	
 	/*	assert */
 	assert(hash_table);
+	
 	/*	loop on each index in the hash table and check for dlist size using*/
 	/*	dlist size func*/
 	curr_list = hash_table->items;	/*	first list	*/
@@ -144,15 +157,27 @@ size_t HTSize(const ht_ty *hash_table)
 /******************************************************************************/
 void *HTFind(ht_ty *hash_table, const void *key)
 {
+	size_t bin_index = -1;
+	dlist_ty *dlist = NULL;
+	void *ret = NULL;
+	dlist_iter_ty ret_iter;
+	
 	/*	asserts*/
+	assert(hash_table);
+	assert(key);
+	
 	/*	move to the right index by hash func(key)	*/
+	bin_index = hash_table->hash_func(key, hash_table->hash_param);
+	
+	dlist = hash_table->items + bin_index;
+	
 	/*	 use find function of dlist */
-	/*	getdata on the result of find */
-	/*	compare each key with is_same_func*/
-	/*	to the given key*/
-	/* if not equal - move next	*/
-
+	ret_iter = DlistFind(DlistIteratorBegin(dlist), DlistIteratorEnd(dlist), 
+										hash_table->is_same, hash_table->param);
+	
 	/*	return null or the element*/
+	return (DlistIteratorIsEqual(ret_iter, DlistIteratorEnd(dlist)) ? NULL :
+														DlistGetData(ret_iter));
 }
 /******************************************************************************/
 int HTIsEmpty(const ht_ty *hash_table)
