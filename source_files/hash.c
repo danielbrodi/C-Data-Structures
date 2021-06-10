@@ -180,18 +180,30 @@ void *HTFind(ht_ty *hash_table, const void *key)
 														DlistGetData(ret_iter));
 }
 /******************************************************************************/
-int HTIsEmpty(const ht_ty *hash_table)
-{
-	/*	loop on the table, and use isempty dlist at each index*/
-	/*	if in the end everything is empty, return true*/
-	/* OR */
-	/*	check if HTSize is 0*/
-}
-/******************************************************************************/
 void HTRemove(ht_ty *hash_table, const void *key)
 {
+	size_t bin_index = -1;
+	dlist_ty *dlist = NULL;
+	void *ret = NULL;
+	dlist_iter_ty ret_iter;
+	
+	/*	asserts	*/
+	assert(hash_table);
+	assert(key);
+	
 	/*	use hash func to get right index of the right dlist */
-	/*	dlist find(key,is_same_func)
-	/*	remove on the iterator that recieved from the dlist find function 	*/ 
+	bin_index = hash_table->hash_func(key, hash_table->hash_param);
+	
+	dlist = hash_table->items + bin_index;
+	
+	/*	 use find function of dlist */
+	ret_iter = DlistFind(DlistIteratorBegin(dlist), DlistIteratorEnd(dlist), 
+										hash_table->is_same, hash_table->param);
+										
+	/*	remove on the iterator that recieved from the dlist find function 	*/
+	if (!DlistIteratorIsEqual(ret_iter, DlistIteratorEnd(dlist)))
+	{
+		DlistRemove(ret_iter);
+	}
 }
 /******************************************************************************/
