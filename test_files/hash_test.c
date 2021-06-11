@@ -8,9 +8,10 @@
 \******************************************************************************/
 
 /********************************* Inclusions *********************************/
-
+#include <assert.h>
 #include <stdio.h>	/* printf	*/
 #include <stdlib.h>	/*	malloc, free, realloc 	*/
+#include <string.h>	/* strlen	*/
 
 #include "utils.h"
 #include "hash.h"
@@ -75,13 +76,33 @@ int main()
 	
 	HTCreateTest(hash_table);
 	
-/*	printf("SIZE: %ld" ,HTSize(hash_table));*/
+	printf("SIZE OF HASH TABLE BEFORE INSERTS: %ld\n\n" ,HTSize(hash_table));
 		
-/*	for(i = 0; i < dict->size; ++i)*/
-/*    {*/
-/*        printf("%ld: %s\n", i, dict->words[i]);*/
-/*    }*/
-/*	*/
+	for(i = 0; i < dict->size; ++i)
+    {
+        printf("%ld: %s\n", i, dict->words[i]);
+    }
+	
+	i = 0;
+
+	while (i < dict->size)
+	{
+		HTInsert(hash_table, dict->words[i]);
+		++i;
+	}
+	
+	HTInsert(hash_table, "Daniel");
+	
+	printf("\nSIZE OF HASH TABLE AFTER 10 INSERTS: %ld\n\n" ,HTSize(hash_table));
+	
+	i = 0;
+	
+	while (i < dict->size)
+	{
+		printf("%ld: %s\n", i, (char *)HTFind(hash_table, "Daniel"));
+		++i;
+	}
+	
     DictionaryDestroy(dict);
     
     free(chars_array);
@@ -224,13 +245,33 @@ int DictionaryIsFull(dictionary_ty* dict)
    return (1);
 }
 /******************************************************************************/
-size_t hash_func(const void *data, const void *param)
+size_t hash_func(const void *string, const void *param)
 {
-	return (10);
+    int c = 0;
+    size_t hash = 5381;
+    
+    char *string_runner = NULL;
+    
+    assert(string);
+    
+	UNUSED(param);
+	
+	string_runner = (char *)string;
+	
+    while (*string_runner )
+    {
+    	c = *string_runner;
+		hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+		++string_runner;
+	}
+	
+    return (hash);
 }
 /******************************************************************************/
 int is_same_key(const void *data1, const void *data2)
 {
-	return (1);
+	const char *string1 = (char *)data1;
+	const char *string2 = (char *)data2;
+	return (strcmp(string1, string2) == 0);
 }
 /******************************************************************************/

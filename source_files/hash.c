@@ -81,6 +81,7 @@ ht_ty *HTCreate(size_t capacity, hash_func_ty hash_func, const void *hash_param,
 		for (i = 0; i < capacity; ++i)
 		{
 			*(new_hash_table->items + i) = DlistCreate();
+			
 			if (!(*(new_hash_table->items + i)))
 			{
 				new_hash_table->capacity = i;
@@ -128,7 +129,7 @@ int HTInsert(ht_ty *hash_table, void *data)
 	assert(data);	/* NULL data is not allowed in tis hash table	*/
 	
 	/*	use hash func to get the right index to insert data into*/
-	bin_index = hash_table->hash_func(data, hash_table->hash_param);
+	bin_index = hash_table->hash_func(data, hash_table->hash_param) % hash_table->capacity;
 	
 	/*	go to that index in the dlists array*/
 	dlist = *(hash_table->items + bin_index);
@@ -153,7 +154,7 @@ size_t HTSize(const ht_ty *hash_table)
 	/*	loop on each index in the hash table and check for dlist size using*/
 	/*	dlist size func*/
 	curr_list = *(hash_table->items);	/*	first list	*/
-	last_list = *(hash_table->items + hash_table->capacity);
+	last_list = *(hash_table->items + hash_table->capacity - 1);
 	
 	while (curr_list < last_list)
 	{
@@ -188,7 +189,7 @@ void *HTFind(ht_ty *hash_table, const void *key)
 	assert(key);
 	
 	/*	move to the right index by hash func(key)	*/
-	bin_index = hash_table->hash_func(key, hash_table->hash_param);
+	bin_index = hash_table->hash_func(key, hash_table->hash_param) % hash_table->capacity;
 	
 	dlist = *(hash_table->items + bin_index);
 	
@@ -216,7 +217,7 @@ void HTRemove(ht_ty *hash_table, const void *key)
 	assert(key);
 	
 	/*	use hash func to get right index of the right dlist */
-	bin_index = hash_table->hash_func(key, hash_table->hash_param);
+	bin_index = hash_table->hash_func(key, hash_table->hash_param) % hash_table->capacity;
 	
 	dlist = *(hash_table->items + bin_index);
 	
