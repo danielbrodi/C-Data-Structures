@@ -42,7 +42,6 @@ typedef struct extended_param
 
 /**************************** Forward Declarations ****************************/
 
-
 /*TODO create helper functions because remove, insert and find use the same
 		things	*/
 /************************* Functions  Implementations *************************/
@@ -145,7 +144,7 @@ int HTInsert(ht_ty *hash_table, void *data)
 size_t HTSize(const ht_ty *hash_table)
 {
 	dlist_ty *curr_list = NULL, *last_list = NULL;
-	size_t total_size = 0;
+	size_t total_size = 0, i = 0;
 	
 	/*	assert */
 	assert(hash_table);
@@ -158,6 +157,8 @@ size_t HTSize(const ht_ty *hash_table)
 	while (curr_list < last_list)
 	{
 		total_size += DlistSize(curr_list);
+		++i;
+		curr_list = *(hash_table->items + i);
 	}
 	
 	/*	return the sum of all sizes*/
