@@ -18,7 +18,7 @@
 
 /**************************** Structs  Definitions ****************************/
 
-/* dynamic memory storage - dictionary */
+/* dynamic dictionary */
 typedef struct dictionary
 {
     size_t size;
@@ -43,78 +43,40 @@ int DictionaryIsFull(dictionary_ty* dict);
 /* adds a character to the dictionary_ty */
 int DictionaryAddTo(dictionary_ty* dict, char* word_to_add);
 
-void CharsToWords(dictionary_ty* dict, char* file_path, char **characters_arr);
-
-void TextFileToArray(char *file_path, char **input_arr);
+/*	converts text file which contains chars to an array of words(strings)	*/
+void TextFileToArray(dictionary_ty* dict, char *file_path, char** chars_array);
 
 /******************************* Main__Function *******************************/
-
 int main() 
 {
-	char *characters;
+	char *chars_array;
 	
 	size_t i = 0;
 	
 	dictionary_ty* dict = DictionaryCreate();
 	if (!dict)
 	{
-		return(1);
+		return (1);
 	}
     
-/*    TextFileToArray(DICTIONARY_PATH, &characters);*/
-    
-    CharsToWords(dict, DICTIONARY_PATH, &characters);
+    TextFileToArray(dict, DICTIONARY_PATH, &chars_array);
     
     for(i = 0; i < dict->size; ++i)
     {
         printf("%ld: %s\n", i, dict->words[i]);
     }
-
-	free(characters);	
 	
     DictionaryDestroy(dict);
     
-    return(0);
+    free(chars_array);
+    
+    return (0);
 }	
-
-/******************************************************************************/
-
-/*void TextFileToArray(char *file_path, char **input_arr)*/
-/*{*/
-/*	size_t i = 0, num_of_chars = 0;*/
-/*	*/
-/*	int character = 0;*/
-/*    */
-/*	FILE *text_file = fopen((char *)file_path, "r");*/
-/*    */
-/*    fseek(text_file, 0, SEEK_END);  move ptr to end of dict	 */
-/*    */
-/*    num_of_chars = ftell(text_file);*/
-/*    */
-/*    printf("\nDictionary SIZE:%ld\n", num_of_chars);*/
-/*    */
-/*    fseek(text_file, 0, SEEK_SET);  move ptr to beginning of dict	 */
-/*    */
-/*    *input_arr = (char *)malloc(sizeof(char) * num_of_chars);*/
-/*    */
-/*    while (i < 200)*/
-/*    {*/
-/*    	character = fgetc(text_file);*/
-/*    	*/
-/*    	if (character == EOF)*/
-/*    	{*/
-/*    		break;*/
-/*    	}*/
-/*    	*/
-/*    	*(*input_arr + i) = character;*/
-/*    	++i;*/
-/*    }*/
-/*}*/
 /******************************************************************************/
 dictionary_ty* DictionaryCreate() 
 {
     dictionary_ty* dict = malloc(sizeof(dictionary_ty));
-    
+
     if (dict) 
     {
         /* initialize values */
@@ -187,7 +149,7 @@ int DictionaryAddTo(dictionary_ty* dict, char* word_to_add)
     return (0);
 }
 /******************************************************************************/
-void CharsToWords(dictionary_ty* dict, char *file_path, char** chars_array) 
+void TextFileToArray(dictionary_ty* dict, char *file_path, char** chars_array) 
 {
 
 	size_t i = 0, num_of_chars = 0;
@@ -203,7 +165,7 @@ void CharsToWords(dictionary_ty* dict, char *file_path, char** chars_array)
     num_of_chars = ftell(text_file);
     
 	*chars_array = malloc(sizeof(char) * num_of_chars);
-    
+
     char_arr_runner = *chars_array;
     
     printf("\nDictionary Size:%ld\n", num_of_chars);
@@ -212,10 +174,9 @@ void CharsToWords(dictionary_ty* dict, char *file_path, char** chars_array)
     
     DictionaryAddTo(dict, (char_arr_runner));
     
-	while (i < 100)
+	while (i < 200)
     {
     	character = fgetc(text_file);
-    	
     	
     	if (character == EOF)
     	{
@@ -237,22 +198,6 @@ void CharsToWords(dictionary_ty* dict, char *file_path, char** chars_array)
     	++i;
     }
     
-    char_arr_runner = *chars_array;
-    i = 0;
-    printf("\nSECOND LOOP:\n");
-     while (i < 50)
-    {
-    	if (*char_arr_runner == '\0')
-    	{
-    		printf("\n");
-    	}
-    	else
-    	{
-    		printf("%c", *char_arr_runner);
-    	}
-    	++char_arr_runner;
-    	++i;
-    }
-    printf("\n");
+    fclose(text_file);
 }
 /******************************************************************************/
