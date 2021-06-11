@@ -57,7 +57,7 @@ int is_same_key(const void *data1, const void *data2);
 /******************************* Main__Function *******************************/
 int main() 
 {
-	char *chars_array;
+	char *chars_array = NULL;
 	
 	size_t i = 0;
 	
@@ -75,13 +75,13 @@ int main()
 	
 	HTCreateTest(hash_table);
 	
-	printf("SIZE:" ,HTSize(hash_table));
+/*	printf("SIZE: %ld" ,HTSize(hash_table));*/
 		
-	for(i = 0; i < dict->size; ++i)
-    {
-        printf("%ld: %s\n", i, dict->words[i]);
-    }
-	
+/*	for(i = 0; i < dict->size; ++i)*/
+/*    {*/
+/*        printf("%ld: %s\n", i, dict->words[i]);*/
+/*    }*/
+/*	*/
     DictionaryDestroy(dict);
     
     free(chars_array);

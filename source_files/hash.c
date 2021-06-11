@@ -33,6 +33,7 @@ struct hash_table
 	is_same_key_func_ty is_same;
 	const void *hash_param;
 };
+
 /* TODO maybe create it locally because it used only by one function */
 typedef struct extended_param
 {
@@ -58,37 +59,36 @@ ht_ty *HTCreate(size_t capacity, hash_func_ty hash_func, const void *hash_param,
 	assert(is_same_func);
 	
 	/*	allocate memory for hash map structure & handle memory errors if any*/
-	new_hash_table = (ht_ty *)malloc(sizeof(ht_ty));
-	if (!new_hash_table)
+	new_hash_table = malloc(sizeof(ht_ty));
+	if (new_hash_table)
 	{
-		return (NULL);
-	}
-	
-	/*	create and allocate memory for an array of */
-	/*	dlists of size of capacity,*/
-	/*	and assign to the struct member, handle memory errors if any.*/
-	/* loop on the array and create dlist at each index				*/
-	for (i = 0; i < capacity; ++i)
-	{
-		*(new_hash_table->items) = DlistCreate();
+		/*	assign parameters to the corrosponding struct members*/
+		new_hash_table->hash_func = hash_func;
+		new_hash_table->capacity = capacity;
+		new_hash_table->is_same = is_same_func;
+		new_hash_table->hash_param = hash_param;
+		
+		new_hash_table->items = (dlist_ty **)malloc(sizeof(dlist_ty *) * capacity);
 		if (!new_hash_table->items)
 		{
-			while (i > 0)
-			{
-				--i;
-				DlistDestroy(*(new_hash_table->items - i));
-			}
-			
-			free(new_hash_table);
+			HTDestroy(new_hash_table);
 			return (NULL);
 		}
+		/*	create and allocate memory for an array of */
+		/*	dlists of size of capacity,*/
+		/*	and assign to the struct member, handle memory errors if any.*/
+		/* loop on the array and create dlist at each index				*/
+		for (i = 0; i < capacity; ++i)
+		{
+			*(new_hash_table->items + i) = DlistCreate();
+			if (!(*(new_hash_table->items + i)))
+			{
+				new_hash_table->capacity = i;
+				HTDestroy(new_hash_table);
+				new_hash_table = NULL;
+			}
+		}	
 	}
-	
-	/*	assign rest of the parameters to the corrosponding struct members*/
-	new_hash_table->hash_func = hash_func;
-	new_hash_table->capacity = capacity;
-	new_hash_table->is_same = is_same_func;
-	new_hash_table->hash_param = hash_param;
 	
 	/*	return created hash map*/
 	return (new_hash_table);
@@ -101,10 +101,11 @@ void HTDestroy(ht_ty *hash_table)
 	/*	loop through the map and destory dlist at each index*/
 	while (i < num_of_bins)
 	{
-		DlistDestroy(*(hash_table->items));
-		hash_table->items += i;
+		DlistDestroy(*(hash_table->items + i));
 		++i;
 	}
+	
+	free(hash_table->items);
 	
 	/*	free the hash map*/
 	memset(hash_table, 0, sizeof(ht_ty));
