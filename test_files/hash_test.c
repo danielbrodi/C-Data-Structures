@@ -103,6 +103,19 @@ int main()
 		++i;
 	}
 	
+	HTRemove(hash_table, "Daniel");
+	
+	i = 0;
+	
+	printf("DANIEL REMOVED\n");
+	while (i < dict->size)
+	{
+		HTFind(hash_table, "Daniel") ? printf("FOUND\n") : printf( "NOT FOUND\n");
+		++i;
+	}
+	
+	printf("\nSIZE OF HASH TABLE AFTER 1 REMOVE: %ld\n\n" ,HTSize(hash_table));
+	
     DictionaryDestroy(dict);
     
     free(chars_array);
