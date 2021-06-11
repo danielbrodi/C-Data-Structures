@@ -187,14 +187,14 @@ int DictionaryAddTo(dictionary_ty* dict, char* word_to_add)
     return (0);
 }
 /******************************************************************************/
-void CharsToWords(dictionary_ty* dict, char *file_path, char** input_arr) 
+void CharsToWords(dictionary_ty* dict, char *file_path, char** chars_array) 
 {
 
 	size_t i = 0, num_of_chars = 0;
 	
 	int character = 0;
     
-	char *curr_char = NULL;
+	char *char_arr_runner = NULL;
     
 	FILE *text_file = fopen((char *)file_path, "r");
     
@@ -202,15 +202,20 @@ void CharsToWords(dictionary_ty* dict, char *file_path, char** input_arr)
     
     num_of_chars = ftell(text_file);
     
-	curr_char = *input_arr = malloc(sizeof(char) * num_of_chars);
+	*chars_array = malloc(sizeof(char) * num_of_chars);
     
-    printf("\nDictionary SIZE:%ld\n", num_of_chars);
+    char_arr_runner = *chars_array;
+    
+    printf("\nDictionary Size:%ld\n", num_of_chars);
     
     fseek(text_file, 0, SEEK_SET); /* move ptr to beginning of dict	 */
     
-	while (i < 50)
+    DictionaryAddTo(dict, (char_arr_runner));
+    
+	while (i < 100)
     {
     	character = fgetc(text_file);
+    	
     	
     	if (character == EOF)
     	{
@@ -219,34 +224,35 @@ void CharsToWords(dictionary_ty* dict, char *file_path, char** input_arr)
     	
     	if (character == '\n')
     	{
-    		*curr_char =  '\0';
-    		DictionaryAddTo(dict, curr_char + i);
+    		*char_arr_runner =  '\0';
+    		DictionaryAddTo(dict, (char_arr_runner + 1));	
     	}
     	
     	else
     	{
-    		*curr_char = character;
+    		*char_arr_runner = character;
     	}
-    	
-    	++curr_char;
+
+    	++char_arr_runner;
     	++i;
     }
     
-    curr_char -= 50;
+    char_arr_runner = *chars_array;
     i = 0;
-    
+    printf("\nSECOND LOOP:\n");
      while (i < 50)
     {
-    	curr_char += i;
-    	if (*curr_char == '\0')
+    	if (*char_arr_runner == '\0')
     	{
     		printf("\n");
     	}
     	else
     	{
-    		printf("%c", *curr_char);
+    		printf("%c", *char_arr_runner);
     	}
+    	++char_arr_runner;
     	++i;
     }
+    printf("\n");
 }
 /******************************************************************************/
