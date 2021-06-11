@@ -41,9 +41,9 @@ int DictionaryResize(dictionary_ty* dict, size_t new_res);
 int DictionaryIsFull(dictionary_ty* dict);
 
 /* adds a character to the dictionary_ty */
-int DictionaryAddTo(dictionary_ty* dict, char* character_to_add);
+int DictionaryAddTo(dictionary_ty* dict, char* word_to_add);
 
-void CharsToWords(dictionary_ty* dict, char* characters_arr);
+void CharsToWords(dictionary_ty* dict, char* file_path, char **characters_arr);
 
 void TextFileToArray(char *file_path, char **input_arr);
 
@@ -87,13 +87,13 @@ int main()
 /*    */
 /*	FILE *text_file = fopen((char *)file_path, "r");*/
 /*    */
-/*    fseek(text_file, 0, SEEK_END); /* move ptr to end of dict	*/ */
+/*    fseek(text_file, 0, SEEK_END);  move ptr to end of dict	 */
 /*    */
 /*    num_of_chars = ftell(text_file);*/
 /*    */
 /*    printf("\nDictionary SIZE:%ld\n", num_of_chars);*/
 /*    */
-/*    fseek(text_file, 0, SEEK_SET); /* move ptr to beginning of dict	*/ */
+/*    fseek(text_file, 0, SEEK_SET);  move ptr to beginning of dict	 */
 /*    */
 /*    *input_arr = (char *)malloc(sizeof(char) * num_of_chars);*/
 /*    */
@@ -175,38 +175,78 @@ int DictionaryIsFull(dictionary_ty* dict)
    return (1);
 }
 /******************************************************************************/
-int DictionaryAddTo(dictionary_ty* dict, char* character_to_add)
+int DictionaryAddTo(dictionary_ty* dict, char* word_to_add)
 {
     if (DictionaryIsFull(dict)) 
     {
     	return (1);
 	}
 	
-    dict->words[dict->size++] = character_to_add;
+    dict->words[dict->size++] = word_to_add;
     
     return (0);
 }
 /******************************************************************************/
-void CharsToWords(dictionary_ty* dict, char *file_path, char** &input_arr) 
+void CharsToWords(dictionary_ty* dict, char *file_path, char** input_arr) 
 {
-	char *curr_char = characters_arr;
+
+	size_t i = 0, num_of_chars = 0;
 	
-	while(*curr_char != '\0')
-	{
-		DictionaryAddTo(dict, curr_char);
-		
-		while(*curr_char != '\n')
-		{
-			++curr_char;
-			
-			if (*curr_char == '\0')
-			{
-				return;
-			}
-		}
-		
-		*curr_char = '\0';
-		++curr_char;
-	}
+	int character = 0;
+    
+	char *curr_char = NULL;
+    
+	FILE *text_file = fopen((char *)file_path, "r");
+    
+    fseek(text_file, 0, SEEK_END); /* move ptr to end of dict	 */
+    
+    num_of_chars = ftell(text_file);
+    
+	curr_char = *input_arr = malloc(sizeof(char) * num_of_chars);
+    
+    printf("\nDictionary SIZE:%ld\n", num_of_chars);
+    
+    fseek(text_file, 0, SEEK_SET); /* move ptr to beginning of dict	 */
+    
+	while (i < 50)
+    {
+    	character = fgetc(text_file);
+    	
+    	if (character == EOF)
+    	{
+    		break;
+    	}
+    	
+    	if (character == '\n')
+    	{
+    		*curr_char =  '\0';
+    		DictionaryAddTo(dict, curr_char + i);
+    	}
+    	
+    	else
+    	{
+    		*curr_char = character;
+    	}
+    	
+    	++curr_char;
+    	++i;
+    }
+    
+    curr_char -= 50;
+    i = 0;
+    
+     while (i < 50)
+    {
+    	curr_char += i;
+    	if (*curr_char == '\0')
+    	{
+    		printf("\n");
+    	}
+    	else
+    	{
+    		printf("%c", *curr_char);
+    	}
+    	++i;
+    }
 }
 /******************************************************************************/
