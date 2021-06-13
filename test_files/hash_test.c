@@ -72,7 +72,9 @@ int main()
     
     TextFileToArray(dict, DICTIONARY_PATH, &chars_array);
 	
-	hash_table = HTCreate(dict->size * 1.1, hash_func, 0, is_same_key);
+	hash_table = HTCreate(dict->size, hash_func, 0, is_same_key);
+	
+	printf("DICT_SIZE : %ld\n", dict->size);
 	
 	HTCreateTest(hash_table);
 	
@@ -93,26 +95,26 @@ int main()
 	
 	HTInsert(hash_table, "Daniel");
 	
-	printf("\nSIZE OF HASH TABLE AFTER 10 INSERTS: %ld\n\n" ,HTSize(hash_table));
-	
-	i = 0;
-	
-	while (i < dict->size)
-	{
-		printf("%ld: %s\n", i, (char *)HTFind(hash_table, "Daniel"));
-		++i;
-	}
+	printf("\nSIZE OF HASH TABLE AFTER %ld INSERTS: %ld\n\n" , i+1+1, HTSize(hash_table));
+/*	*/
+/*	i = 0;*/
+/*	*/
+/*	while (i < dict->size)*/
+/*	{*/
+/*		printf("%ld: %s\n", i, (char *)HTFind(hash_table, "Daniel"));*/
+/*		++i;*/
+/*	}*/
 	
 	HTRemove(hash_table, "Daniel");
 	
 	i = 0;
 	
-	printf("DANIEL REMOVED\n");
-	while (i < dict->size)
-	{
-		HTFind(hash_table, "Daniel") ? printf("FOUND\n") : printf( "NOT FOUND\n");
-		++i;
-	}
+/*	printf("DANIEL REMOVED\n");*/
+/*	while (i < dict->size)*/
+/*	{*/
+/*		HTFind(hash_table, "Daniel") ? printf("FOUND\n") : printf( "NOT FOUND\n");*/
+/*		++i;*/
+/*	}*/
 	
 	printf("\nSIZE OF HASH TABLE AFTER 1 REMOVE: %ld\n\n" ,HTSize(hash_table));
 	
@@ -129,7 +131,7 @@ void HTCreateTest(ht_ty * hasht)
 {
 	hasht ? PRINT_SUCCESS : PRINT_FAILURE;
 }
-
+/******************************************************************************/
 dictionary_ty* DictionaryCreate() 
 {
     dictionary_ty* dict = malloc(sizeof(dictionary_ty));
@@ -139,7 +141,7 @@ dictionary_ty* DictionaryCreate()
         /* initialize values */
         dict->size = 0;
         dict->reserved = 1;
-        dict->words = malloc(sizeof(char*) * dict->reserved);
+        dict->words = malloc(sizeof(char *) * dict->reserved);
         if (!dict->words) 
         {
             free(dict);
@@ -196,7 +198,7 @@ void TextFileToArray(dictionary_ty* dict, char *file_path, char** chars_array)
 
     DictionaryAddTo(dict, (char_arr_runner));
     
-	while (i < 50)
+	while (i < 100)
     {
     	character = fgetc(text_file);
     	
@@ -234,7 +236,8 @@ int DictionaryResize(dictionary_ty* dict, size_t new_res)
         if (!temp)
         {
         	return (1); /* memory allocation failure */
-        } 
+        }
+        
         dict->reserved = new_res;
         dict->words = temp;
     }
@@ -277,6 +280,8 @@ size_t hash_func(const void *string, const void *param)
 		hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
 		++string_runner;
 	}
+	
+	printf("HASH: %ld for string: %s\n", (hash % 17) , (char *)string);
 	
     return (hash);
 }

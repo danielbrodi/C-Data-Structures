@@ -68,7 +68,7 @@ ht_ty *HTCreate(size_t capacity, hash_func_ty hash_func, const void *hash_param,
 		new_hash_table->is_same = is_same_func;
 		new_hash_table->hash_param = hash_param;
 		
-		new_hash_table->items = (dlist_ty **)malloc(sizeof(dlist_ty *) * capacity);
+		new_hash_table->items = malloc(sizeof(dlist_ty *) * capacity);
 		if (!new_hash_table->items)
 		{
 			HTDestroy(new_hash_table);
@@ -122,14 +122,15 @@ int HTInsert(ht_ty *hash_table, void *data)
 	
 	dlist_ty *dlist = NULL;
 	
-	dlist_iter_ty ret_status;
+	dlist_iter_ty ret_status = {0};
 	
 	/*	assert*/
 	assert(hash_table);
 	assert(data);	/* NULL data is not allowed in tis hash table	*/
 	
 	/*	use hash func to get the right index to insert data into*/
-	bin_index = hash_table->hash_func(data, hash_table->hash_param) % hash_table->capacity;
+	bin_index = hash_table->hash_func(data, hash_table->hash_param) %
+														 hash_table->capacity;
 	
 	/*	go to that index in the dlists array*/
 	dlist = *(hash_table->items + bin_index);
@@ -180,7 +181,7 @@ void *HTFind(ht_ty *hash_table, const void *key)
 	size_t bin_index = -1;
 	
 	dlist_ty *dlist = NULL;
-	dlist_iter_ty ret_iter;
+	dlist_iter_ty ret_iter = {0};
 	
 	extended_param_ty extended_param = {0};
 	
@@ -189,7 +190,8 @@ void *HTFind(ht_ty *hash_table, const void *key)
 	assert(key);
 	
 	/*	move to the right index by hash func(key)	*/
-	bin_index = hash_table->hash_func(key, hash_table->hash_param) % hash_table->capacity;
+	bin_index = hash_table->hash_func(key, hash_table->hash_param) % 
+														hash_table->capacity;
 	
 	dlist = *(hash_table->items + bin_index);
 	
@@ -209,7 +211,7 @@ void HTRemove(ht_ty *hash_table, const void *key)
 {
 	size_t bin_index = -1;
 	dlist_ty *dlist = NULL;
-	dlist_iter_ty ret_iter;
+	dlist_iter_ty ret_iter = {0};
 	extended_param_ty extended_param = {0};
 	
 	/*	asserts	*/
