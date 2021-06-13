@@ -42,9 +42,12 @@ typedef struct extended_param
 }extended_param_ty;
 
 /**************************** Forward Declarations ****************************/
+
+/*	searches for an item in a hash table based on a given key to look for.
+ *	returns a dlist iterator to that item if found.
+ *	otherwise, returns iterator which points to '0'							*/
 static dlist_iter_ty FindItemIMP(ht_ty *hash_table, const void *key_to_find);
-/*TODO create helper functions because remove, insert and find use the same
-		things	*/
+
 /************************* Functions  Implementations *************************/
 ht_ty *HTCreate(size_t capacity, hash_func_ty hash_func, const void *hash_param,
 											is_same_key_func_ty is_same_func)
