@@ -42,7 +42,7 @@ typedef struct extended_param
 }extended_param_ty;
 
 /**************************** Forward Declarations ****************************/
-
+static dlist_iter_ty FindItemIMP(ht_ty *hash_table, const void *key_to_find);
 /*TODO create helper functions because remove, insert and find use the same
 		things	*/
 /************************* Functions  Implementations *************************/
@@ -178,62 +178,69 @@ int CompareKeysIMP(const void *data1, void *extended_param)
 /*----------------------------------------------------------------------------*/
 void *HTFind(ht_ty *hash_table, const void *key)
 {
-	size_t bin_index = -1;
-	
-	dlist_ty *dlist = NULL;
-	dlist_iter_ty ret_iter = {0};
-	
-	extended_param_ty extended_param = {0};
+	dlist_iter_ty item_to_find, not_found_iter = {0};
 	
 	/*	asserts*/
 	assert(hash_table);
 	assert(key);
 	
-	/*	move to the right index by hash func(key)	*/
-	bin_index = hash_table->hash_func(key, hash_table->hash_param) % 
+	item_to_find = FindItemIMP(hash_table, key);
+	
+	/*	return null or the element*/
+	return (DlistIteratorIsEqual(item_to_find, not_found_iter) ? NULL :
+													DlistGetData(item_to_find));
+}
+/******************************************************************************/
+void HTRemove(ht_ty *hash_table, const void *key)
+{
+	
+	dlist_iter_ty item_to_remove, not_found_iter = {0};
+		
+	/*	asserts	*/
+	assert(hash_table);
+	assert(key);
+	
+	item_to_remove = FindItemIMP(hash_table, key);
+										
+	/*	remove on the iterator that recieved from the FindIMP func	*/
+	if (!DlistIteratorIsEqual(not_found_iter, item_to_remove))
+	{
+		DlistRemove(item_to_remove);
+	}
+}
+/******************************************************************************/
+/*	returns iter that equals to 0 if not found */
+static dlist_iter_ty FindItemIMP(ht_ty *hash_table, const void *key_to_find)
+{
+	dlist_iter_ty ret_iter, not_found_iter = {0};
+	
+	dlist_ty *dlist = NULL;
+	
+	extended_param_ty extended_param = {0};
+	
+	size_t bin_index = -1;
+		
+	assert(hash_table);
+	assert(key_to_find);
+	
+	/*	use hash func to get right index of the right dlist */
+	bin_index = hash_table->hash_func(key_to_find, hash_table->hash_param) %
 														hash_table->capacity;
 	
 	dlist = *(hash_table->items + bin_index);
 	
 	extended_param.hash_table = hash_table;
-	extended_param.key = key;
-	
-	/*	 use find function of dlist */
-	ret_iter = DlistFind(DlistIteratorBegin(dlist), DlistIteratorEnd(dlist), 
-								CompareKeysIMP, &extended_param);
-	
-	/*	return null or the element*/
-	return (DlistIteratorIsEqual(ret_iter, DlistIteratorEnd(dlist)) ? NULL :
-														DlistGetData(ret_iter));
-}
-/******************************************************************************/
-void HTRemove(ht_ty *hash_table, const void *key)
-{
-	size_t bin_index = -1;
-	dlist_ty *dlist = NULL;
-	dlist_iter_ty ret_iter = {0};
-	extended_param_ty extended_param = {0};
-	
-	/*	asserts	*/
-	assert(hash_table);
-	assert(key);
-	
-	/*	use hash func to get right index of the right dlist */
-	bin_index = hash_table->hash_func(key, hash_table->hash_param) % hash_table->capacity;
-	
-	dlist = *(hash_table->items + bin_index);
-	
-	extended_param.hash_table = hash_table;
-	extended_param.key = key;
+	extended_param.key = key_to_find;
 	
 	/*	 use find function of dlist */
 	ret_iter = DlistFind(DlistIteratorBegin(dlist), DlistIteratorEnd(dlist), 
 										CompareKeysIMP, &extended_param);
 										
-	/*	remove on the iterator that recieved from the dlist find function 	*/
-	if (!DlistIteratorIsEqual(ret_iter, DlistIteratorEnd(dlist)))
+	if (DlistIteratorIsEqual(ret_iter, DlistIteratorEnd(dlist)))
 	{
-		DlistRemove(ret_iter);
+		return (not_found_iter);
 	}
+										
+	return (ret_iter);
 }
 /******************************************************************************/
