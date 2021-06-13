@@ -95,7 +95,7 @@ int main()
 	
 	HTInsert(hash_table, "Daniel");
 	
-	printf("\nSIZE OF HASH TABLE AFTER %ld INSERTS: %ld\n\n" , i+1+1, HTSize(hash_table));
+	printf("\nSIZE OF HASH TABLE AFTER %ld INSERTS: %ld\n\n" , i+1, HTSize(hash_table));
 /*	*/
 /*	i = 0;*/
 /*	*/
@@ -188,7 +188,7 @@ void TextFileToArray(dictionary_ty* dict, char *file_path, char** chars_array)
     
     num_of_chars = ftell(text_file);
     
-	*chars_array = malloc(sizeof(char) * num_of_chars);
+	*chars_array = calloc(sizeof(char) , num_of_chars);
 
     char_arr_runner = *chars_array;
     
@@ -251,7 +251,7 @@ int DictionaryIsFull(dictionary_ty* dict)
     {
         /* change 5/4 to a larger value for more aggressive
          * increase of memory allocation */
-        return (DictionaryResize(dict, (dict->reserved+1) * 5 / 4));
+        return (DictionaryResize(dict, (dict->reserved + 1) * 5 / 4));
 	}
     else
     {

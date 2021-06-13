@@ -5,7 +5,7 @@
 * Code Reviewer:	
 * Pseudo Reviewer: 						   								
 * Version:			1.0   								
-* Description:		Hash Map implementation pseudo-code.
+* Description:		Hash Map implementation.
 \******************************************************************************/
 
 /********************************* Inclusions *********************************/
@@ -18,11 +18,6 @@
 #include "dlist.h"
 #include "hash.h"
 
-
-/******************************* Macros & enums *******************************/
-
-
-
 /**************************** Structs  Definitions ****************************/
 
 struct hash_table
@@ -34,7 +29,6 @@ struct hash_table
 	const void *hash_param;
 };
 
-/* TODO maybe create it locally because it used only by one function */
 typedef struct extended_param
 {
 	ht_ty *hash_table;
@@ -48,50 +42,56 @@ typedef struct extended_param
  *	otherwise, returns iterator which points to '0'							*/
 static dlist_iter_ty FindItemIMP(ht_ty *hash_table, const void *key_to_find);
 
+/*	creates an array of doubly linked lists. Receives an allocated array
+ *	and runs through it and creates a list in each element of the array
+ *	returns 0 if succeeded, 1 otherwise	*/
+static int CreateListsArrayIMP(dlist_ty **lists, size_t size);
+
 /************************* Functions  Implementations *************************/
+
 ht_ty *HTCreate(size_t capacity, hash_func_ty hash_func, const void *hash_param,
 											is_same_key_func_ty is_same_func)
 {
 	ht_ty *new_hash_table = NULL;
 	
-	size_t i = 0;
-	
-	/*	asserts for parameters*/
+	/*	asserts for recevied parameters	*/
 	assert(capacity);
 	assert(hash_func);
 	assert(is_same_func);
 	
 	/*	allocate memory for hash map structure & handle memory errors if any*/
-	new_hash_table = malloc(sizeof(ht_ty));
+	new_hash_table = (ht_ty *)malloc(sizeof(ht_ty));
 	if (new_hash_table)
-	{
-		/*	assign parameters to the corrosponding struct members*/
-		new_hash_table->hash_func = hash_func;
-		new_hash_table->capacity = capacity;
-		new_hash_table->is_same = is_same_func;
-		new_hash_table->hash_param = hash_param;
+	{		
+		/* allocate memory for the lists array and handle memory errors if any*/
+		new_hash_table->items = (dlist_ty **)malloc(sizeof(dlist_ty *) * capacity);
 		
-		new_hash_table->items = malloc(sizeof(dlist_ty *) * capacity);
-		if (!new_hash_table->items)
-		{
-			HTDestroy(new_hash_table);
-			return (NULL);
-		}
-		/*	create and allocate memory for an array of */
-		/*	dlists of size of capacity,*/
-		/*	and assign to the struct member, handle memory errors if any.*/
-		/* loop on the array and create dlist at each index				*/
-		for (i = 0; i < capacity; ++i)
-		{
-			*(new_hash_table->items + i) = DlistCreate();
-			
-			if (!(*(new_hash_table->items + i)))
+		/* if memory allocation succeeded */
+		if (new_hash_table->items)
+		{	
+			/* if lists creation inside the array was failed */
+			if (CreateListsArrayIMP(new_hash_table->items, capacity))
 			{
-				new_hash_table->capacity = i;
-				HTDestroy(new_hash_table);
+				free(new_hash_table->items);
+				new_hash_table->items = NULL;
+				
+				free(new_hash_table);
 				new_hash_table = NULL;
 			}
-		}	
+			else
+			{
+				/*	assign parameters to the corrosponding struct members*/
+				new_hash_table->hash_func = hash_func;
+				new_hash_table->capacity = capacity;
+				new_hash_table->is_same = is_same_func;
+				new_hash_table->hash_param = hash_param;
+			}
+		}
+		else
+		{
+			free(new_hash_table);
+			new_hash_table = NULL;
+		}
 	}
 	
 	/*	return created hash map*/
@@ -247,3 +247,40 @@ static dlist_iter_ty FindItemIMP(ht_ty *hash_table, const void *key_to_find)
 	return (ret_iter);
 }
 /******************************************************************************/
+static int CreateListsArrayIMP(dlist_ty **lists, size_t size)
+{
+	dlist_ty **start_list = NULL;
+	dlist_ty **curr_list = NULL;
+	dlist_ty **end_list = NULL;
+	
+	assert(lists);
+	assert(size);
+	
+	start_list = lists;
+	curr_list = start_list;
+	end_list = lists + size;
+	
+	/* 	loop through the lists array and create a new list at every element
+	 *	of the array. handle creation errors if any		*/
+	while (curr_list < end_list)
+	{
+		*curr_list = DlistCreate();
+		
+		if (!curr_list)
+		{
+			/*	destroy any list (if any) which was created till now */	
+			while (start_list < curr_list)
+			{
+				DlistDestroy(*start_list);
+				++start_list;
+			}
+			break;
+		}
+		
+		++curr_list;
+	}
+	
+	/*	if start list equals curr list, it means a memory error has occured
+	 *	while creating the lists */
+	return (start_list == curr_list);
+}
