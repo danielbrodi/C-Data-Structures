@@ -13,7 +13,8 @@
 #include <assert.h>			/*	assert			*/
 #include <stddef.h>			/*	size_t, NULL	*/
 #include <stdlib.h>			/*	malloc, free	*/
-#include <string.h>
+#include <string.h>			/*	memset			*/
+#include <math.h>			
 
 #include "dlist.h"
 #include "hash.h"
@@ -46,6 +47,12 @@ static dlist_iter_ty FindItemIMP(ht_ty *hash_table, const void *key_to_find);
  *	and runs through it and creates a list in each element of the array
  *	returns 0 if succeeded, 1 otherwise	*/
 static int CreateListsArrayIMP(dlist_ty **lists, size_t size);
+
+/*	compares 2 lists lengths: 
+ *	returns an integer less than, equal to, or greater than zero if
+ *	the first argument is considered to be respectively less than,
+ *	equal to, or greater than the second.	*/
+int CompareListsLength(const void *length1, const void *length2);
 
 /************************* Functions  Implementations *************************/
 
@@ -149,22 +156,21 @@ int HTInsert(ht_ty *hash_table, void *data)
 /******************************************************************************/
 size_t HTSize(const ht_ty *hash_table)
 {
-	dlist_ty *curr_list = NULL, *last_list = NULL;
-	size_t total_size = 0, i = 0;
+	dlist_ty **curr_list = NULL, **end_of_list = NULL;
+	size_t total_size = 0;
 	
 	/*	assert */
 	assert(hash_table);
 	
 	/*	loop on each index in the hash table and check for dlist size using*/
 	/*	dlist size func*/
-	curr_list = *(hash_table->items);	/*	first list	*/
-	last_list = *(hash_table->items + hash_table->capacity - 1);
+	curr_list = hash_table->items;	/*	first list	*/
+	end_of_list = hash_table->items + hash_table->capacity;
 	
-	while (curr_list < last_list)
+	while (curr_list < end_of_list)
 	{
-		total_size += DlistSize(curr_list);
-		++i;
-		curr_list = *(hash_table->items + i);
+		total_size += DlistSize(*curr_list);
+		++curr_list;
 	}
 	
 	/*	return the sum of all sizes*/
@@ -210,6 +216,64 @@ void HTRemove(ht_ty *hash_table, const void *key)
 	{
 		DlistRemove(item_to_remove);
 	}
+}
+/******************************************************************************/
+statistics_ty HTGetStatistics(const ht_ty *hash_table)
+{
+	statistics_ty ret_stats = {0};
+	
+	dlist_ty **curr_list = NULL, **end_of_list = NULL;
+	
+	size_t *lists_sizes = NULL, *curr_list_size = NULL;
+	size_t hash_table_size = 0;
+	
+	/*	assert */
+	assert(hash_table);
+	
+	hash_table_size = hash_table->capacity;
+	
+	lists_sizes = (size_t *)malloc(sizeof(size_t) * hash_table_size);
+	if (!lists_sizes)
+	{
+		return (ret_stats);
+	}
+	
+	curr_list_size = lists_sizes;
+	
+	/*	loop on each index in the hash table and check for dlist size using*/
+	/*	dlist size func*/
+	curr_list = hash_table->items;	/*	first list	*/
+	end_of_list = hash_table->items + hash_table_size;
+	
+	while (curr_list < end_of_list)
+	{
+		*(curr_list_size) = DlistSize(*curr_list);
+		++curr_list;
+		++curr_list_size;
+	}
+	
+	
+	qsort(lists_sizes, hash_table_size, sizeof(size_t), CompareListsLength);
+	
+	if (0 == (hash_table_size + 1) % 2)
+	{
+		ret_stats.median_list = *(lists_sizes + (hash_table_size + 1) / 2);
+	}
+	else
+	{
+		ret_stats.median_list = *(lists_sizes + hash_table_size / 2);
+	}
+	
+	ret_stats.longest_list = *(lists_sizes + hash_table_size - 1);
+	
+	printf("MEDIAN: %ld, LONGEST: %ld\n", ret_stats.median_list, ret_stats.longest_list);
+	
+	return (ret_stats);
+}
+/******************************************************************************/
+int CompareListsLength(const void *length1, const void *length2)
+{
+	return (*(int *)length1 - *(int *)length2);
 }
 /******************************************************************************/
 /*	returns iter that equals to 0 if not found */
@@ -284,3 +348,4 @@ static int CreateListsArrayIMP(dlist_ty **lists, size_t size)
 	 *	while creating the lists */
 	return (start_list == curr_list);
 }
+/******************************************************************************/

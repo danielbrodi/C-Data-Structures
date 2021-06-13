@@ -72,7 +72,7 @@ int main()
 	}
     
     TextFileToArray(dict, DICTIONARY_PATH, &chars_array);
-	
+
 	hash_table = HTCreate(dict->size, hash_func, 0, is_same_key);
 	if (!hash_table)
 	{
@@ -86,13 +86,15 @@ int main()
 	
 	HashTableFromStringsArr(hash_table, dict);
 	
+	HTGetStatistics(hash_table);
+	
 	RunMenu(hash_table);
   
 	DictionaryDestroy(dict);
 	free(chars_array);
 	HTDestroy(hash_table);
 	
-	return 0;
+	return (0);
 }
 /******************************************************************************/
 void HashTableFromStringsArr(ht_ty *hash_table, dictionary_ty *dict)
@@ -120,7 +122,8 @@ void HashTableFromStringsArr(ht_ty *hash_table, dictionary_ty *dict)
 		++curr_word;
 	}
 	
-	printf(GREEN "\nSpell Checker has been succeesfully created\n\n" RESET_COLOR);
+	printf(PURPLE "\nDictionary has been loaded into the memory.\n" RESET_COLOR);
+	printf(GREEN "Spell Checker has been succeesfully created.\n\n" RESET_COLOR);
 }
 /******************************************************************************/
 static void RunMenu(ht_ty *hash_table)
@@ -129,27 +132,26 @@ static void RunMenu(ht_ty *hash_table)
 	
 	int cmdQuit = 0;
 	
-	printf("Dictionary has been loaded into the memory.\n");
-	printf("Enter \"-exit\"" " to exit the program.\n");
+	printf(YELLOW "Enter \"-exit\"" " to exit the program.\n\n" RESET_COLOR);
 
 	while(!cmdQuit)
 	{
-		printf("Enter a word: ");
+		printf(CYAN "Enter a word: " RESET_COLOR);
 		scanf("%s", input_word);
 
-		if(strcmp(input_word, "-exit") == 0)
+		if (0 == strcmp(input_word, "-exit"))
 		{
 			cmdQuit = 1;
 			continue;
 		}
 
-		if(HTFind(hash_table, input_word))
+		if(strlen(input_word) < 64 && HTFind(hash_table, input_word))
 		{
-			printf("Word \"%s\" is correct.\n\n", input_word);
+			printf(GREEN "Word \"%s\" is correct.\n\n" RESET_COLOR, input_word);
 		} 
 		else 
 		{
-			printf("Word \"%s\" does not exist.\n\n", input_word);
+			printf(RED "Word \"%s\" does not exist.\n\n" RESET_COLOR, input_word);
 		}
 	}
 }
@@ -215,10 +217,12 @@ void TextFileToArray(dictionary_ty* dict, char *file_path, char** chars_array)
     char_arr_runner = *chars_array;
     
     fseek(text_file, 0, SEEK_SET); /* move ptr to beginning of dict	 */
-
+    
+    /* add first first char as a word to words array */
     DictionaryAddTo(dict, (char_arr_runner));
     
-	while (i < 100)
+    /* num_of_chars - 1 because of the one char we already added */
+	while (i < num_of_chars - 1)
     {
     	character = fgetc(text_file);
     	
@@ -294,7 +298,7 @@ size_t hash_func(const void *string, const void *param)
 	
 	string_runner = (char *)string;
 	
-    while (*string_runner )
+    while (*string_runner)
     {
     	c = *string_runner;
 		hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
