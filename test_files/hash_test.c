@@ -11,7 +11,7 @@
 #include <assert.h>
 #include <stdio.h>	/* printf	*/
 #include <stdlib.h>	/*	malloc, free, realloc 	*/
-#include <string.h>	/* strlen	*/
+#include <string.h>	/* strlen, strcmp	*/
 
 #include "utils.h"
 #include "hash.h"
@@ -51,11 +51,13 @@ int DictionaryAddTo(dictionary_ty* dict, char* word_to_add);
 /*	converts text file which contains chars to an array of words(strings)	*/
 void TextFileToArray(dictionary_ty* dict, char *file_path, char** chars_array);
 
-static void CreateSpellChecker(ht_ty *hasht, dictionary_ty *dict);
+static void HashTableFromStringsArr(ht_ty *hash_table, dictionary_ty *dict);
 
 size_t hash_func(const void *data, const void *param);
 
 int is_same_key(const void *data1, const void *data2);
+
+static void RunMenu(ht_ty *hash_table);
 /******************************* Main__Function *******************************/
 int main() 
 {
@@ -72,25 +74,34 @@ int main()
     TextFileToArray(dict, DICTIONARY_PATH, &chars_array);
 	
 	hash_table = HTCreate(dict->size, hash_func, 0, is_same_key);
+	if (!hash_table)
+	{
+		free(dict);
+		dict = NULL;
+		
+		free(chars_array);
+		
+		return (1);
+	}
 	
-	CreateSpellChecker(hash_table, dict);
+	HashTableFromStringsArr(hash_table, dict);
 	
-    DictionaryDestroy(dict);
-    
-    free(chars_array);
-    
-    HTDestroy(hash_table);
-    
-    return (0);
-}	
+	RunMenu(hash_table);
+  
+	DictionaryDestroy(dict);
+	free(chars_array);
+	HTDestroy(hash_table);
+	
+	return 0;
+}
 /******************************************************************************/
-void CreateSpellChecker(ht_ty *hasht, dictionary_ty *dict)
+void HashTableFromStringsArr(ht_ty *hash_table, dictionary_ty *dict)
 {
 	char **curr_word = NULL, **last_word = NULL;
 	
 	size_t size = 0;
 	
-	assert(hasht);
+	assert(hash_table);
 	assert(dict);
 	
 	size = dict->size;
@@ -101,11 +112,46 @@ void CreateSpellChecker(ht_ty *hasht, dictionary_ty *dict)
 	
 	while (curr_word < last_word)
 	{
-		HTInsert(hasht, *curr_word);
+		if (HTInsert(hash_table, *curr_word))
+		{
+			PRINT_FAILURE;
+		}
+		
 		++curr_word;
 	}
 	
-	printf(GREEN "Spell Checker has been succeesfully created" RESET_COLOR);
+	printf(GREEN "\nSpell Checker has been succeesfully created\n\n" RESET_COLOR);
+}
+/******************************************************************************/
+static void RunMenu(ht_ty *hash_table)
+{
+	char input_word[64] = {0};
+	
+	int cmdQuit = 0;
+	
+	printf("Dictionary has been loaded into the memory.\n");
+	printf("Enter \"-exit\"" " to exit the program.\n");
+
+	while(!cmdQuit)
+	{
+		printf("Enter a word: ");
+		scanf("%s", input_word);
+
+		if(strcmp(input_word, "-exit") == 0)
+		{
+			cmdQuit = 1;
+			continue;
+		}
+
+		if(HTFind(hash_table, input_word))
+		{
+			printf("Word \"%s\" is correct.\n\n", input_word);
+		} 
+		else 
+		{
+			printf("Word \"%s\" does not exist.\n\n", input_word);
+		}
+	}
 }
 /******************************************************************************/
 dictionary_ty* DictionaryCreate() 
@@ -167,8 +213,6 @@ void TextFileToArray(dictionary_ty* dict, char *file_path, char** chars_array)
 	*chars_array = calloc(sizeof(char) , num_of_chars);
 
     char_arr_runner = *chars_array;
-    
-    printf("\nDictionary Size:%ld\n", num_of_chars);
     
     fseek(text_file, 0, SEEK_SET); /* move ptr to beginning of dict	 */
 
@@ -256,8 +300,8 @@ size_t hash_func(const void *string, const void *param)
 		hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
 		++string_runner;
 	}
-	
-	printf("HASH: %ld for string: %s\n", (hash % 17) , (char *)string);
+/* TODO for debug: */
+/*	printf("HASH: %ld for string: %s\n", (hash % 17) , (char *)string);*/
 	
     return (hash);
 }
