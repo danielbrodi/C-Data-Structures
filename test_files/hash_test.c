@@ -29,6 +29,7 @@ typedef struct dictionary
     size_t reserved;
     char** words;
 }dictionary_ty;
+
 /******************************************************************************/
 
 /* creates a dictionary_ty */
@@ -50,7 +51,7 @@ int DictionaryAddTo(dictionary_ty* dict, char* word_to_add);
 /*	converts text file which contains chars to an array of words(strings)	*/
 void TextFileToArray(dictionary_ty* dict, char *file_path, char** chars_array);
 
-void HTCreateTest(ht_ty * hasht);
+static void CreateSpellChecker(ht_ty *hasht, dictionary_ty *dict);
 
 size_t hash_func(const void *data, const void *param);
 
@@ -59,8 +60,6 @@ int is_same_key(const void *data1, const void *data2);
 int main() 
 {
 	char *chars_array = NULL;
-	
-	size_t i = 0;
 	
 	ht_ty *hash_table = NULL;
 	
@@ -74,49 +73,7 @@ int main()
 	
 	hash_table = HTCreate(dict->size, hash_func, 0, is_same_key);
 	
-	printf("DICT_SIZE : %ld\n", dict->size);
-	
-	HTCreateTest(hash_table);
-	
-	printf("SIZE OF HASH TABLE BEFORE INSERTS: %ld\n\n" ,HTSize(hash_table));
-		
-	for(i = 0; i < dict->size; ++i)
-    {
-        printf("%ld: %s\n", i, dict->words[i]);
-    }
-	
-	i = 0;
-
-	while (i < dict->size)
-	{
-		HTInsert(hash_table, dict->words[i]);
-		++i;
-	}
-	
-	HTInsert(hash_table, "Daniel");
-	
-	printf("\nSIZE OF HASH TABLE AFTER %ld INSERTS: %ld\n\n" , i+1, HTSize(hash_table));
-/*	*/
-/*	i = 0;*/
-/*	*/
-/*	while (i < dict->size)*/
-/*	{*/
-/*		printf("%ld: %s\n", i, (char *)HTFind(hash_table, "Daniel"));*/
-/*		++i;*/
-/*	}*/
-	
-	HTRemove(hash_table, "Daniel");
-	
-	i = 0;
-	
-/*	printf("DANIEL REMOVED\n");*/
-/*	while (i < dict->size)*/
-/*	{*/
-/*		HTFind(hash_table, "Daniel") ? printf("FOUND\n") : printf( "NOT FOUND\n");*/
-/*		++i;*/
-/*	}*/
-	
-	printf("\nSIZE OF HASH TABLE AFTER 1 REMOVE: %ld\n\n" ,HTSize(hash_table));
+	CreateSpellChecker(hash_table, dict);
 	
     DictionaryDestroy(dict);
     
@@ -127,9 +84,28 @@ int main()
     return (0);
 }	
 /******************************************************************************/
-void HTCreateTest(ht_ty * hasht)
+void CreateSpellChecker(ht_ty *hasht, dictionary_ty *dict)
 {
-	hasht ? PRINT_SUCCESS : PRINT_FAILURE;
+	char **curr_word = NULL, **last_word = NULL;
+	
+	size_t size = 0;
+	
+	assert(hasht);
+	assert(dict);
+	
+	size = dict->size;
+	
+	curr_word = dict->words;
+	
+	last_word = curr_word + size;
+	
+	while (curr_word < last_word)
+	{
+		HTInsert(hasht, *curr_word);
+		++curr_word;
+	}
+	
+	printf(GREEN "Spell Checker has been succeesfully created" RESET_COLOR);
 }
 /******************************************************************************/
 dictionary_ty* DictionaryCreate() 
