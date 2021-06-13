@@ -60,6 +60,10 @@ int is_same_key(const void *data1, const void *data2);
 static void RunMenu(ht_ty *hash_table);
 
 static void PrintStats(ht_ty *hash_table);
+
+static void RemoveFromDict(ht_ty *hash_table);
+
+static void PrintSize(ht_ty *hash_table);
 /******************************* Main__Function *******************************/
 int main() 
 {
@@ -134,8 +138,11 @@ static void RunMenu(ht_ty *hash_table)
 	
 	int cmdQuit = 0;
 	
-	printf(YELLOW "Enter \"-exit\"" " to exit the program.\n\n" RESET_COLOR);
-	printf(YELLOW "Enter \"-stats\"" " to see the statistics.\n\n" RESET_COLOR);
+	printf("%15s\033[47;30mSpell-Checker: MENU\033[0m\n\n", "");
+	printf(YELLOW "* Enter \"-size\"" " to see how big is the dictionary.\n" RESET_COLOR);
+	printf(YELLOW "* Enter \"-stats\"" " to see the statistics.\n" RESET_COLOR);
+	printf(YELLOW "* Enter \"-remove\"" " to remove a word from the dictionary.\n" RESET_COLOR);
+	printf(YELLOW "* Enter \"-exit\"" " to exit the program.\n\n" RESET_COLOR);
 	
 	while(!cmdQuit)
 	{
@@ -148,13 +155,31 @@ static void RunMenu(ht_ty *hash_table)
 			continue;
 		}
 		
-		if (0 == strcmp(input_word, "-exit"))
+		if (0 == strcmp(input_word, "-stats"))
 		{
 			PrintStats(hash_table);
 			continue;
 		}
-
-		if(strlen(input_word) < 64 && HTFind(hash_table, input_word))
+		
+		if (0 == strcmp(input_word, "-stats"))
+		{
+			PrintStats(hash_table);
+			continue;
+		}
+		
+		if (0 == strcmp(input_word, "-size"))
+		{
+			PrintSize(hash_table);
+			continue;
+		}
+		
+		if (0 == strcmp(input_word, "-remove"))
+		{
+			RemoveFromDict(hash_table);
+			continue;
+		}
+		
+		else if (strlen(input_word) < 64 && HTFind(hash_table, input_word))
 		{
 			printf(GREEN "Word \"%s\" is correct.\n\n" RESET_COLOR, input_word);
 		} 
@@ -165,17 +190,62 @@ static void RunMenu(ht_ty *hash_table)
 	}
 }
 /******************************************************************************/
+static void RemoveFromDict(ht_ty *hash_table)
+{
+	char word_to_remove[64] = {0};
+	
+	assert(hash_table);
+	assert(word_to_remove);
+	
+	printf(PURPLE "Enter a word to remove: " RESET_COLOR);
+	scanf("%s", word_to_remove);
+	
+	if (HTFind(hash_table, word_to_remove))
+	{
+		HTRemove(hash_table, word_to_remove);
+		printf(GREEN "Word \"%s\" was succeesfully" 
+		"removed from the dictionary.\n\n" RESET_COLOR, word_to_remove);
+	}
+	else
+	{
+	printf(RED "Word \"%s\" was not found.\n\n" RESET_COLOR, word_to_remove);
+	}
+}
+/******************************************************************************/
+static void PrintSize(ht_ty *hash_table)
+{
+	size_t size = 0;
+	
+	assert(hash_table);
+	
+	size = HTSize(hash_table);
+	
+	size ? printf(YELLOW "The dictionary is full of " GREEN "%ld " YELLOW
+	 "different words.\n" RESET_COLOR, HTSize(hash_table)) : 
+	 printf(RED "The dictionary is empty\n" RESET_COLOR);
+}
+/******************************************************************************/
 static void PrintStats(ht_ty *hash_table)
 {
 	statistics_ty stats = {0};
+	
 	assert(hash_table);
 	
 	stats = HTGetStatistics(hash_table);
 	
-	printf("Longest list got %ld elements.\n" RESET_COLOR, "stats.longest_list");
-	printf("Median list got %ld elements.\n" RESET_COLOR, "stats.median_list");
+	if (stats.longest_list != 0)
+	{
+		printf(BLUE "Longest list has " GREEN "%ld " BLUE
+		 "elements.\n" RESET_COLOR, stats.longest_list);
+		printf(BLUE "Median list has " GREEN "%ld " BLUE
+		 "elements.\n" RESET_COLOR, stats.median_list);
+	}
+	else
+	{
+		printf(RED "No statistics are available for now.\n" RESET_COLOR);
+	}
 }
-
+/******************************************************************************/
 dictionary_ty* DictionaryCreate() 
 {
     dictionary_ty* dict = malloc(sizeof(dictionary_ty));

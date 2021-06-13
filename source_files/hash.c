@@ -10,10 +10,10 @@
 
 /********************************* Inclusions *********************************/
 
-#include <assert.h>			/*	assert			*/
-#include <stddef.h>			/*	size_t, NULL	*/
-#include <stdlib.h>			/*	malloc, free	*/
-#include <string.h>			/*	memset			*/
+#include <assert.h>			/*	assert				*/
+#include <stddef.h>			/*	size_t, NULL		*/
+#include <stdlib.h>			/*	malloc, free, qsort	*/
+#include <string.h>			/*	memset				*/
 #include <math.h>			
 
 #include "dlist.h"
@@ -252,7 +252,6 @@ statistics_ty HTGetStatistics(const ht_ty *hash_table)
 		++curr_list_size;
 	}
 	
-	
 	qsort(lists_sizes, hash_table_size, sizeof(size_t), CompareListsLength);
 	
 	if (0 == (hash_table_size + 1) % 2)
@@ -266,7 +265,7 @@ statistics_ty HTGetStatistics(const ht_ty *hash_table)
 	
 	ret_stats.longest_list = *(lists_sizes + hash_table_size - 1);
 	
-	printf("MEDIAN: %ld, LONGEST: %ld\n", ret_stats.median_list, ret_stats.longest_list);
+	free(lists_sizes);
 	
 	return (ret_stats);
 }
