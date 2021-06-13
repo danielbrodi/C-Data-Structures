@@ -58,6 +58,8 @@ size_t hash_func(const void *data, const void *param);
 int is_same_key(const void *data1, const void *data2);
 
 static void RunMenu(ht_ty *hash_table);
+
+static void PrintStats(ht_ty *hash_table);
 /******************************* Main__Function *******************************/
 int main() 
 {
@@ -133,7 +135,8 @@ static void RunMenu(ht_ty *hash_table)
 	int cmdQuit = 0;
 	
 	printf(YELLOW "Enter \"-exit\"" " to exit the program.\n\n" RESET_COLOR);
-
+	printf(YELLOW "Enter \"-stats\"" " to see the statistics.\n\n" RESET_COLOR);
+	
 	while(!cmdQuit)
 	{
 		printf(CYAN "Enter a word: " RESET_COLOR);
@@ -142,6 +145,12 @@ static void RunMenu(ht_ty *hash_table)
 		if (0 == strcmp(input_word, "-exit"))
 		{
 			cmdQuit = 1;
+			continue;
+		}
+		
+		if (0 == strcmp(input_word, "-exit"))
+		{
+			PrintStats(hash_table);
 			continue;
 		}
 
@@ -156,6 +165,17 @@ static void RunMenu(ht_ty *hash_table)
 	}
 }
 /******************************************************************************/
+static void PrintStats(ht_ty *hash_table)
+{
+	statistics_ty stats = {0};
+	assert(hash_table);
+	
+	stats = HTGetStatistics(hash_table);
+	
+	printf("Longest list got %ld elements.\n" RESET_COLOR, "stats.longest_list");
+	printf("Median list got %ld elements.\n" RESET_COLOR, "stats.median_list");
+}
+
 dictionary_ty* DictionaryCreate() 
 {
     dictionary_ty* dict = malloc(sizeof(dictionary_ty));
