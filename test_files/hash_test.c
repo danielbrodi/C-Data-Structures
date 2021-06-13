@@ -204,7 +204,7 @@ static void RemoveFromDict(ht_ty *hash_table)
 	{
 		HTRemove(hash_table, word_to_remove);
 		printf(GREEN "Word \"%s\" was succeesfully" 
-		"removed from the dictionary.\n\n" RESET_COLOR, word_to_remove);
+		" removed from the dictionary.\n\n" RESET_COLOR, word_to_remove);
 	}
 	else
 	{
