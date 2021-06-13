@@ -2,8 +2,7 @@
 * File:				hash.c
 * Author:			Daniel Brodsky				 		  												  								
 * Date:				09-06-2021
-* Code Reviewer:	
-* Pseudo Reviewer: 						   								
+* Code Reviewer:					   								
 * Version:			1.0   								
 * Description:		Hash Map implementation.
 \******************************************************************************/
@@ -14,13 +13,13 @@
 #include <stddef.h>			/*	size_t, NULL		*/
 #include <stdlib.h>			/*	malloc, free, qsort	*/
 #include <string.h>			/*	memset				*/
-#include <math.h>			
 
 #include "dlist.h"
 #include "hash.h"
 
 /**************************** Structs  Definitions ****************************/
 
+/* Hash Table structure */
 struct hash_table
 {
 	dlist_ty **items;
@@ -30,6 +29,7 @@ struct hash_table
 	const void *hash_param;
 };
 
+/* Used for functions which look for a specific key in the hash table	*/
 typedef struct extended_param
 {
 	ht_ty *hash_table;
