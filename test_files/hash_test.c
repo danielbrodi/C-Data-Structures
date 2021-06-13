@@ -221,8 +221,8 @@ static void PrintSize(ht_ty *hash_table)
 	size = HTSize(hash_table);
 	
 	size ? printf(YELLOW "The dictionary is full of " GREEN "%ld " YELLOW
-	 "different words.\n" RESET_COLOR, HTSize(hash_table)) : 
-	 printf(RED "The dictionary is empty\n" RESET_COLOR);
+	 "different words.\n\n" RESET_COLOR, HTSize(hash_table)) : 
+	 printf(RED "The dictionary is empty\n\n" RESET_COLOR);
 }
 /******************************************************************************/
 static void PrintStats(ht_ty *hash_table)
@@ -238,11 +238,11 @@ static void PrintStats(ht_ty *hash_table)
 		printf(BLUE "Longest list has " GREEN "%ld " BLUE
 		 "elements.\n" RESET_COLOR, stats.longest_list);
 		printf(BLUE "Median list has " GREEN "%ld " BLUE
-		 "elements.\n" RESET_COLOR, stats.median_list);
+		 "elements.\n\n" RESET_COLOR, stats.median_list);
 	}
 	else
 	{
-		printf(RED "No statistics are available for now.\n" RESET_COLOR);
+		printf(RED "No statistics are available for now.\n\n" RESET_COLOR);
 	}
 }
 /******************************************************************************/
