@@ -104,11 +104,11 @@ void *PqueueDequeue(p_queue_ty *p_queue)
 	assert(p_queue);
 	
 	/*peek first element and sava data to return it*/
-	ret_data = *(VectorGetActualArray(p_queue->vector));
+	ret_data = PqueuePeek(p_queue);
 	
 	/*	switch last and first element in the vector*/
 	first_elem = ret_data;
-	last_elem = p_queue->vector + VectorSize(p_queue->vector) - 1;
+	last_elem = *(VectorGetActualArray(p_queue->vector) + VectorSize(p_queue->vector) - 1);
 	
 	VectorSetElement(p_queue->vector, 0, last_elem);
 	VectorSetElement(p_queue->vector, VectorSize(p_queue->vector) - 1, first_elem);
@@ -139,24 +139,36 @@ boolean_ty PqueueIsEmpty(const p_queue_ty *p_queue)
 size_t PqueueSize(const p_queue_ty *p_queue)
 {
 	/*	asserts*/
-
+	assert(p_queue);
+	
 	/*	return the size of the vector*/
+	return (VectorSize(p_queue->vector));
 }
 /******************************************************************************/
 void *PqueuePeek(const p_queue_ty *p_queue)
 {
+	void *ret_data = NULL;
+	
 	/*	asserts*/
-
-	/* get data of element of first index of the vector	*/
-
+	assert(p_queue);
+	
+	/* get data of first element in the vector	*/
+	ret_data = *(VectorGetActualArray(p_queue->vector));
+	
 	/*	return this data*/
+	return (ret_data);
 }
 /******************************************************************************/
 void PqueueClear(p_queue_ty *p_queue)
 {
 	/*	assert*/
-
+	assert(p_queue);
+	
 	/*	resereve vector's size to 1 */
-	/*	dequeue	last element */
+	if (SUCCESS == VectorReserve(p_queue->vector, 1))
+	{ 
+		/*	dequeue	last element */
+		PqueueDequeue(p_queue);
+	}
 }
 /******************************************************************************/
