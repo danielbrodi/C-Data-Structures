@@ -12,10 +12,20 @@
 
 /******************************************************************************/
 
-static void *GetBiggerChildIMP(void **parent, size_t parent_index);
+static size_t GetParentIndexIMP(size_t child_index);
 
-static void *GetParentIMP(void **base, size_t child_index);
+static size_t GetLeftChildIndexIMP(size_t parent_index);
 
+static size_t GetLeftRightIndexIMP(size_t parent_index);
+
+static size_t GetBiggestElemIndexIMP(void **base, , size_t num_of_elements, 
+	Heap_Cmp_Func_ty compare, size_t left_child_index, size_t right_child_index,
+														size_t parent_index);
+
+void HeapifyDownRecIMP(void **base, size_t num_of_elements, 
+								Heap_Cmp_Func_ty compare, size_t root_index);
+								
+static void SwapElementsIMP(void **elem1, void **elem2);												
 /******************************************************************************/
 void HeapSort(void **base, size_t num_of_elements, Heap_Cmp_Func_ty compare)
 {
@@ -36,15 +46,15 @@ void HeapSort(void **base, size_t num_of_elements, Heap_Cmp_Func_ty compare)
 /******************************************************************************/
 void HeapifyUp(void **base, size_t size, Heap_Cmp_Func_ty compare)
 {
-	void *parent = NULL, *curr_elem = NULL;
+	size_t parent_index = 0, curr_elem_index = 0;
 	
 		/*	asserts*/
 	assert(base);
 	assert(size);
 	assert(compare);
 	
-	parent_index = GetParentIMP(size);
 	curr_elem_index = size;
+	parent_index = GetParentIndexIMP(curr_elem_index);
 	
 	/*	till reach a node without a parent (the "root") or parent is bigger*/
 	if (1 == size || compare(base[parent_index], base[curr_elem_index]) > 0)
@@ -54,50 +64,97 @@ void HeapifyUp(void **base, size_t size, Heap_Cmp_Func_ty compare)
 	
 	/*	recursivly scan each node to check if its bigger than its parent*/
 	/*	if it does: swap them*/
-	SwapElementsIMP(base + parent, base + curr_elem);
+	SwapElementsIMP(base + parent_index, base + curr_elem_index);
 	
 	HeapifyUp(base, size / 2, compare);
 }
 /******************************************************************************/
-void HeapifyDown(void **root, size_t size, Heap_Cmp_Func_ty compare)
+void HeapifyDown(void **base, size_t size, Heap_Cmp_Func_ty compare)
 {
-		/*	assert*/
-	assert(root);
+	/*	assert*/
+	assert(base);
 	assert(size);
 	assert(compare);
 
-		/*	till reach a node without children or if no child node is biger	*/
-	bigger_child = GetBiggerChildIMP(root, 0)
-	curr_elem = base[size - 1];
-
-		/*	recursivly traverse the array and switch each root with its
-															 bigger child node*/
-										 
-															 
-}
-/******************************************************************************/
-static void *GetBiggerChildIMP(void **parent, size_t parent_index, 
-													Heap_Cmp_Func_ty compare)
+	/*	recursivly traverse the array from the root and switch each node with its
+	 *	bigger child node (if any)		*/
+	 HeapifyDownRecIMP(base, size, compare, 0);
+}									 
+/*----------------------------------------------------------------------------*/														 
+void HeapifyDownRecIMP(void **base, size_t num_of_elements, 
+									Heap_Cmp_Func_ty compare, size_t root_index)
 {
-	size_t bigger_child_index = 0, right_child_index = 0, left_child_index = 0;
+	size_t parent_index = 0, left_child_index = 0, right_child_index = 0;
+	size_t biggest_element_index = 0;
 	
-	void *bigger_child = NULL;
+	/*	assert*/
+	assert(root);
+	assert(compare);
 	
-	size_t IsRightChildBigger = 0;
+	parent_index = root_index;
+	left_child_index = GetLeftChildIndex(parent_index);
+	right_child_index GetRightChildIndex(parent_index);
 	
-	right_child_index = 2 * parent_index + 1;
-	left_child_index = 2 * parent_index;
-}
+	/* compare root index with both of its childs to find if there is 
+		a bigger child. If yes - swap them. 	*/
+	biggest_element_index = GetBiggestElemIndex(base, num_of_elements, compare, 
+							left_child_index, right_child_index, parent_index);
+	
+	if (parent_index != biggest_element_index)
+	{
+		SwapElementsIMP(base + parent_index, base + biggest_element_index);
+		
+		HeapifyDownRecIMP(base, num_of_elements - 1, compare, biggest_element_index);
+	}
+}												
 /******************************************************************************/
-static void *GetParentIMP(void **base, size_t child_index)
+static size_t GetBiggestElemIndexIMP(void **base, , size_t num_of_elements, 
+	Heap_Cmp_Func_ty compare, size_t left_child_index, size_t right_child_index,
+	size_t parent_index)
 {
-	size_t parent_index = 0;
+	size_t biggest_element_index = parent_index;
 	
 	assert(base);
-	assert(child_index);
+	assert(compare);
 	
-	parent_index = child_index / 2;
+	if (base[left_child_index] < num_of_elements && 
+								base[left_child_index] > base[parent_index]) 
+	{
+		biggest_element_index = left_child_index;
+	}
 	
-	return (base[parent_index]);
+	if (base[right_child_index] < num_of_elements && 
+								base[right_child_index] > base[parent_index]) 
+	{
+		biggest_element_index = right_child_index;
+	}
+	
+	return (biggest_element_index);
+}
+/******************************************************************************/
+static size_t GetParentIndexIMP(size_t child_index)
+{	
+	return (child_index < 2 ? -1 : (child_index - 1) / 2);
+}
+/******************************************************************************/
+static size_t GetLeftChildIndexIMP(size_t parent_index)
+{	
+	return (child_index < 1 ? -1 : (parent_index * 2 + 1);
+}
+/******************************************************************************/
+static size_t GetRightChildIndexIMP(size_t parent_index)
+{	
+	return (child_index < 1 ? -1 : (parent_index * 2 + 2);
+}
+/******************************************************************************/
+static void SwapElementsIMP(void **elem1, void **elem2)
+{
+	void *temp = (assert(elem1), *elem1);
+	
+	assert(elem2);
+	
+	*elem1 = *elem2;
+	
+	*elem2 = temp;
 }
 /******************************************************************************/
