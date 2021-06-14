@@ -14,6 +14,8 @@ TARGETS := vector slist slist_ex queue cbuffer dlist uid fixed_size_allocator va
 
 all: $(TARGETS)
 
+heapq: heap_queue.c $(TDIR)heap_queue_test.c $(IDIR)heap.h $(IDIR)$(DEPS)
+
 hash: hash.c $(TDIR)hash_test.c dlist.c
 
 rec: recursion.c $(TDIR)recursion_test.c int_stack.c stack.c
