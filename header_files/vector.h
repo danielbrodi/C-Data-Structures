@@ -57,4 +57,7 @@ void *VectorGetElement(const vector_ty *vector, size_t index);
 /* Behavior is undefined for out of bounds indeces */
 void VectorSetElement(vector_ty *vector, size_t index, void *element);
 
+/*	Returns the actual array that included in the vector	*/
+void** VectorGetActualArray(vector_ty*);
+
 #endif	/* __VECTOR_H__ */

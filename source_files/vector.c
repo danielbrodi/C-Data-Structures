@@ -205,3 +205,11 @@ void VectorSetElement(vector_ty *vector, size_t index, void *element)
 	
 	vector->items[index] = element;
 }
+/******************************************************************************/
+void** VectorGetActualArray(vector_ty *vector)
+{
+	assert(vector);
+	
+	return (vector->items);
+}
+/******************************************************************************/
