@@ -43,20 +43,20 @@ void HeapifyUp(void **base, size_t size, Heap_Cmp_Func_ty compare)
 	assert(size);
 	assert(compare);
 	
-	parent = GetParentIMP(base, size - 1);
-	curr_elem = base[size - 1];
+	parent_index = GetParentIMP(size);
+	curr_elem_index = size;
 	
-		/*	till reach a node without a parent (the "root") or parent is bigger*/
-	if (1 == size || compare(parent, curr_elem) > 0)
+	/*	till reach a node without a parent (the "root") or parent is bigger*/
+	if (1 == size || compare(base[parent_index], base[curr_elem_index]) > 0)
 	{
 		return;
 	}
 	
-		/*	recursivly scan each node to check if its bigger than its parent*/
-		/*	if it does: switch them*/
-	SwitchElementsIMP(parent, curr_elem);
+	/*	recursivly scan each node to check if its bigger than its parent*/
+	/*	if it does: swap them*/
+	SwapElementsIMP(base + parent, base + curr_elem);
 	
-	return (HeapifyUp(base, size / 2, compare));
+	HeapifyUp(base, size / 2, compare);
 }
 /******************************************************************************/
 void HeapifyDown(void **root, size_t size, Heap_Cmp_Func_ty compare)
