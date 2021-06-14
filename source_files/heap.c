@@ -93,7 +93,7 @@ void HeapifyDownRecIMP(void **base, size_t num_of_elements,
 	
 	parent_index = root_index;
 	left_child_index = GetLeftChildIndex(parent_index);
-	right_child_index GetRightChildIndex(parent_index);
+	right_child_index = GetRightChildIndex(parent_index);
 	
 	/* compare root index with both of its childs to find if there is 
 		a bigger child. If yes - swap them. 	*/
