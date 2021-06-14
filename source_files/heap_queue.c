@@ -87,7 +87,7 @@ status_ty PqueueEnqueue(p_queue_ty *p_queue, void *data)
 	if (SUCCESS == ret_status)
 	{
 		/*	HeapifyUp*/
-		HeapifyUp(VectorGetActualArray(p_queue->vector), sizeof(size_t),
+		HeapifyUp(VectorGetActualArray(p_queue->vector),PqueueSize(p_queue),
 															p_queue->cmp_func);
 	}
 	
@@ -120,7 +120,7 @@ void *PqueueDequeue(p_queue_ty *p_queue)
 	if (SUCCESS == status)
 	{
 		/*	HeapifyDown*/
-		HeapifyDown(VectorGetActualArray(p_queue->vector), sizeof(size_t),
+		HeapifyDown(VectorGetActualArray(p_queue->vector),PqueueSize(p_queue),
 															p_queue->cmp_func);
 	}
 	
