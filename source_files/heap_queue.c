@@ -176,3 +176,12 @@ void PqueueClear(p_queue_ty *p_queue)
 	}
 }
 /******************************************************************************/
+void *PqueueErase(p_queue_ty *p_queue, Match_Function_ty match_func, void *param)
+{
+	UNUSED(p_queue);
+	UNUSED(match_func);
+	UNUSED(param);
+	
+	return (NULL);
+}
+/******************************************************************************/
