@@ -91,7 +91,6 @@ void HeapifyDownRecIMP(void **base, size_t num_of_elements,
 	int biggest_element_index = 0;
 	
 	/*	assert*/
-	assert(root_index);
 	assert(compare);
 	
 	parent_index = root_index;
