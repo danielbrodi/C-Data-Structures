@@ -9,16 +9,19 @@
 \******************************************************************************/
 
 #include <assert.h>
+#include <stddef.h>	/* sise_t, NULL	*/
+
+#include "heap.h"
 
 /******************************************************************************/
 
-static size_t GetParentIndexIMP(size_t child_index);
+static int GetParentIndexIMP(size_t child_index);
 
-static size_t GetLeftChildIndexIMP(size_t parent_index);
+static int GetLeftChildIndexIMP(size_t parent_index);
 
-static size_t GetLeftRightIndexIMP(size_t parent_index);
+static int GetRightChildIndexIMP(size_t parent_index);
 
-static size_t GetBiggestElemIndexIMP(void **base, , size_t num_of_elements, 
+static size_t GetBiggestElemIndexIMP(void **base, size_t num_of_elements, 
 	Heap_Cmp_Func_ty compare, size_t left_child_index, size_t right_child_index,
 														size_t parent_index);
 
@@ -27,8 +30,8 @@ void HeapifyDownRecIMP(void **base, size_t num_of_elements,
 								
 static void SwapElementsIMP(void **elem1, void **elem2);												
 /******************************************************************************/
-void HeapSort(void **base, size_t num_of_elements, Heap_Cmp_Func_ty compare)
-{
+/*void HeapSort(void **base, size_t num_of_elements, Heap_Cmp_Func_ty compare)*/
+/*{*/
 	/*	asserts*/
 
 	/*	start with size of 1 */
@@ -42,7 +45,7 @@ void HeapSort(void **base, size_t num_of_elements, Heap_Cmp_Func_ty compare)
 	/*			swap first & last element*/
 	/*			decrement size by one*/
 	/*			HeapifyDown on the sub-array  */
-}
+/*}*/
 /******************************************************************************/
 void HeapifyUp(void **base, size_t size, Heap_Cmp_Func_ty compare)
 {
@@ -88,16 +91,16 @@ void HeapifyDownRecIMP(void **base, size_t num_of_elements,
 	size_t biggest_element_index = 0;
 	
 	/*	assert*/
-	assert(root);
+	assert(root_index);
 	assert(compare);
 	
 	parent_index = root_index;
-	left_child_index = GetLeftChildIndex(parent_index);
-	right_child_index = GetRightChildIndex(parent_index);
+	left_child_index = GetLeftChildIndexIMP(parent_index);
+	right_child_index = GetRightChildIndexIMP(parent_index);
 	
 	/* compare root index with both of its childs to find if there is 
 		a bigger child. If yes - swap them. 	*/
-	biggest_element_index = GetBiggestElemIndex(base, num_of_elements, compare, 
+	biggest_element_index = GetBiggestElemIndexIMP(base, num_of_elements, compare, 
 							left_child_index, right_child_index, parent_index);
 	
 	if (parent_index != biggest_element_index)
@@ -108,7 +111,7 @@ void HeapifyDownRecIMP(void **base, size_t num_of_elements,
 	}
 }												
 /******************************************************************************/
-static size_t GetBiggestElemIndexIMP(void **base, , size_t num_of_elements, 
+static size_t GetBiggestElemIndexIMP(void **base, size_t num_of_elements, 
 	Heap_Cmp_Func_ty compare, size_t left_child_index, size_t right_child_index,
 	size_t parent_index)
 {
@@ -132,19 +135,19 @@ static size_t GetBiggestElemIndexIMP(void **base, , size_t num_of_elements,
 	return (biggest_element_index);
 }
 /******************************************************************************/
-static size_t GetParentIndexIMP(size_t child_index)
+static int GetParentIndexIMP(size_t child_index)
 {	
 	return (child_index < 2 ? -1 : (child_index - 1) / 2);
 }
 /******************************************************************************/
-static size_t GetLeftChildIndexIMP(size_t parent_index)
+static int GetLeftChildIndexIMP(size_t parent_index)
 {	
-	return (child_index < 1 ? -1 : (parent_index * 2 + 1);
+	return (parent_index < 1 ? -1 : (parent_index * 2 + 1));
 }
 /******************************************************************************/
-static size_t GetRightChildIndexIMP(size_t parent_index)
+static int GetRightChildIndexIMP(size_t parent_index)
 {	
-	return (child_index < 1 ? -1 : (parent_index * 2 + 2);
+	return (parent_index < 1 ? -1 : (parent_index * 2 + 2));
 }
 /******************************************************************************/
 static void SwapElementsIMP(void **elem1, void **elem2)

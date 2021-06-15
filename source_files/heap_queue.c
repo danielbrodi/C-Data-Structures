@@ -10,8 +10,12 @@
 
 #include <assert.h>	/*	assert	*/
 #include <stdlib.h>	/*	malloc, free	*/
+#include <stddef.h>	/* sise_t, NULL	*/
+
 #include "utils.h"	/* boolean_ty, status_ty	*/
 #include "pqueue.h"
+#include	"vector.h"
+#include "heap.h"
 
 /******************************************************************************/
 
@@ -31,7 +35,7 @@ p_queue_ty *PqueueCreate(Cmp_Func_ty cmp_func)
 	
 	/*	create and allocate memory for pqueue structure*/
 	/*	handle memory issues if any*/
-	new_pqueue = (p_queue_ty *)malloc(sizeof(pqueue_ty));
+	new_pqueue = (p_queue_ty *)malloc(sizeof(p_queue_ty));
 	if (new_pqueue)
 	{
 		/*	assign cmp func to pqueue*/

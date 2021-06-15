@@ -14,10 +14,10 @@ TARGETS := vector slist slist_ex queue cbuffer dlist uid fixed_size_allocator va
 
 all: $(TARGETS)
 
-heapq: heap_queue.c $(TDIR)heap_queue_test.c $(IDIR)heap.h $(IDIR)$(DEPS) heap.c
-
+heapq: heap.c heap_queue.c $(TDIR)pqueue_test.c
+	$(CC) $(CFLAGS) -o a.out $^
 hash: hash.c $(TDIR)hash_test.c dlist.c
-
+	$(CC) $(CFLAGS) -o a.out $^
 rec: recursion.c $(TDIR)recursion_test.c int_stack.c stack.c
 	$(CC) $(CFLAGS) -o a.out $^
 scheduler: scheduler.c $(TDIR)scheduler_test.c task.c pqueue.c UID.c sorted_list.c dlist.c

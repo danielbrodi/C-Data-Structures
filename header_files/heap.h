@@ -14,7 +14,7 @@
 /* data1 in the heap */
 /* Returns 0 if the keys are equal */
 /* Returns positive otherwise */
-typedef int (*Heap_Cmp_Func_ty)(const void *data1, const void *data2)
+typedef int (*Heap_Cmp_Func_ty)(const void *data1, const void *data2);
 
 /* Operation to fix heap after insertion*/
 /* Complexity: O(log(size))*/
