@@ -76,7 +76,6 @@ void HeapifyDown(void **base, size_t size, Heap_Cmp_Func_ty compare)
 {
 	/*	assert*/
 	assert(base);
-	assert(size);
 	assert(compare);
 
 	/*	recursivly traverse the array from the root and switch each node with its

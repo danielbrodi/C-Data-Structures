@@ -43,7 +43,7 @@ p_queue_ty *PqueueCreate(Cmp_Func_ty cmp_func)
 			
 		/*	create and allocate memory for the vector inside the pqueue*/
 		/*	handle memory issues if any*/
-		new_pqueue->vector = VectorCreate(1);
+		new_pqueue->vector = VectorCreate(10);
 		if (!new_pqueue->vector)
 		{
 			new_pqueue->cmp_func = NULL;
