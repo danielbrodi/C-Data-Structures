@@ -14,6 +14,8 @@ TARGETS := vector slist slist_ex queue cbuffer dlist uid fixed_size_allocator va
 
 all: $(TARGETS)
 
+ktour: knight_tour.c $(TDIR)knight_tour_test.c bit_array.c
+	$(CC) $(CFLAGS) -o a.out $^
 heapq: heap.c heap_queue.c $(TDIR)pqueue_test.c vector.c
 	$(CC) $(CFLAGS) -o a.out $^
 hash: hash.c $(TDIR)hash_test.c dlist.c
