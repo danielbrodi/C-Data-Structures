@@ -12,6 +12,7 @@
 #include <stdlib.h> /* malloc, realloc, free */
 #include <assert.h> /* assert */
 
+#include "utils.h"
 #include "vector.h"
 
 /******************************* Global Definitions ***************************/

@@ -14,7 +14,7 @@
 
 #include "utils.h"	/* boolean_ty, status_ty	*/
 #include "pqueue.h"
-#include	"vector.h"
+#include "vector.h"
 #include "heap.h"
 
 /******************************************************************************/
@@ -43,8 +43,8 @@ p_queue_ty *PqueueCreate(Cmp_Func_ty cmp_func)
 			
 		/*	create and allocate memory for the vector inside the pqueue*/
 		/*	handle memory issues if any*/
-		new_pqueue->vector = (vector_ty *)malloc(sizeof(vector_ty));
-		if (!pqueue->vector)
+		new_pqueue->vector = VectorCreate(1);
+		if (!new_pqueue->vector)
 		{
 			new_pqueue->cmp_func = NULL;
 			
@@ -119,7 +119,7 @@ void *PqueueDequeue(p_queue_ty *p_queue)
 	
 	/*	remove the last element of the vector*/
 	/*	if failed - return null*/
-	status == VectorPopBack(p_queue->vector);
+	VectorPopBack(p_queue->vector);
 	
 	if (SUCCESS == status)
 	{

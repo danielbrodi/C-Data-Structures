@@ -15,18 +15,18 @@
 
 /******************************************************************************/
 
-static int GetParentIndexIMP(size_t child_index);
+static int GetParentIndexIMP(int child_index);
 
-static int GetLeftChildIndexIMP(size_t parent_index);
+static int GetLeftChildIndexIMP(int parent_index);
 
-static int GetRightChildIndexIMP(size_t parent_index);
+static int GetRightChildIndexIMP(int parent_index);
 
-static size_t GetBiggestElemIndexIMP(void **base, size_t num_of_elements, 
-	Heap_Cmp_Func_ty compare, size_t left_child_index, size_t right_child_index,
-														size_t parent_index);
+static int GetBiggestElemIndexIMP(void **base, size_t num_of_elements, 
+	Heap_Cmp_Func_ty compare, int left_child_index, int right_child_index,
+														int parent_index);
 
 void HeapifyDownRecIMP(void **base, size_t num_of_elements, 
-								Heap_Cmp_Func_ty compare, size_t root_index);
+								Heap_Cmp_Func_ty compare, int root_index);
 								
 static void SwapElementsIMP(void **elem1, void **elem2);												
 /******************************************************************************/
@@ -49,7 +49,7 @@ static void SwapElementsIMP(void **elem1, void **elem2);
 /******************************************************************************/
 void HeapifyUp(void **base, size_t size, Heap_Cmp_Func_ty compare)
 {
-	size_t parent_index = 0, curr_elem_index = 0;
+	int parent_index = 0, curr_elem_index = 0;
 	
 		/*	asserts*/
 	assert(base);
@@ -85,10 +85,10 @@ void HeapifyDown(void **base, size_t size, Heap_Cmp_Func_ty compare)
 }									 
 /*----------------------------------------------------------------------------*/														 
 void HeapifyDownRecIMP(void **base, size_t num_of_elements, 
-									Heap_Cmp_Func_ty compare, size_t root_index)
+									Heap_Cmp_Func_ty compare, int root_index)
 {
-	size_t parent_index = 0, left_child_index = 0, right_child_index = 0;
-	size_t biggest_element_index = 0;
+	int parent_index = 0, left_child_index = 0, right_child_index = 0;
+	int biggest_element_index = 0;
 	
 	/*	assert*/
 	assert(root_index);
@@ -111,41 +111,44 @@ void HeapifyDownRecIMP(void **base, size_t num_of_elements,
 	}
 }												
 /******************************************************************************/
-static size_t GetBiggestElemIndexIMP(void **base, size_t num_of_elements, 
-	Heap_Cmp_Func_ty compare, size_t left_child_index, size_t right_child_index,
-	size_t parent_index)
+static int GetBiggestElemIndexIMP(void **base, size_t num_of_elements, 
+	Heap_Cmp_Func_ty compare, int left_child_index, int right_child_index,
+	int parent_index)
 {
-	size_t biggest_element_index = parent_index;
+	int biggest_element_index = parent_index;
 	
 	assert(base);
 	assert(compare);
 	
-	if (base[left_child_index] < num_of_elements && 
+	/* check if the index is in the range of the array and  bigger than parent*/
+	if (left_child_index < (int)num_of_elements && 
 								base[left_child_index] > base[parent_index]) 
 	{
 		biggest_element_index = left_child_index;
 	}
 	
-	if (base[right_child_index] < num_of_elements && 
+	/* check if the index is in the range of the array and  bigger than parent*/
+	if (left_child_index < (int)num_of_elements && 
 								base[right_child_index] > base[parent_index]) 
 	{
 		biggest_element_index = right_child_index;
 	}
 	
+	/*	return the index of biggest element of the tree */
 	return (biggest_element_index);
 }
 /******************************************************************************/
-static int GetParentIndexIMP(size_t child_index)
+static int GetParentIndexIMP(int child_index)
 {	
 	return (child_index < 2 ? -1 : (child_index - 1) / 2);
 }
 /******************************************************************************/
-static int GetLeftChildIndexIMP(size_t parent_index)
+static int GetLeftChildIndexIMP(int parent_index)
 {	
 	return (parent_index < 1 ? -1 : (parent_index * 2 + 1));
 }
 /******************************************************************************/
-static int GetRightChildIndexIMP(size_t parent_index)
+static int GetRightChildIndexIMP(int parent_index)
 {	
 	return (parent_index < 1 ? -1 : (parent_index * 2 + 2));
 }

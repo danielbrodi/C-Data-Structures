@@ -11,12 +11,7 @@
 \******************************************************************************/
 
 #include <stddef.h>	/* size_t */
-
-typedef enum
-{
-	SUCCESS,
-	FAILURE
-} status_ty;
+#include "utils.h"	/* status_ty, bolean_ty	*/
 
 typedef struct vector vector_ty;
 
