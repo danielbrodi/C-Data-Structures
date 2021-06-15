@@ -10,7 +10,7 @@
 /******************************* Inclusions **********************/
 #include <assert.h> /* assert */
 
-#include "../include/bit_array.h"
+#include "bit_array.h"
 
 /********************** Macros & Enums Definitions **********************/
 #define MASK_ONLY_ONES 0xFFFFFFFFFFFFFFFF

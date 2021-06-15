@@ -11,7 +11,7 @@
 
 #include <stdio.h> /* printf */
 
-#include "../include/bit_array.h"
+#include "bit_array.h"
 
 void PrintBits(bitsarr_ty bitarr);
 
