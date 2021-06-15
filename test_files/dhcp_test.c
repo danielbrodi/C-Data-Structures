@@ -15,8 +15,7 @@
 #include <time.h>	/*	time						*/
 
 #include "utils.h"	/*	PRINT_COLOR, COLOR			*/
-#include ".h"
-
+#include "dhcp.h"
 /***************************** Macros Definitions *****************************/
 
 /* generates random number from -99 to 99 			*/
