@@ -9,29 +9,19 @@
 \******************************************************************************/
 
 /* trie's nodes strucure */
-typdef struct trie_node
+typedef struct trie_node
 {
-	struct trie_node *children[2];
-	struct trie_node *parent;
 	int is_full;
-}
-
-/* trie struct. may need more members */
-typedef struct trie
-{
-	trie_node_ty *root;
-}trie_ty;
-
-
+	struct trie_node *children[2];
+}trie_node_ty;
 
 /* DHCP manager */
 struct dhcp
 {
-	trie_ty *trie;
+	trie_node_ty rooti;
 	address_ty subnet;
 	int num_variable_bits;
 };
-
 /*****************************Pseudo-Code*************************************/
 /******************************************************************************/
 dhcp_ty *DhcpCreate(address_ty subnet, int num_variable_bits)
@@ -53,67 +43,97 @@ void DhcpDestroy(dhcp_ty *dhcp)
 	/*	free dhcp*/
 }
 /******************************************************************************/
-int DhcpAllocateIp(dhcp_ty *dhcp, address_ty *preferred_ip)
+int DhcpAllocateIp(dhcp_ty *dhcp, address_ty preferred_ip)
 {
 	/*	asserts*/
 	
-	/* undefined if preferred_ip is not dhc's subnet */
+	/* if AllocteIpIMP has failed: */
+		/* Call AllocteIpIMP on the smallest group in the subnet */
+		/* If also this failed: */
+			/* return failured */
+		
+	/*	return success*/
+}
+/*----------------------------------------------------------------------------*/
+static int AllocteIpIMP(trie_node_ty **node, address_ty *preferred_ip, int num_variable_bits)
+{
 	
-	/*	if trie of dhcp is full:*/
-	/*		return 1*/
+	/*	if node is null:*/
+	/*		create node, handle memory errors */
+	/*		connect created node to the tree */
 	
-	/*	if preferred_ip is not 0:*/
-	/*		traverse the trie to find out if its available or not*/
-	/*		trie insert each time to allocate this preferred_ip*/
-	
-	/*		if preferred_ip is not available or preferred_ip is 0:*/
-	/*		scan for te first available ip*/
-	/*		if (FindIpIMP(dhcp)) //
-			 helper function to find IP and if it was not found or not free
-	 	 		return first available ip after it*/
-	/*			return 0*/
-	/*		if null it means no available ip addresses -> return 1;*/
-}	
-/*-------------------------------_RECURSIVE_----------------------------------*/
+	/*	if node is full:*/
+	/*		return  failure */
 
-/*	if next  is full:*/
-	/*		return 1*/
+	/*	if num_variable_bits == 0:*/
+	/*		mark as full*/
+	/*		return succeess*/
 
-	/*if no node:*/
-	/*	allocate node*/
 
-	/*move to child node by the needed ip*/
-	
+	/*				// side depends on preferred_ip )*/
+	/*	recursively call AllocteIpIMP with needed side (by ip) of node 
+	/*	if succeess:*/
+	/*		update children of node as full*/
 
+	/*	else (failure):	*/
+		/* if side was left side, which means we failed to go on left child:*/
+		/*			nullify rest of the tree*/
+		/*			call AllocteIpIMP on right subtree
+					if this call was successful:
+						update ip to be with '1' at the current level
+						return succeess
+
+		/*	return failure */
+}
 /******************************************************************************/
 void DhcpFreeIp(dhcp_ty *dhcp, address_ty ip)
 {
-	/*	asserts*/
-	/* use FindIpIMP to find ip 	*/
-	/* if found: */
-	
-/*	if null: return*/
+	/*	assert not a special ip address - broadcast and everything	*/
+	/*  */
+}
+/*----------------------------------------------------------------------------*/
+FreeIpIMP(trie_node_ty *node, address_ty *ip, int level)
+{
+	/*	if node does not exist:*/
+	/*		return*/
 
-/*	if reach the end of ip:*/
-/*		return*/
-/*		decrement ip pointer by one*/
+	/*	mark as not full*/
 
-/*	reach the end of ip*/
-/*		free(node)*/
+	/*	if level is 0:*/
+	/*		return */
+
+	/*	recursively move to next node by level and ip	*/
 }
 /******************************************************************************/
 size_t DhcpCountFree(dhcp_ty *dhcp)
 {
-	/*	traverse the trie and count free nodes*/
+	/*	traverse the trie and count occupied nodes using CountFullNodes func */
+	/*	substract number of full nodes of the total number of nodes (2 ^ num_variable_bits) */
+}
+/*----------------------------------------------------------------------------*/
+size_t CountFullNodesIMP(trie_node_ty *node, int level)
+{
+	/*	if node doesn't exist */
+	/*	return (0) 	*/
+	
+	/*	if node is full, return 2^curr_level				*/
+
+	/*	scan left subtree and return its size								*/
+	/*	scan right subtree and add its size									*/
+	/*	return the sum of the sizes											*/
+/*	return (CountFullNodes(node->children[LEFT]) + */
+/*				CountFullNodes(node->children[RIGHT]));*/
 }
 /******************************************************************************/
-trie_ty *TrieCreateIMP(root?)
+static trie_node_ty *TrieCreateIMP(void)
 {
-/*	allocate memory and create trie_ty struct handler*/
-/*	handle errors if any*/
-/*	*/
-/*	allocate memory and create node that will be used as a root*/
-/*	handle errors if any*/
-/*	*/
-/*	return trie */
+	/*	allocate memory and create trie_node struct handler*/
+	/*	handle errors if any*/
+	
+	/*	return trie */
+}
+/******************************************************************************/
+static void TrieDestory(trie_node_ty *root)
+{
+	
 }
