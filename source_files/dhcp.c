@@ -73,13 +73,33 @@ int DhcpAllocateIp(dhcp_ty *dhcp, address_ty *preferred_ip)
 	 	 		return first available ip after it*/
 	/*			return 0*/
 	/*		if null it means no available ip addresses -> return 1;*/
-}
+}	
+/*-------------------------------_RECURSIVE_----------------------------------*/
+
+/*	if next  is full:*/
+	/*		return 1*/
+
+	/*if no node:*/
+	/*	allocate node*/
+
+	/*move to child node by the needed ip*/
+	
+
 /******************************************************************************/
 void DhcpFreeIp(dhcp_ty *dhcp, address_ty ip)
 {
 	/*	asserts*/
 	/* use FindIpIMP to find ip 	*/
-	/* if found: remove the ip from the trie 
+	/* if found: */
+	
+/*	if null: return*/
+
+/*	if reach the end of ip:*/
+/*		return*/
+/*		decrement ip pointer by one*/
+
+/*	reach the end of ip*/
+/*		free(node)*/
 }
 /******************************************************************************/
 size_t DhcpCountFree(dhcp_ty *dhcp)
