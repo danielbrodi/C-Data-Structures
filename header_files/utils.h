@@ -9,6 +9,8 @@
 #include <stdio.h>
 #include <stddef.h>
 
+#include "ANSI-color-codes.h"
+
 /*	frequently used macros	*/
 #define DEAD_MEM(type) ((type)0xdeadbeef)
 #define UNUSED(x) (void)(x)

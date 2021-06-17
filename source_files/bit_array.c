@@ -157,7 +157,7 @@ bitsarr_ty BitArraySetBit(bitsarr_ty bitarr, unsigned int bit_to_set,
 
 bit_state_ty BitArrayGetVal(bitsarr_ty bitarr, unsigned int bit_to_read)
 {
-	int bit_status = bitarr & (1UL << bit_to_read);
+	bitsarr_ty bit_status = bitarr & (1UL << bit_to_read);
 	
 	return(!!bit_status);
 }
