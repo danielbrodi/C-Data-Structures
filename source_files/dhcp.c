@@ -8,6 +8,25 @@
 * Description:		DHCP module implementation based on a trie.
 \******************************************************************************/
 
+/********************************* Inclusions *********************************/
+
+#include <assert.h>			/*	assert					*/
+#include <stddef.h>			/*	size_t, NULL			*/
+#include <stdlib.h>			/*	malloc, calloc, free	*/
+
+#include "dhcp.h"
+
+/******************************* macros & enums *******************************/
+
+enum
+{
+	SUCCESS = 0,
+	NO_AVAILABLE_IPS = 1,
+	MEMORY_ALLOCATION_ERR = 2
+}
+
+/**************************** Structs  Definitions ****************************/
+
 /* trie's nodes strucure */
 typedef struct trie_node
 {
@@ -23,14 +42,10 @@ struct dhcp
 	int num_variable_bits;
 };
 
-enum
-{
-	SUCCESS = 0,
-	NO_AVAILABLE_IPS = 1,
-	MEMORY_ALLOCATION_ERR = 2
-}
-/*****************************Pseudo-Code*************************************/
-/******************************************************************************/
+/**************************** Forward Declarations ****************************/
+
+
+/************************* Functions  Implementations *************************/
 dhcp_ty *DhcpCreate(address_ty subnet, int num_variable_bits)
 {
 	dhcp_ty *new_dhcp = NULL;
@@ -146,33 +161,50 @@ static int AllocteIpIMP(trie_node_ty **node, address_ty *preferred_ip, int num_v
 	/*	else (failure):	*/
 	else
 	{
-		/* if side was left side, which means we failed to go on left child:*/
-		/*			nullify rest of the tree*/
-		/*			call AllocteIpIMP on right subtree
-					if this call was successful:
-						update ip to be with '1' at the current level
-						return succeess */
+		/* if side was left side, which means we failed to go on left child: TODO*/
+		/*			nullify rest of the tree TODO */
+		/*			call AllocteIpIMP on right subtree */
+		if (SUCCESS == AllocteIpIMP(node->children[1], preferred_ip, num_variable_bits))
+		{
+			/* if this call was successful: */
+			/* update ip to be with '1' at the current level */
+			*preferred_ip = 1;
+			/* return succeess */
+			return (SUCCESS);
+		}
 	}
-		/*	return failure */
+		
+	/*	return failure */
+	return (NO_AVAILABLE_IPS);
 }
 /******************************************************************************/
 void DhcpFreeIp(dhcp_ty *dhcp, address_ty ip)
 {
 	/*	assert not a special ip address - broadcast and everything	*/
-	/*  */
+	/*  TODO */
 }
 /*----------------------------------------------------------------------------*/
 FreeIpIMP(trie_node_ty *node, address_ty *ip, int level)
 {
 	/*	if node does not exist:*/
-	/*		return*/
-
+	if (!node)
+	{
+		/*	return	*/
+		return;
+	}
+	
 	/*	mark as not full*/
-
+	node->is_full = 0;
+	
 	/*	if level is 0:*/
-	/*		return */
+	if (!level)
+	{
+		/*	return */
+		return;
+	}
 
 	/*	recursively move to next node by level and ip	*/
+	FreeIpIMP(node->children[*ip], level - 1);
 }
 /******************************************************************************/
 size_t DhcpCountFree(dhcp_ty *dhcp)
