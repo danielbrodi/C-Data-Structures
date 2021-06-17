@@ -44,7 +44,15 @@ struct dhcp
 
 /**************************** Forward Declarations ****************************/
 
+static size_t CountFullNodesIMP(trie_node_ty *node, int level);
 
+static int AllocteIpIMP(trie_node_ty **node, address_ty *preferred_ip, 
+														int num_variable_bits);
+														
+static void FreeIpIMP(trie_node_ty *node, address_ty *ip, int level);
+
+static trie_node_ty *TrieCreateIMP(void);
+													
 /************************* Functions  Implementations *************************/
 dhcp_ty *DhcpCreate(address_ty subnet, int num_variable_bits)
 {
@@ -116,7 +124,8 @@ int DhcpAllocateIp(dhcp_ty *dhcp, address_ty preferred_ip)
 	return (SUCCESS);
 }
 /*----------------------------------------------------------------------------*/
-static int AllocteIpIMP(trie_node_ty **node, address_ty *preferred_ip, int num_variable_bits)
+int AllocteIpIMP(trie_node_ty **node, address_ty *preferred_ip, 
+														int num_variable_bits)
 {
 	trie_node_ty *new_node = NULL;
 	
@@ -184,7 +193,7 @@ void DhcpFreeIp(dhcp_ty *dhcp, address_ty ip)
 	/*  TODO */
 }
 /*----------------------------------------------------------------------------*/
-FreeIpIMP(trie_node_ty *node, address_ty *ip, int level)
+void FreeIpIMP(trie_node_ty *node, address_ty *ip, int level)
 {
 	/*	if node does not exist:*/
 	if (!node)
@@ -209,30 +218,54 @@ FreeIpIMP(trie_node_ty *node, address_ty *ip, int level)
 /******************************************************************************/
 size_t DhcpCountFree(dhcp_ty *dhcp)
 {
+	size_t total_number_of_nodes = Pow(2, num_variable_bits);
+	/* asserts	*/
+	assert(dhcp);
+	
 	/*	traverse the trie and count occupied nodes using CountFullNodes func */
-	/*	substract number of full nodes of the total number of nodes (2 ^ num_variable_bits) */
+	/*	substract number of full nodes of the total number of nodes  */
+	return (total_number_of_nodes - 
+								CountFullNodes(dhcp->root, num_variable_bits));
 }
 /*----------------------------------------------------------------------------*/
 size_t CountFullNodesIMP(trie_node_ty *node, int level)
 {
 	/*	if node doesn't exist */
-	/*	return (0) 	*/
+	if (!node)
+	{
+		/*	return (0) 	*/
+		return (0);
+	}
 	
 	/*	if node is full, return 2^curr_level				*/
+	if (node->is_full)
+	{
+		return (Pow(2, level));
+	}
 
 	/*	scan left subtree and return its size								*/
 	/*	scan right subtree and add its size									*/
 	/*	return the sum of the sizes											*/
-/*	return (CountFullNodes(node->children[LEFT]) + */
-/*				CountFullNodes(node->children[RIGHT]));*/
+	return (CountFullNodes(node->children[LEFT]) + 
+										CountFullNodes(node->children[RIGHT]));
 }
 /******************************************************************************/
-static trie_node_ty *TrieCreateIMP(void)
+trie_node_ty *TrieCreateIMP(void)
 {
 	/*	allocate memory and create trie_node struct handler*/
-	/*	handle errors if any*/
+	trie_node_ty *new_trie = (trie_node_ty *)malloc(sizeof(trie_node_ty));
+	if (!new_trie)
+	{
+		/*	handle errors if any*/
+		return (NULL);
+	}
+	
+	/*	nullify members*/
+	memset (new_trie, 0, sizeof(trie_node_ty));
 	
 	/*	return trie */
+	return (new_trie);
+	
 }
 /******************************************************************************/
 static void TrieDestory(trie_node_ty *root)
