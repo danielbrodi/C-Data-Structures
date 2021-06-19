@@ -148,24 +148,25 @@ rbst_ty *RBSTCreate(Cmp_Func_ty cmp_func, const void *param)
 /******************************************************************************/
 void RBSTDestroy(rbst_ty *rbst)
 {
-	assert(rbst);
-	
-	/*	assure that there are nodes to free in the tree						*/
-	if (!RBSTIsEmpty(rbst))
+	if (rbst)
 	{
-		/*	DestroyNodesIMP(root)											*/
-		DestroyNodesIMP(rbst->stub.children[LEFT]);
+	
+		/*	assure that there are nodes to free in the tree					*/
+		if (!RBSTIsEmpty(rbst))
+		{
+			/*	DestroyNodesIMP(root)										*/
+			DestroyNodesIMP(rbst->stub.children[LEFT]);
+		}
+		
+		/*	nullify tree's struct ptrs										*/
+		rbst->stub.children[RIGHT] = rbst->stub.children[LEFT] = NULL;
+		rbst->stub.data = NULL;
+		rbst->compare_func = NULL;
+		rbst->param = NULL;
+		
+		/*	free tree handler												*/
+		free(rbst);
 	}
-	
-	/*	nullify tree's struct ptrs											*/
-	rbst->stub.children[RIGHT] = rbst->stub.children[LEFT] = NULL;
-	rbst->stub.data = NULL;
-	rbst->compare_func = NULL;
-	rbst->param = NULL;
-	
-	/*	free tree handler													*/
-	free(rbst);
-	rbst = NULL;
 }
 /*----------------------------------------------------------------------------*/
 static void DestroyNodesIMP(rbst_node_ty *node)
