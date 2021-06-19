@@ -20,6 +20,7 @@
 
 /******************************* macros & enums *******************************/
 
+/*	status indication of a finished ip allocation operation					*/
 enum
 {
 	SUCCESS = 0,
@@ -27,6 +28,7 @@ enum
 	MEMORY_ALLOCATION_ERR = 2
 }
 
+/*	from which direction the child node connected to its parent node		*/
 enum
 {
 	LEFT = 0,
