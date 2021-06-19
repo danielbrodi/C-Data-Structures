@@ -51,13 +51,19 @@ struct dhcp
 
 /**************************** Forward Declarations ****************************/
 
+/*	returns the number of the full (allocated) ips in the dhcp */
 static size_t CountFullNodesIMP(trie_node_ty *node, int level);
 
+/*	allocates an ip based on a request	*/
+/*	RETURNS  0 on successful ip allocation			*/
+/*	RETURNS: 1 if no ips are available				*/
+/*	RETURNS: 2 if memory allocation failure			*/
 static int AllocteIpIMP(trie_node_ty **node, address_ty *preferred_ip, 
 														int num_variable_bits);
-														
+/* frees up an previously allocaed ip */											
 static void FreeIpIMP(trie_node_ty *node, address_ty *ip, int level);
 
+/*	allocates memory and creates a new clean new trie node */
 static trie_node_ty *TrieCreateNodeIMP(void);
 													
 /************************* Functions  Implementations *************************/
