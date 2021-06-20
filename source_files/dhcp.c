@@ -26,7 +26,7 @@ enum
 	SUCCESS = 0,
 	NO_AVAILABLE_IPS = 1,
 	MEMORY_ALLOCATION_ERR = 2
-}
+};
 
 /*	from which direction the child node connected to its parent node		*/
 enum
@@ -54,42 +54,65 @@ struct dhcp
 /**************************** Forward Declarations ****************************/
 
 /*	returns the number of the full (allocated) ips in the dhcp */
-static size_t CountFullNodesIMP(trie_node_ty *node, int level);
+static size_t CountUsedIpsIMP(trie_node_ty *node, int level);
 
 /*	allocates an ip based on a request	*/
 /*	RETURNS  0 on successful ip allocation			*/
 /*	RETURNS: 1 if no ips are available				*/
 /*	RETURNS: 2 if memory allocation failure			*/
-static int AllocteIpIMP(trie_node_ty **node, address_ty *preferred_ip, 
+static int AllocateIpIMP(trie_node_ty **node, address_ty *preferred_ip, 
 														int num_variable_bits);
 /* frees up an previously allocaed ip */											
 static void FreeIpIMP(trie_node_ty *node, address_ty *ip, int level);
 
 /*	allocates memory and creates a new clean new trie node */
 static trie_node_ty *TrieCreateNodeIMP(void);
-													
+
+/*	recursively traverses through trie, in a post order way,
+ *	and frees every node.													*/
+void TrieDestroyIMP(trie_node_ty *node);
+
+/*	returns whether a given node is full or not				*/			
+static int IsNodeFull(trie_node_ty *node);
+
+/*	returns side to advance based on ip and level	*/
+static int GetSideToGo(address_ty ip, int level);	
 /************************* Functions  Implementations *************************/
 dhcp_ty *DhcpCreate(address_ty subnet, int num_variable_bits)
 {
 	dhcp_ty *new_dhcp = NULL;
+	
+	address_ty network_address = 0;
+	address_ty server_address = 0;
+	address_ty broadcast_address = 0;
 	
 	/* asserts */
 	assert(subnet);
 	assert(num_variable_bits);
 	
 	/*	allocate memory for dhcp struct and handle errors*/
-	new_dhcp = (dhcp_ty *)malloc(sizeof(dhcp_ty));
+	new_dhcp = (dhcp_ty *)calloc(1,sizeof(dhcp_ty));
 	if (!new_dhcp)
 	{
 		return (NULL);
 	}
 	
 	/*	define the subnet as the "root" of our dhcp */
-	new_dhcp->root
 	
 	/*	assign parameters to dhcp struct memebrs*/
 	new_dhcp->subnet = subnet;
 	new_dhcp->num_variable_bits = num_variable_bits;
+	
+	/*	define the addresses that are allocated impliclity	*/
+	network_address = subnet;
+	broadcast_address = subnet | (((address_ty)1 << new_dhcp->num_variable_bits) - 1);
+	server_address = broadcast_address - 1;
+	
+	/*	allocate reserved ip addresses	*/
+	DhcpAllocateIp(new_dhcp, &network_address);
+	DhcpAllocateIp(new_dhcp, &server_address);
+	DhcpAllocateIp(new_dhcp, &broadcast_address);
+	
 	
 	/*	return pointer to dhcp*/
 	return (new_dhcp);
@@ -99,7 +122,8 @@ void DhcpDestroy(dhcp_ty *dhcp)
 {
 	if (dhcp)
 	{
-		TrieDestroyIMP(dhcp->root);
+		TrieDestroyIMP(dhcp->root.children[LEFT]);
+		TrieDestroyIMP(dhcp->root.children[RIGHT]);
 		
 		/*	nullify dhcp struct members*/
 		memset(dhcp, 0, sizeof(dhcp_ty));
@@ -109,25 +133,28 @@ void DhcpDestroy(dhcp_ty *dhcp)
 	}
 }
 /******************************************************************************/
-int DhcpAllocateIp(dhcp_ty *dhcp, address_ty preferred_ip)
+int DhcpAllocateIp(dhcp_ty *dhcp, address_ty *preferred_ip)
 {
 	int ret = 0;
+	trie_node_ty *root_ptr = NULL;
 	
 	/*	asserts*/
 	assert(dhcp);
 	
-	ret = AllocteIpIMP(&dhcp->root, &preferred_ip, dhcp->num_variable_bits);
-	/* if AllocteIpIMP has failed because of a mem error: */
+	root_ptr = &dhcp->root;
+	
+	ret = AllocateIpIMP(&root_ptr, preferred_ip, dhcp->num_variable_bits);
+	/* if AllocateIpIMP has failed because of a mem error: */
 	if (MEMORY_ALLOCATION_ERR == ret)
 	{
 		return (MEMORY_ALLOCATION_ERR);
 	}
 	
-	/* if AllocteIpIMP has failed because no available ip: */
-	if (NO_AVAILABLE_IPS == ret))
+	/* if AllocateIpIMP has failed because no available ip: */
+	if (NO_AVAILABLE_IPS == ret)
 	{
-		/* Call AllocteIpIMP on the smallest ip in the subnet */
-		ret = AllocteIpIMP(&dhcp->root, &dhcp->subnet, dhcp->num_variable_bits);
+		/* Call AllocateIpIMP on the smallest ip in the subnet */
+		ret = AllocateIpIMP(&root_ptr, &dhcp->subnet, dhcp->num_variable_bits);
 		/* If also this failed: */
 		if (NO_AVAILABLE_IPS == ret)
 		{
@@ -140,7 +167,7 @@ int DhcpAllocateIp(dhcp_ty *dhcp, address_ty preferred_ip)
 	return (SUCCESS);
 }
 /*----------------------------------------------------------------------------*/
-int AllocteIpIMP(trie_node_ty **node, address_ty *preferred_ip, 
+int AllocateIpIMP(trie_node_ty **node, address_ty *preferred_ip, 
 														int num_variable_bits)
 {
 	int level = num_variable_bits;
@@ -153,7 +180,7 @@ int AllocteIpIMP(trie_node_ty **node, address_ty *preferred_ip,
 	if (!(*node))
 	{
 		/*		create node, handle memory errors */
-		trie_node_ty *new_node = CreateTrieNodeIMP();
+		trie_node_ty *new_node = TrieCreateNodeIMP();
 		if (!new_node)
 		{
 			return (MEMORY_ALLOCATION_ERR);
@@ -181,11 +208,11 @@ int AllocteIpIMP(trie_node_ty **node, address_ty *preferred_ip,
 	}
 
 	/*				// side depends on preferred_ip )*/
-	/*	recursively call AllocteIpIMP with correct side (by ip) of node */
+	/*	recursively call AllocateIpIMP with correct side (by ip) of node */
 	curr_node = *node;
 	
 	/* determine from which side the node is connected to its parent */
-	child_side = GetSideButIpIMP(*preferred_ip, level - 1);
+	child_side = GetSideToGo(*preferred_ip, level - 1);
 	
 	/*next_node = child of node at correct side*/
 	next_node = &(curr_node->children[child_side]);
@@ -206,15 +233,16 @@ int AllocteIpIMP(trie_node_ty **node, address_ty *preferred_ip,
 		/*	if side was left side, which means we failed to go on left child */
 		if (curr_node->children[LEFT] == *next_node)
 		{
-			/*	nullify rest of the tree TODO  */
+			/*	nullify rest of the subtree */
+			*preferred_ip =  (*preferred_ip & (~(((address_ty)1 << level) - 1)));
 			
-			/*	call AllocteIpIMP on right subtree */
+			/*	call AllocateIpIMP on right subtree */
 			if (SUCCESS == AllocateIpIMP(&curr_node->children[RIGHT], 
 													preferred_ip, level - 1))
 			{
 				/* if this call was successful: */
 				/* update ip to be with '1' at current level + 1 */
-				*preferred_ip =| (address_ty)1 << (level - 1);
+				*preferred_ip |= ((address_ty)1 << (level - 1));
 				
 				/* return succeess */
 				return (SUCCESS);
@@ -224,6 +252,16 @@ int AllocteIpIMP(trie_node_ty **node, address_ty *preferred_ip,
 		
 	/*	return failure */
 	return (NO_AVAILABLE_IPS);
+}
+/*----------------------------------------------------------------------------*/
+int IsNodeFull(trie_node_ty *node)
+{
+	return (!!(node && node->is_full));
+}
+/*----------------------------------------------------------------------------*/
+int GetSideToGo(address_ty ip, int level)
+{
+	return (!!(ip & ((address_ty)1 << level)));
 }
 /******************************************************************************/
 void DhcpFreeIp(dhcp_ty *dhcp, address_ty ip)
@@ -258,7 +296,7 @@ void FreeIpIMP(trie_node_ty *node, address_ty *ip, int level)
 	}
 
 	/*	next_node = get next child by ip_to_free		*/
-	next_node = node->children[GetSideButIpIMP(ip, level - 1)];
+	next_node = node->children[GetSideToGo(*ip, level - 1)];
 	
 	/*	recursively move to next node by level and ip	*/
 	FreeIpIMP(next_node, ip, level - 1);
@@ -266,21 +304,21 @@ void FreeIpIMP(trie_node_ty *node, address_ty *ip, int level)
 /******************************************************************************/
 size_t DhcpCountFree(dhcp_ty *dhcp)
 {
-	size_t num_of_nodes = 0, num_of_full_nodes = 0;
+	size_t num_of_ips = 0, num_of_allocated_ips = 0;
 	
 	/* asserts	*/
 	assert(dhcp);
 	
-	num_of_nodes = pow(2, num_variable_bits);
+	num_of_ips = pow(2, dhcp->num_variable_bits);
 	
 	/*	traverse the trie and count occupied nodes using CountFullNodes func */
-	num_of_full_nodes = CountFullNodes(dhcp->root, num_variable_bits);
+	num_of_allocated_ips = CountUsedIpsIMP(&dhcp->root, dhcp->num_variable_bits);
 	
 	/*	substract number of full nodes of the total number of nodes  */
-	return (num_of_nodes - num_of_full_nodes);
+	return (num_of_ips - num_of_allocated_ips);
 }
 /*----------------------------------------------------------------------------*/
-size_t CountFullNodesIMP(trie_node_ty *node, int level)
+size_t CountUsedIpsIMP(trie_node_ty *node, int level)
 {
 	/*	if node doesn't exist */
 	if (!node)
@@ -305,28 +343,20 @@ size_t CountFullNodesIMP(trie_node_ty *node, int level)
 	/*	scan left subtree and return its size								*/
 	/*	scan right subtree and add its size									*/
 	/*	return the sum of the sizes											*/
-	return (CountFullNodes(node->children[LEFT]) + 
-										CountFullNodes(node->children[RIGHT]));
+	return (CountUsedIpsIMP(node->children[LEFT], level - 1) + 
+						CountUsedIpsIMP(node->children[RIGHT], level - 1));
 }
 /******************************************************************************/
 trie_node_ty *TrieCreateNodeIMP(void)
 {
 	/*	allocate memory and create trie_node struct handler*/
-	trie_node_ty *new_trie = (trie_node_ty *)malloc(sizeof(trie_node_ty));
-	if (!new_trie)
-	{
-		/*	handle errors if any*/
-		return (NULL);
-	}
-	
-	/*	nullify members*/
-	memset (new_trie, 0, sizeof(trie_node_ty));
+	trie_node_ty *new_node = (trie_node_ty *)calloc(1, sizeof(trie_node_ty));
 	
 	/*	return trie */
-	return (new_trie);
+	return (new_node);
 }
 /******************************************************************************/
-static void TrieDestroyIMP(trie_node_ty *node)
+void TrieDestroyIMP(trie_node_ty *node)
 {
 	/*	if node does not exist do nothing					*/
 	if (!node)
@@ -335,10 +365,14 @@ static void TrieDestroyIMP(trie_node_ty *node)
 	}
 	
 	/*	recursivly scan the left subtree and destroy it						*/
-	DestroyNodesIMP(node->children[LEFT]);
+	TrieDestroyIMP(node->children[LEFT]);
 	/*	recursivly scan the right subtree and destroy it					*/
-	DestroyNodesIMP(node->children[RIGHT]);
+	TrieDestroyIMP(node->children[RIGHT]);
+	
+	/*	nullify node's children nodes fields */
+	memset(node, 0, sizeof(trie_node_ty));
 	
 	/*	free reached node because it has no child nodes					*/
 	free(node);
 }
+/******************************************************************************/

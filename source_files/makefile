@@ -5,7 +5,7 @@ TDIR = ../test/
 DEPS = utils.h
 
 CC = gcc
-CFLAGS = -ansi -pedantic-errors -Wall -Wextra -g -I$(IDIR)
+CFLAGS = -ansi -pedantic-errors -Wall -Wextra -g -lm -I$(IDIR)
 RM = rm -rf
 
 TARGETS := vector slist slist_ex queue cbuffer dlist uid fixed_size_allocator variable_size_allocator cmp_sort bs_tree sorts rbst
@@ -34,8 +34,8 @@ sorted_list: $(IDIR)sorted_list.h sorted_list.c $(TDIR)sorted_list_test.c $(IDIR
 queue: $(IDIR)queue.h queue.c $(TDIR)queue_test.c $(IDIR)$(DEPS) $(IDIR)slist.h slist.c
 	$(CC) $(CFLAGS) -o $@ $^
 
-%: $(TDIR)%_test.c %.c $(IDIR)%.h $(IDIR)$(DEPS)
-	$(CC) $(CFLAGS) -o a.out $^
+%: $(TDIR)%_test.c %.c
+	$(CC) $(CFLAGS) -o a.out $^ -lm
 
 clean:
 	$(RM) *.o $(TARGETS)
