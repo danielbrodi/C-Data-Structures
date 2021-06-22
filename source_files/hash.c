@@ -40,8 +40,9 @@ typedef struct extended_param
 
 /*	searches for an item in a hash table based on a given key to look for.
  *	returns a dlist iterator to that item if found.
- *	otherwise, returns iterator which points to '0'							*/
-static dlist_iter_ty FindItemIMP(ht_ty *hash_table, const void *key_to_find);
+ *	otherwise, returns iterator to the end of the list which has been searched*/
+dlist_iter_ty FindItemIMP(ht_ty *hash_table, const void *key_to_find, 
+																dlist_ty *list);
 
 /*	creates an array of doubly linked lists. Receives an allocated array
  *	and runs through it and creates a list in each element of the array
@@ -52,8 +53,11 @@ static int CreateListsArrayIMP(dlist_ty **lists, size_t size);
  *	returns an integer less than, equal to, or greater than zero if
  *	the first argument is considered to be respectively less than,
  *	equal to, or greater than the second.	*/
-int CompareListsLength(const void *length1, const void *length2);
+static int CompareListsLengthIMP(const void *length1, const void *length2);
 
+/*	returns the bin's index of the list that contains the key which is 
+ *	looked for */
+static int GetBinOfKeyIMP(ht_ty *hash_table, const void *key_to_find);
 /************************* Functions  Implementations *************************/
 
 ht_ty *HTCreate(size_t capacity, hash_func_ty hash_func, const void *hash_param,
@@ -128,19 +132,18 @@ void HTDestroy(ht_ty *hash_table)
 /******************************************************************************/
 int HTInsert(ht_ty *hash_table, void *data)
 {
-	size_t bin_index = -1;
+	int bin_index = -1;
 	
 	dlist_ty *dlist = NULL;
 	
-	dlist_iter_ty ret_status = {0};
+	dlist_iter_ty ret_status;
 	
 	/*	assert*/
 	assert(hash_table);
 	assert(data);	/* NULL data is not allowed in tis hash table	*/
 	
 	/*	use hash func to get the right index to insert data into*/
-	bin_index = hash_table->hash_func(data, hash_table->hash_param) %
-														 hash_table->capacity;
+	bin_index = GetBinOfKeyIMP(hash_table, data);
 	
 	/*	go to that index in the dlists array*/
 	dlist = *(hash_table->items + bin_index);
@@ -187,32 +190,53 @@ int CompareKeysIMP(const void *data1, void *extended_param)
 /*----------------------------------------------------------------------------*/
 void *HTFind(ht_ty *hash_table, const void *key)
 {
-	dlist_iter_ty item_to_find, not_found_iter = {0};
+	int bin_index = -1;
 	
-	/*	asserts*/
-	assert(hash_table);
-	assert(key);
+	dlist_iter_ty item_to_find;
 	
-	item_to_find = FindItemIMP(hash_table, key);
+	dlist_ty *dlist = NULL;
 	
-	/*	return null or the element*/
-	return (DlistIteratorIsEqual(item_to_find, not_found_iter) ? NULL :
-													DlistGetData(item_to_find));
-}
-/******************************************************************************/
-void HTRemove(ht_ty *hash_table, const void *key)
-{
-	
-	dlist_iter_ty item_to_remove, not_found_iter = {0};
-		
 	/*	asserts	*/
 	assert(hash_table);
 	assert(key);
 	
-	item_to_remove = FindItemIMP(hash_table, key);
+	/*	use hash func to get right index of the right dlist */
+	bin_index = GetBinOfKeyIMP(hash_table, key);
+	
+	dlist = *(hash_table->items + bin_index);
+	
+	item_to_find = FindItemIMP(hash_table, key, dlist);
 										
 	/*	remove on the iterator that recieved from the FindIMP func	*/
-	if (!DlistIteratorIsEqual(not_found_iter, item_to_remove))
+	if (!DlistIteratorIsEqual(DlistIteratorEnd(dlist), item_to_find))
+	{
+		return (DlistGetData(item_to_find));
+	}
+	
+	return (NULL);
+}
+/******************************************************************************/
+void HTRemove(ht_ty *hash_table, const void *key)
+{
+	int bin_index = -1;
+	
+	dlist_iter_ty item_to_remove;
+	
+	dlist_ty *dlist = NULL;
+	
+	/*	asserts	*/
+	assert(hash_table);
+	assert(key);
+	
+	/*	use hash func to get right index of the right dlist */
+	bin_index = GetBinOfKeyIMP(hash_table, key);
+	
+	dlist = *(hash_table->items + bin_index);
+	
+	item_to_remove = FindItemIMP(hash_table, key, dlist);
+										
+	/*	remove on the iterator that recieved from the FindIMP func	*/
+	if (!DlistIteratorIsEqual(DlistIteratorEnd(dlist), item_to_remove))
 	{
 		DlistRemove(item_to_remove);
 	}
@@ -252,7 +276,7 @@ statistics_ty HTGetStatistics(const ht_ty *hash_table)
 		++curr_list_size;
 	}
 	
-	qsort(lists_sizes, hash_table_size, sizeof(size_t), CompareListsLength);
+	qsort(lists_sizes, hash_table_size, sizeof(size_t), CompareListsLengthIMP);
 	
 	if (0 == (hash_table_size + 1) % 2)
 	{
@@ -270,33 +294,32 @@ statistics_ty HTGetStatistics(const ht_ty *hash_table)
 	return (ret_stats);
 }
 /******************************************************************************/
-int CompareListsLength(const void *length1, const void *length2)
+int CompareListsLengthIMP(const void *length1, const void *length2)
 {
+	assert(length1);
+	assert(length2);
+	
 	return (*(int *)length1 - *(int *)length2);
 }
 /******************************************************************************/
-/*	returns iter that equals to 0 if not found */
-static dlist_iter_ty FindItemIMP(ht_ty *hash_table, const void *key_to_find)
+dlist_iter_ty FindItemIMP(ht_ty *hash_table, const void *key_to_find, 
+																dlist_ty *list)
 {
-	dlist_iter_ty ret_iter, not_found_iter = {0};
+	dlist_iter_ty ret_iter;
 	
 	dlist_ty *dlist = NULL;
 	
 	extended_param_ty extended_param = {0};
 	
-	size_t bin_index = -1;
-		
 	assert(hash_table);
 	assert(key_to_find);
-	
-	/*	use hash func to get right index of the right dlist */
-	bin_index = hash_table->hash_func(key_to_find, hash_table->hash_param) %
-														hash_table->capacity;
-	
-	dlist = *(hash_table->items + bin_index);
+	assert(list);
 	
 	extended_param.hash_table = hash_table;
+	
 	extended_param.key = key_to_find;
+	
+	dlist = list;
 	
 	/*	 use find function of dlist */
 	ret_iter = DlistFind(DlistIteratorBegin(dlist), DlistIteratorEnd(dlist), 
@@ -304,7 +327,7 @@ static dlist_iter_ty FindItemIMP(ht_ty *hash_table, const void *key_to_find)
 										
 	if (DlistIteratorIsEqual(ret_iter, DlistIteratorEnd(dlist)))
 	{
-		return (not_found_iter);
+		return (DlistIteratorEnd(dlist));
 	}
 										
 	return (ret_iter);
@@ -348,3 +371,11 @@ static int CreateListsArrayIMP(dlist_ty **lists, size_t size)
 	return (start_list == curr_list);
 }
 /******************************************************************************/
+int GetBinOfKeyIMP(ht_ty *hash_table, const void *key_to_find)
+{
+	assert(hash_table);
+	assert(key_to_find);
+	
+	return (hash_table->hash_func(key_to_find, hash_table->hash_param) %
+														hash_table->capacity);
+}
