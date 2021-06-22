@@ -2,8 +2,8 @@
 * File:				hash.c
 * Author:			Daniel Brodsky				 		  												  								
 * Date:				09-06-2021
-* Code Reviewer:					   								
-* Version:			1.0   								
+* Code Reviewer:	Ariel				   								
+* Version:			1.5   								
 * Description:		Hash Map implementation.
 \******************************************************************************/
 
@@ -32,7 +32,7 @@ struct hash_table
 /* Used for functions which look for a specific key in the hash table	*/
 typedef struct extended_param
 {
-	ht_ty *hash_table;
+	is_same_key_func_ty is_same_func;
 	const void *key;
 }extended_param_ty;
 
@@ -75,7 +75,7 @@ ht_ty *HTCreate(size_t capacity, hash_func_ty hash_func, const void *hash_param,
 	if (new_hash_table)
 	{		
 		/* allocate memory for the lists array and handle memory errors if any*/
-		new_hash_table->items = (dlist_ty **)malloc(sizeof(dlist_ty *) * capacity);
+		new_hash_table->items = (dlist_ty **)malloc(sizeof(dlist_ty*)*capacity);
 		
 		/* if memory allocation succeeded */
 		if (new_hash_table->items)
@@ -111,13 +111,13 @@ ht_ty *HTCreate(size_t capacity, hash_func_ty hash_func, const void *hash_param,
 /******************************************************************************/
 void HTDestroy(ht_ty *hash_table)
 {
-	size_t num_of_bins = hash_table->capacity, i = 0;
+	size_t num_of_bins = hash_table->capacity, curr_bin = 0;
 	
 	/*	loop through the map and destory dlist at each index*/
-	while (i < num_of_bins)
+	while (curr_bin < num_of_bins)
 	{
-		DlistDestroy(*(hash_table->items + i));
-		++i;
+		DlistDestroy(*(hash_table->items + curr_bin));
+		++curr_bin;
 	}
 	
 	free(hash_table->items);
@@ -182,10 +182,11 @@ size_t HTSize(const ht_ty *hash_table)
 /******************************************************************************/
 int CompareKeysIMP(const void *data1, void *extended_param)
 {
-	ht_ty *hash_table = ((extended_param_ty *)extended_param)->hash_table;
+	is_same_key_func_ty is_same_func = ((extended_param_ty *)extended_param)->
+															is_same_func;
 	const void *key = ((extended_param_ty *)extended_param)->key;
 	
-	return(hash_table->is_same(data1, key));
+	return(is_same_func(data1, key));
 }
 /*----------------------------------------------------------------------------*/
 void *HTFind(ht_ty *hash_table, const void *key)
@@ -249,6 +250,7 @@ statistics_ty HTGetStatistics(const ht_ty *hash_table)
 	dlist_ty **curr_list = NULL, **end_of_list = NULL;
 	
 	size_t *lists_sizes = NULL, *curr_list_size = NULL;
+	
 	size_t hash_table_size = 0;
 	
 	/*	assert */
@@ -271,14 +273,14 @@ statistics_ty HTGetStatistics(const ht_ty *hash_table)
 	
 	while (curr_list < end_of_list)
 	{
-		*(curr_list_size) = DlistSize(*curr_list);
+		*curr_list_size = DlistSize(*curr_list);
 		++curr_list;
 		++curr_list_size;
 	}
 	
 	qsort(lists_sizes, hash_table_size, sizeof(size_t), CompareListsLengthIMP);
 	
-	if (0 == (hash_table_size + 1) % 2)
+	if ((0 == hash_table_size + 1) % 2)
 	{
 		ret_stats.median_list = *(lists_sizes + (hash_table_size + 1) / 2);
 	}
@@ -315,7 +317,7 @@ dlist_iter_ty FindItemIMP(ht_ty *hash_table, const void *key_to_find,
 	assert(key_to_find);
 	assert(list);
 	
-	extended_param.hash_table = hash_table;
+	extended_param.is_same_func = hash_table->is_same;
 	
 	extended_param.key = key_to_find;
 	
@@ -360,7 +362,7 @@ static int CreateListsArrayIMP(dlist_ty **lists, size_t size)
 				DlistDestroy(*start_list);
 				++start_list;
 			}
-			break;
+			return (1);
 		}
 		
 		++curr_list;
@@ -379,3 +381,4 @@ int GetBinOfKeyIMP(ht_ty *hash_table, const void *key_to_find)
 	return (hash_table->hash_func(key_to_find, hash_table->hash_param) %
 														hash_table->capacity);
 }
+/******************************************************************************/
