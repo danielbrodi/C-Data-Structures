@@ -2,16 +2,16 @@
 * File:				hash.c						 		  								
 * Author:			Daniel Brodsky					  								
 * Date:				09-06-2021
-* Code Reviewer:							   								
+* Code Reviewer:	Ariel						   								
 * Version:			1.0					   								
 * Description:		Hash Map implementation tests file.		 
 \******************************************************************************/
 
 /********************************* Inclusions *********************************/
 #include <assert.h>
-#include <stdio.h>	/* printf	*/
-#include <stdlib.h>	/*	malloc, free, realloc 	*/
-#include <string.h>	/* strlen, strcmp	*/
+#include <stdio.h>		/*	printf					*/
+#include <stdlib.h>		/*	malloc, free, realloc 	*/
+#include <string.h>		/* 	strlen, strcmp			*/
 
 #include "utils.h"
 #include "hash.h"
@@ -35,41 +35,48 @@ typedef struct dictionary
 /* creates a dictionary_ty */
 dictionary_ty* DictionaryCreate();
 
-/* destroy a store */
+/* destroys a dictionary */
 void DictionaryDestroy(dictionary_ty* dict);
 
 /* reserve more space for the characters if needed */
 int DictionaryResize(dictionary_ty* dict, size_t new_res);
 
-/* change 5/4 to a larger value for more aggressive
- * increase of memory allocation */
+/* returns 1 if dictionary is full, otherwise 0. */
 int DictionaryIsFull(dictionary_ty* dict);
 
-/* adds a character to the dictionary_ty */
+/*	adds a word to a dictionary */
 int DictionaryAddTo(dictionary_ty* dict, char* word_to_add);
 
-/*	converts text file which contains chars to an array of words(strings)	*/
+/*	converts a text file to an array of words (strings)
+ *	also adds each character from the file to an array of characters */
 void TextFileToArray(dictionary_ty* dict, char *file_path, char** chars_array);
 
+/*	creates a hash table of words that are taken out of a dictionary	*/ 
 static void HashTableFromStringsArr(ht_ty *hash_table, dictionary_ty *dict);
 
+/*	hash function that takes strings and returns an index	*/
 size_t hash_func(const void *data, const void *param);
 
+/*	checks if 2 given data keys are equal */
 int is_same_key(const void *data1, const void *data2);
 
+/*	runs menu of the dictionary program	*/
 static void RunMenu(ht_ty *hash_table);
 
+/*	prints stats of the dictionary	*/
 static void PrintStats(ht_ty *hash_table);
 
+/*	removes a word from the dictionary */
 static void RemoveFromDict(ht_ty *hash_table);
 
+/*	prints the size of a hash table	*/
 static void PrintSize(ht_ty *hash_table);
 /******************************* Main__Function *******************************/
 int main() 
 {
 	char *chars_array = NULL;
 	
-	ht_ty *hash_table = NULL;
+	ht_ty *dictionary_hash_table = NULL;
 	
 	dictionary_ty* dict = DictionaryCreate();
 	if (!dict)
@@ -77,10 +84,12 @@ int main()
 		return (1);
 	}
     
+    /*	creates a dictionary data structure based on linux's dictionary	*/
     TextFileToArray(dict, DICTIONARY_PATH, &chars_array);
-
-	hash_table = HTCreate(dict->size, hash_func, 0, is_same_key);
-	if (!hash_table)
+	
+	/*	creates a hash table based on the dictionary	*/
+	dictionary_hash_table = HTCreate(dict->size, hash_func, 0, is_same_key);
+	if (!dictionary_hash_table)
 	{
 		free(dict);
 		dict = NULL;
@@ -90,15 +99,16 @@ int main()
 		return (1);
 	}
 	
-	HashTableFromStringsArr(hash_table, dict);
+	/*	inserts all the words from the dictionary to the hash table	*/
+	HashTableFromStringsArr(dictionary_hash_table, dict);
 	
-	HTGetStatistics(hash_table);
+	/* run program of the dictionary	*/
+	RunMenu(dictionary_hash_table);
 	
-	RunMenu(hash_table);
-  
+	/* close program */
 	DictionaryDestroy(dict);
 	free(chars_array);
-	HTDestroy(hash_table);
+	HTDestroy(dictionary_hash_table);
 	
 	return (0);
 }
@@ -139,9 +149,9 @@ static void RunMenu(ht_ty *hash_table)
 	int cmdQuit = 0;
 	
 	printf("%15s\033[47;30mSpell-Checker: MENU\033[0m\n\n", "");
-	printf(YELLOW "* Enter \"-size\"" " to see how big is the dictionary.\n" RESET_COLOR);
-	printf(YELLOW "* Enter \"-stats\"" " to see the statistics.\n" RESET_COLOR);
-	printf(YELLOW "* Enter \"-remove\"" " to remove a word from the dictionary.\n" RESET_COLOR);
+	printf(YELLOW "* Enter \"-size\"" " to see how big is the dictionary.\n");
+	printf(YELLOW "* Enter \"-stats\"" " to see the statistics.\n");
+	printf(YELLOW "* Enter \"-remove\"" " to remove a word from the dictionary.\n");
 	printf(YELLOW "* Enter \"-exit\"" " to exit the program.\n\n" RESET_COLOR);
 	
 	while(!cmdQuit)
@@ -311,7 +321,7 @@ void TextFileToArray(dictionary_ty* dict, char *file_path, char** chars_array)
     /* add first first char as a word to words array */
     DictionaryAddTo(dict, (char_arr_runner));
     
-    /* num_of_chars - 1 because of the one char we already added */
+    /* num_of_chars - 1 because of the one char we already added the first char */
 	while (i < num_of_chars - 1)
     {
     	character = fgetc(text_file);
@@ -394,8 +404,6 @@ size_t hash_func(const void *string, const void *param)
 		hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
 		++string_runner;
 	}
-/* TODO for debug: */
-/*	printf("HASH: %ld for string: %s\n", (hash % 17) , (char *)string);*/
 	
     return (hash);
 }
