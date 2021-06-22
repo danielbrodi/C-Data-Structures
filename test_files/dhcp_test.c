@@ -72,7 +72,6 @@ static void TestAllocateIP(void)
 	STATUS_TEST(DhcpCountFree, dhcp, (1<<2) - 4, "CountFree")
 	STATUS_TEST_2PARAM(DhcpAllocateIp, dhcp, &wanted, 1, "Allocate IP")
 	STATUS_TEST_2PARAM(DhcpAllocateIp, dhcp, &any, 1, "Allocate IP")
-
 	wanted = 0xABCDEF01;
 	DhcpFreeIp(dhcp, wanted);
 	STATUS_TEST(DhcpCountFree, dhcp, (1<<2) - 3, "CountFree")

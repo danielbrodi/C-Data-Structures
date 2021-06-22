@@ -11,9 +11,8 @@
 /********************************* Inclusions *********************************/
 
 #include <assert.h>			/*	assert					*/
-#include <math.h>			/*	pow						*/
 #include <stddef.h>			/*	size_t, NULL			*/
-#include <stdlib.h>			/*	malloc, calloc, free	*/
+#include <stdlib.h>			/*	calloc, free	*/
 #include <string.h>			/*	memset					*/
 
 #include "dhcp.h"
@@ -91,7 +90,7 @@ dhcp_ty *DhcpCreate(address_ty subnet, int num_variable_bits)
 	assert(num_variable_bits);
 	
 	/*	allocate memory for dhcp struct and handle errors*/
-	new_dhcp = (dhcp_ty *)calloc(1,sizeof(dhcp_ty));
+	new_dhcp = (dhcp_ty *)calloc(1, sizeof(dhcp_ty));
 	if (!new_dhcp)
 	{
 		return (NULL);
@@ -143,44 +142,39 @@ int DhcpAllocateIp(dhcp_ty *dhcp, address_ty *preferred_ip)
 	
 	root_ptr = &dhcp->root;
 	
-	ret = AllocateIpIMP(&root_ptr, preferred_ip, dhcp->num_variable_bits);
-	/* if AllocateIpIMP has failed because of a mem error: */
-	if (MEMORY_ALLOCATION_ERR == ret)
-	{
-		return (MEMORY_ALLOCATION_ERR);
-	}
+	*preferred_ip |= dhcp->subnet; 
 	
+	ret = AllocateIpIMP(&root_ptr, preferred_ip, dhcp->num_variable_bits);
+
 	/* if AllocateIpIMP has failed because no available ip: */
 	if (NO_AVAILABLE_IPS == ret)
 	{
 		/* Call AllocateIpIMP on the smallest ip in the subnet */
 		ret = AllocateIpIMP(&root_ptr, &dhcp->subnet, dhcp->num_variable_bits);
-		/* If also this failed: */
-		if (NO_AVAILABLE_IPS == ret)
-		{
-			/* return failured */
-			return (NO_AVAILABLE_IPS);
-		}
 	}
 		
-	/*	return success*/
-	return (SUCCESS);
+	/*	return */
+	return (ret);
 }
 /*----------------------------------------------------------------------------*/
 int AllocateIpIMP(trie_node_ty **node, address_ty *preferred_ip, 
 														int num_variable_bits)
 {
 	int level = num_variable_bits;
+	int ret = 0;
 	
-	trie_node_ty **next_node = NULL;
+	trie_node_ty *new_node = NULL;
+	
+	trie_node_ty **next_node_ptr = NULL;
 	trie_node_ty *curr_node = NULL;
-	int child_side = LEFT;
+	
+	int child_side = 0;
 		
 	/*	if node is null:*/
 	if (!(*node))
 	{
-		/*		create node, handle memory errors */
-		trie_node_ty *new_node = TrieCreateNodeIMP();
+		/*	create node, handle memory errors */
+		new_node = TrieCreateNodeIMP();
 		if (!new_node)
 		{
 			return (MEMORY_ALLOCATION_ERR);
@@ -191,7 +185,7 @@ int AllocateIpIMP(trie_node_ty **node, address_ty *preferred_ip,
 	}
 	
 	/*	if node is full:*/
-	if (((*node)->is_full))
+	if (IsNodeFull(*node))
 	{
 		/*	return  failure	 */
 		return (NO_AVAILABLE_IPS);
@@ -214,24 +208,30 @@ int AllocateIpIMP(trie_node_ty **node, address_ty *preferred_ip,
 	/* determine from which side the node is connected to its parent */
 	child_side = GetSideToGo(*preferred_ip, level - 1);
 	
-	/*next_node = child of node at correct side*/
-	next_node = &(curr_node->children[child_side]);
+	/*next_node_ptr = child of node at correct side*/
+	next_node_ptr = &(curr_node->children[child_side]);
 	
-	if (SUCCESS == AllocateIpIMP(next_node, preferred_ip, level - 1))
+	ret = AllocateIpIMP(next_node_ptr, preferred_ip, level - 1);
+	if (MEMORY_ALLOCATION_ERR == ret)
 	{
-		/*	if succeess:*/
-		/*		update fulness based on child nodes fulness status 	*/
-		curr_node->is_full = (IsNodeFull(curr_node->children[LEFT]) & 
+		return (ret);
+	}
+	
+	else if (SUCCESS == ret)
+	{
+		/*	if succeess:	*/
+		/*	update fulness based on child nodes fulness status 	*/
+		curr_node->is_full = (IsNodeFull(curr_node->children[LEFT]) && 
 										IsNodeFull(curr_node->children[RIGHT]));
 		/*return success*/
 		return (SUCCESS);
 	}
 	
-	/*	else (failure):	*/
+	/*	else (means not a memory failure but also were no available ips):	*/
 	else
 	{
 		/*	if side was left side, which means we failed to go on left child */
-		if (curr_node->children[LEFT] == *next_node)
+		if (curr_node->children[LEFT] == *next_node_ptr)
 		{
 			/*	nullify rest of the subtree */
 			*preferred_ip =  (*preferred_ip & (~(((address_ty)1 << level) - 1)));
@@ -313,7 +313,7 @@ size_t DhcpCountFree(dhcp_ty *dhcp)
 	/* asserts	*/
 	assert(dhcp);
 	
-	num_of_ips = pow(2, dhcp->num_variable_bits);
+	num_of_ips = (1 << dhcp->num_variable_bits);
 	
 	/*	traverse the trie and count occupied nodes using CountFullNodes func */
 	num_of_allocated_ips = CountUsedIpsIMP(&dhcp->root, dhcp->num_variable_bits);
@@ -341,7 +341,7 @@ size_t CountUsedIpsIMP(trie_node_ty *node, int level)
 	/*	if node is full, return 2^curr_level				*/
 	if (node->is_full)
 	{
-		return (pow(2, level));
+		return (1 << level);
 	}
 
 	/*	scan left subtree and return its size								*/

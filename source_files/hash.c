@@ -281,13 +281,14 @@ statistics_ty HTGetStatistics(const ht_ty *hash_table)
 	
 	qsort(lists_sizes, hash_table_size, sizeof(size_t), CompareListsLengthIMP);
 	
-	if ((0 == hash_table_size + 1) % 2)
+	if ((1 == (hash_table_size % 2)))
 	{
 		ret_stats.median_list = *(lists_sizes + (hash_table_size + 1) / 2);
 	}
 	else
 	{
-		ret_stats.median_list = *(lists_sizes + hash_table_size / 2);
+		ret_stats.median_list = ((*(lists_sizes + (hash_table_size + 1) / 2)) +
+								(*(lists_sizes + (hash_table_size) / 2))) / 2;
 	}
 	
 	ret_stats.longest_list = *(lists_sizes + hash_table_size - 1);
@@ -327,12 +328,7 @@ dlist_iter_ty FindItemIMP(ht_ty *hash_table, const void *key_to_find,
 	/*	 use find function of dlist */
 	ret_iter = DlistFind(DlistIteratorBegin(dlist), DlistIteratorEnd(dlist), 
 										CompareKeysIMP, &extended_param);
-										
-	if (DlistIteratorIsEqual(ret_iter, DlistIteratorEnd(dlist)))
-	{
-		return (DlistIteratorEnd(dlist));
-	}
-										
+	
 	return (ret_iter);
 }
 /******************************************************************************/
