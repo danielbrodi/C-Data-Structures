@@ -244,6 +244,10 @@ int AllocateIpIMP(trie_node_ty **node, address_ty *preferred_ip,
 				/* update ip to be with '1' at current level + 1 */
 				*preferred_ip |= ((address_ty)1 << (level - 1));
 				
+				/*	update fulness based on child nodes fulness status 	*/
+				curr_node->is_full = (IsNodeFull(curr_node->children[LEFT]) & 
+										IsNodeFull(curr_node->children[RIGHT]));
+				
 				/* return succeess */
 				return (SUCCESS);
 			}
