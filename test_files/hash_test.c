@@ -2,7 +2,7 @@
 * File:				hash.c						 		  								
 * Author:			Daniel Brodsky					  								
 * Date:				09-06-2021
-* Code Reviewer:	Ariel						   								
+* Code Reviewer:	Ariel White						   								
 * Version:			1.0					   								
 * Description:		Hash Map implementation tests file.		 
 \******************************************************************************/
