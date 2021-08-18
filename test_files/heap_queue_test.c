@@ -5,3 +5,8 @@
 * Version:			1.0							
 * Description:		Heap Queue tests file.
 \******************************************************************************/
+
+int main()
+{
+	return 0;
+}

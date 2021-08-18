@@ -12,36 +12,36 @@
 #include <stdlib.h>	/*	malloc, free	*/
 #include <stddef.h>	/* sise_t, NULL	*/
 
+#include "heap_queue.h"
 #include "utils.h"	/* boolean_ty, status_ty	*/
-#include "pqueue.h"
 #include "vector.h"
 #include "heap.h"
 
 /******************************************************************************/
 
-struct p_queue
+struct heap_queue
 {
 	vector_ty *vector;
 	Cmp_Func_ty cmp_func;
 };
 
 /******************************************************************************/
-p_queue_ty *PqueueCreate(Cmp_Func_ty cmp_func)
+heap_queue_ty *HeapQueueCreate(Cmp_Func_ty cmp_func)
 {
-	p_queue_ty *new_pqueue = NULL;
+	heap_queue_ty *new_pqueue = NULL;
 	
 	/*	assert for the cmp_func*/
 	assert(cmp_func);
 	
-	/*	create and allocate memory for pqueue structure*/
+	/*	create and allocate memory for HeapQueue structure*/
 	/*	handle memory issues if any*/
-	new_pqueue = (p_queue_ty *)malloc(sizeof(p_queue_ty));
+	new_pqueue = (heap_queue_ty *)malloc(sizeof(heap_queue_ty));
 	if (new_pqueue)
 	{
-		/*	assign cmp func to pqueue*/
+		/*	assign cmp func to HeapQueue*/
 			new_pqueue->cmp_func = cmp_func;
 			
-		/*	create and allocate memory for the vector inside the pqueue*/
+		/*	create and allocate memory for the vector inside the HeapQueue*/
 		/*	handle memory issues if any*/
 		new_pqueue->vector = VectorCreate(10);
 		if (!new_pqueue->vector)
@@ -53,132 +53,132 @@ p_queue_ty *PqueueCreate(Cmp_Func_ty cmp_func)
 		}
 	}
 	
-	/*	return pqueue*/
+	/*	return HeapQueue*/
 	return (new_pqueue);
 }
 /******************************************************************************/
-void PqueueDestroy(p_queue_ty *p_queue)
+void HeapQueueDestroy(heap_queue_ty *heap_queue)
 {
-	/*	if pqueue not null*/
-	if (p_queue)
+	/*	if HeapQueue not null*/
+	if (heap_queue)
 	{
 		/*	destroy vector with inbuilt function*/
-		VectorDestroy(p_queue->vector);
+		VectorDestroy(heap_queue->vector);
 		
-		/*	nullify pqueue struct members*/
-		p_queue->vector = NULL;
-		p_queue->cmp_func = NULL;
+		/*	nullify HeapQueue struct members*/
+		heap_queue->vector = NULL;
+		heap_queue->cmp_func = NULL;
 		
-		/*	free pqueue*/
-		free(p_queue);
+		/*	free HeapQueue*/
+		free(heap_queue);
 		
-		/*	nullify pqueue*/
-		p_queue = NULL;
+		/*	nullify HeapQueue*/
+		heap_queue = NULL;
 	}
 }
 /******************************************************************************/
-status_ty PqueueEnqueue(p_queue_ty *p_queue, void *data)
+status_ty HeapQueueEnqueue(heap_queue_ty *heap_queue, void *data)
 {
 	status_ty ret_status = SUCCESS;
 	
 	/*	asserts*/
-	assert(p_queue);
+	assert(heap_queue);
 	assert(data);
 	
 	/*	insert data to the end of the vector*/
 	/*	if failed - return failure*/
-	ret_status = VectorPushBack(p_queue->vector, data);
+	ret_status = VectorPushBack(heap_queue->vector, data);
 	if (SUCCESS == ret_status)
 	{
 		/*	HeapifyUp*/
-		HeapifyUp(VectorGetActualArray(p_queue->vector),PqueueSize(p_queue),
-															p_queue->cmp_func);
+		HeapifyUp(VectorGetActualArray(heap_queue->vector),HeapQueueSize(heap_queue),
+															heap_queue->cmp_func);
 	}
 	
 	return (ret_status);
 }
 /******************************************************************************/
-void *PqueueDequeue(p_queue_ty *p_queue)
+void *HeapQueueDequeue(heap_queue_ty *heap_queue)
 {
 	void *ret_data = NULL, *first_elem = NULL, *last_elem = NULL;
 	
 	status_ty status = SUCCESS;
 	
 	/*	asserts*/
-	assert(p_queue);
+	assert(heap_queue);
 	
 	/*peek first element and sava data to return it*/
-	ret_data = PqueuePeek(p_queue);
+	ret_data = HeapQueuePeek(heap_queue);
 	
 	/*	switch last and first element in the vector*/
 	first_elem = ret_data;
-	last_elem = *(VectorGetActualArray(p_queue->vector) + VectorSize(p_queue->vector) - 1);
+	last_elem = *(VectorGetActualArray(heap_queue->vector) + VectorSize(heap_queue->vector) - 1);
 	
-	VectorSetElement(p_queue->vector, 0, last_elem);
-	VectorSetElement(p_queue->vector, VectorSize(p_queue->vector) - 1, first_elem);
+	VectorSetElement(heap_queue->vector, 0, last_elem);
+	VectorSetElement(heap_queue->vector, VectorSize(heap_queue->vector) - 1, first_elem);
 	
 	/*	remove the last element of the vector*/
 	/*	if failed - return null*/
-	VectorPopBack(p_queue->vector);
+	VectorPopBack(heap_queue->vector);
 	
 	if (SUCCESS == status)
 	{
 		/*	HeapifyDown*/
-		HeapifyDown(VectorGetActualArray(p_queue->vector),PqueueSize(p_queue),
-															p_queue->cmp_func);
+		HeapifyDown(VectorGetActualArray(heap_queue->vector),HeapQueueSize(heap_queue),
+															heap_queue->cmp_func);
 	}
 	
 	return (SUCCESS == status ? ret_data : NULL);
 }
 /******************************************************************************/
-boolean_ty PqueueIsEmpty(const p_queue_ty *p_queue)
+boolean_ty HeapQueueIsEmpty(const heap_queue_ty *heap_queue)
 {
 	/*	asserts*/
-	assert(p_queue);
+	assert(heap_queue);
 	
 	/*	return true or false based on if the size of the vector is zero*/
-	return (0 == VectorSize(p_queue->vector));
+	return (0 == VectorSize(heap_queue->vector));
 }
 /******************************************************************************/
-size_t PqueueSize(const p_queue_ty *p_queue)
+size_t HeapQueueSize(const heap_queue_ty *heap_queue)
 {
 	/*	asserts*/
-	assert(p_queue);
+	assert(heap_queue);
 	
 	/*	return the size of the vector*/
-	return (VectorSize(p_queue->vector));
+	return (VectorSize(heap_queue->vector));
 }
 /******************************************************************************/
-void *PqueuePeek(const p_queue_ty *p_queue)
+void *HeapQueuePeek(const heap_queue_ty *heap_queue)
 {
 	void *ret_data = NULL;
 	
 	/*	asserts*/
-	assert(p_queue);
+	assert(heap_queue);
 	
 	/* get data of first element in the vector	*/
-	ret_data = *(VectorGetActualArray(p_queue->vector));
+	ret_data = *(VectorGetActualArray(heap_queue->vector));
 	
 	/*	return this data*/
 	return (ret_data);
 }
 /******************************************************************************/
-void PqueueClear(p_queue_ty *p_queue)
+void HeapQueueClear(heap_queue_ty *heap_queue)
 {
 	/*	assert*/
-	assert(p_queue);
+	assert(heap_queue);
 	
 	/*	resereve vector's size to 1 */
-	if (SUCCESS == VectorReserve(p_queue->vector, 1))
+	if (SUCCESS == VectorReserve(heap_queue->vector, 1))
 	{ 
 		/*	dequeue	last element */
-		PqueueDequeue(p_queue);
+		HeapQueueDequeue(heap_queue);
 	}
 }
 /******************************************************************************/
-void *PqueueErase(p_queue_ty *p_queue, Match_Function_ty match_func, void *param)
+void *HeapQueueErase(heap_queue_ty *heap_queue, Match_Function_ty match_func, void *param)
 {
-	UNUSED(p_queue);
+	UNUSED(heap_queue);
 	UNUSED(match_func);
 	UNUSED(param);
 	
