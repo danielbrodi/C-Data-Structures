@@ -1,22 +1,22 @@
 #COMPILER
 CC=gcc
-CFLAGS=-I./include/ -L. -Wl,-rpath=. -Wall
-CORFLAGS=-I./include/ -c -ansi -pedantic-errors -Wall -Wextra -g
-COFLAGS=-I./include/ -Wall -Werror -fpic -c
+CFLAGS=-I./header_files/ -L. -Wl,-rpath=. -Wall
+CORFLAGS=-I./header_files/ -c -ansi -pedantic-errors -Wall -Wextra -g
+COFLAGS=-I./header_files/ -Wall -Werror -fpic -c
 CSOFLAGS=-shared
 #vpath
-vpath %.h ./include/
-vpath %.c ./test/
-vpath %.c ./source/
+vpath %.h ./header_files/
+vpath %.c ./test_files/
+vpath %.c ./source_files/
 vpath %.o ./obj/
 #PATH
-SOURCE=./source/
+SOURCE=./source_files/
 OUT=-o ./obj/$@
-TEST=./test/
+TEST=./test_files/
 OBJPATH=./obj/
 #LISTS
-CFILESWP=$(wildcard ./source/*.c)
-TFILESWP=$(wildcard ./test/*.c)
+CFILESWP=$(wildcard ./source_files/*.c)
+TFILESWP=$(wildcard ./test_files/*.c)
 CFILES=$(notdir $(CFILESWP))
 TFILES=$(notdir $(TFILESWP))
 TOFILES=$(TFILES:.c=.o)
@@ -50,6 +50,9 @@ libds.so: $(OFILES)
 	$(CC) $(COFLAGS) -o $@ $< -g
 
 #CLEAN
-clean:
+cleanall:
 	rm -f *.o $(OBJPATH)*.o
 	rm -f $(NAMES) libds.so
+
+clean:
+	rm -f *.o $(OBJPATH)*.o
